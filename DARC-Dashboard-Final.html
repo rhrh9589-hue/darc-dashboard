@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DARC | Design Team Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#B8960C; --gold-light:#D4AF37; --gold-pale:#F5ECC7; --gold-bg:#FFFDF0;
+  --dark:#1A1A1A; --dark2:#2D2D2D; --gray:#6B7280; --gray-light:#F3F4F6; --gray-border:#E5E7EB;
+  --white:#FFFFFF; --green:#059669; --green-bg:#ECFDF5; --blue:#2563EB; --blue-bg:#EFF6FF;
+  --red:#DC2626; --red-bg:#FEF2F2; --orange:#D97706; --orange-bg:#FFFBEB;
+  --purple:#7C3AED; --purple-bg:#F5F3FF; --teal:#0891B2; --teal-bg:#ECFEFF;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08); --shadow:0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.12); --radius:12px; --radius-sm:8px;
+  --font-ar:'Cairo',sans-serif; --font-en:'Montserrat',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:100vh;}
+::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-track{background:#F1F1F1;}
+::-webkit-scrollbar-thumb{background:var(--gold-light);border-radius:3px;}
+
+/* ── LOGIN SCREENS ── */
+.screen{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;background:#F8F9FB;}
+.screen.hidden{display:none;}
+.auth-box{background:var(--white);border-radius:20px;padding:40px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.12);border:1px solid var(--gray-border);text-align:center;}
+.auth-logo{width:64px;height:64px;background:var(--dark);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:var(--font-en);font-weight:700;font-size:20px;color:var(--gold-light);}
+.auth-title{font-size:20px;font-weight:700;margin-bottom:6px;}
+.auth-sub{font-size:13px;color:var(--gray);margin-bottom:24px;}
+.user-select-grid{display:flex;flex-direction:column;gap:8px;}
+.user-option{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.2s;text-align:right;}
+.user-option:hover{border-color:var(--gold-light);background:var(--gold-bg);}
+.user-option .uav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--white);flex-shrink:0;}
+.user-option .uinfo .un{font-size:13px;font-weight:600;}
+.user-option .uinfo .ur{font-size:11px;color:var(--gray);margin-top:2px;}
+.badge-adm{font-size:10px;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-pale);padding:2px 8px;border-radius:10px;margin-right:auto;}
+
+/* password screen */
+.pass-back{display:flex;align-items:center;gap:6px;color:var(--gray);font-size:12px;cursor:pointer;margin-bottom:20px;width:fit-content;}
+.pass-back:hover{color:var(--dark);}
+.pass-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--white);margin:0 auto 12px;}
+.pass-name{font-size:16px;font-weight:700;margin-bottom:4px;}
+.pass-role{font-size:12px;color:var(--gray);margin-bottom:20px;}
+.pass-input-wrap{position:relative;}
+.pass-input{width:100%;padding:12px 48px 12px 16px;border:2px solid var(--gray-border);border-radius:var(--radius-sm);font-family:inherit;font-size:15px;outline:none;text-align:center;letter-spacing:3px;transition:border 0.2s;}
+.pass-input:focus{border-color:var(--gold-light);}
+.pass-input.error{border-color:var(--red);animation:shake 0.3s;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+.pass-toggle{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--gray);}
+.pass-error{color:var(--red);font-size:12px;margin-top:8px;min-height:18px;}
+.otp-badge{background:var(--orange-bg);border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--orange);margin-bottom:16px;text-align:right;}
+
+/* change password screen */
+.pwd-rule{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray);margin-top:4px;}
+.pwd-rule.ok{color:var(--green);}
+.pwd-rule.ok::before{content:"✅";}
+.pwd-rule.bad::before{content:"❌";}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;right:0;width:240px;height:100vh;background:var(--dark);z-index:100;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,0.15);}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:12px;}
+.logo-mark{width:42px;height:42px;background:var(--gold-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-en);font-weight:700;font-size:14px;color:var(--dark);flex-shrink:0;}
+.logo-text .brand{font-size:15px;font-weight:700;color:#fff;letter-spacing:1px;}
+.logo-text .sub{font-size:10px;color:rgba(255,255,255,0.45);margin-top:2px;}
+.sidebar-section{padding:20px 12px 8px;}
+.sidebar-section-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all 0.2s;color:rgba(255,255,255,0.6);font-size:13.5px;font-weight:500;margin-bottom:2px;}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--white);}
+.nav-item.active{background:rgba(184,150,12,0.18);color:var(--gold-light);}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-right:auto;background:var(--red);color:white;font-size:10px;border-radius:10px;padding:1px 6px;font-weight:600;display:none;}
+.nav-badge.vis{display:inline-block;}
+.sidebar-user{margin-top:auto;padding:16px 12px;border-top:1px solid rgba(255,255,255,0.08);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.05);border-radius:var(--radius-sm);}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--gold-light);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--dark);flex-shrink:0;}
+.user-info .uname{color:var(--white);font-size:13px;font-weight:600;}
+.user-info .urole{font-size:10px;background:rgba(184,150,12,0.2);color:var(--gold-light);padding:1px 6px;border-radius:4px;margin-top:3px;display:inline-block;}
+.sidebar-footer-btns{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+
+/* MAIN */
+.main{margin-right:240px;min-height:100vh;}
+/* TOPBAR */
+.topbar{background:var(--white);border-bottom:1px solid var(--gray-border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);}
+.topbar-title{font-size:15px;font-weight:700;}
+.topbar-actions{display:flex;align-items:center;gap:12px;}
+.notif-btn{position:relative;width:36px;height:36px;border-radius:50%;background:var(--gray-light);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background 0.2s;}
+.notif-btn:hover{background:var(--gold-pale);}
+.notif-count{position:absolute;top:-2px;right:-2px;background:var(--red);color:white;font-size:9px;border-radius:10px;padding:1px 5px;font-weight:700;min-width:16px;text-align:center;display:none;}
+.notif-count.visible{display:block;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all 0.2s;}
+.btn-primary{background:var(--gold-light);color:var(--dark);}
+.btn-primary:hover{background:var(--gold);}
+.btn-ghost{background:transparent;color:var(--gray);border:1px solid var(--gray-border);}
+.btn-ghost:hover{background:var(--gray-light);color:var(--dark);}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #FECACA;}
+.btn-danger:hover{background:#FEE2E2;}
+.btn-success{background:var(--green-bg);color:var(--green);border:1px solid #A7F3D0;}
+.btn-success:hover{background:#D1FAE5;}
+.btn-orange{background:var(--orange-bg);color:var(--orange);border:1px solid #FDE68A;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-full{width:100%;justify-content:center;}
+.lang-btn{background:var(--gold-bg);border:1px solid var(--gold-pale);color:var(--gold);font-family:var(--font-en);font-weight:600;font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer;transition:all 0.2s;}
+.lang-btn:hover{background:var(--gold-light);color:var(--white);}
+
+/* CONTENT */
+.content{padding:28px 32px;}
+.page{display:none;}
+.page.active{display:block;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.section-title{font-size:20px;font-weight:700;}
+.section-sub{font-size:13px;color:var(--gray);margin-top:2px;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.kpi-card{background:var(--white);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-border);position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;right:0;width:4px;height:100%;}
+.kpi-card.gold::before{background:var(--gold-light);}
+.kpi-card.green::before{background:var(--green);}
+.kpi-card.blue::before{background:var(--blue);}
+.kpi-card.red::before{background:var(--red);}
+.kpi-label{font-size:12px;color:var(--gray);font-weight:600;margin-bottom:8px;}
+.kpi-value{font-size:28px;font-weight:700;font-family:var(--font-en);}
+.kpi-card.gold .kpi-value{color:var(--gold);}
+.kpi-card.green .kpi-value{color:var(--green);}
+.kpi-card.blue .kpi-value{color:var(--blue);}
+.kpi-card.red .kpi-value{color:var(--red);}
+.kpi-icon{position:absolute;top:20px;left:20px;font-size:22px;opacity:0.15;}
+
+/* PROJECTS */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;}
+.project-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-border);box-shadow:var(--shadow-sm);overflow:hidden;cursor:pointer;transition:all 0.25s;}
+.project-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);}
+.project-card-header{padding:18px 20px 14px;border-bottom:1px solid var(--gray-border);display:flex;justify-content:space-between;align-items:flex-start;}
+.project-name{font-size:15px;font-weight:700;}
+.project-client{font-size:12px;color:var(--gray);margin-top:3px;}
+.status-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;flex-shrink:0;margin-right:8px;}
+.badge-active{background:var(--blue-bg);color:var(--blue);}
+.badge-done{background:var(--green-bg);color:var(--green);}
+.badge-delayed{background:var(--red-bg);color:var(--red);}
+.badge-pending{background:var(--orange-bg);color:var(--orange);}
+.project-card-body{padding:16px 20px;}
+.progress-label{display:flex;justify-content:space-between;margin-bottom:6px;}
+.progress-label span{font-size:12px;color:var(--gray);}
+.progress-label strong{font-size:12px;color:var(--dark);font-family:var(--font-en);}
+.progress-bar{height:8px;background:#F0F0F0;border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;transition:width 0.6s ease;}
+.progress-fill.green{background:linear-gradient(90deg,var(--green),#34D399);}
+.progress-fill.blue{background:linear-gradient(90deg,var(--blue),#60A5FA);}
+.progress-fill.red{background:linear-gradient(90deg,var(--red),#F87171);}
+.progress-fill.gold{background:linear-gradient(90deg,var(--gold),var(--gold-light));}
+.project-meta{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;}
+.project-meta-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gray);}
+.team-avatars{display:flex;margin-top:12px;}
+.team-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--white);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--white);margin-right:-8px;flex-shrink:0;}
+
+/* DETAIL */
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:13px;cursor:pointer;margin-bottom:20px;padding:6px 12px;border-radius:var(--radius-sm);transition:all 0.2s;}
+.back-btn:hover{background:var(--gray-light);color:var(--dark);}
+.detail-header{background:var(--white);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-border);margin-bottom:24px;}
+.detail-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
+.detail-title{font-size:22px;font-weight:700;}
+.detail-client{font-size:13px;color:var(--gray);margin-top:4px;}
+.detail-stats{display:flex;gap:24px;margin-top:16px;flex-wrap:wrap;}
+.detail-stat{text-align:center;}
+.detail-stat .num{font-size:22px;font-weight:700;font-family:var(--font-en);}
+.detail-stat .lbl{font-size:11px;color:var(--gray);margin-top:2px;}
+.two-col{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
+
+/* CARD */
+.card{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-border);box-shadow:var(--shadow-sm);overflow:hidden;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--gray-border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:700;}
+
+/* TASKS TABLE */
+.tasks-table{width:100%;border-collapse:collapse;}
+.tasks-table th{background:var(--gray-light);padding:10px 14px;font-size:11px;font-weight:700;color:var(--gray);text-align:right;white-space:nowrap;border-bottom:1px solid var(--gray-border);}
+.tasks-table td{padding:11px 14px;border-bottom:1px solid #F3F4F6;font-size:13px;vertical-align:middle;}
+.tasks-table tr:last-child td{border-bottom:none;}
+.tasks-table tr:hover td{background:#FAFAFA;}
+.task-name{font-weight:600;color:var(--dark);font-size:13px;}
+
+/* WF BADGES */
+.wf-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+.wf-not-started{background:var(--gray-light);color:var(--gray);}
+.wf-pending-accept{background:#FEF3C7;color:#92400E;}
+.wf-negotiating{background:var(--orange-bg);color:var(--orange);}
+.wf-accepted{background:var(--teal-bg);color:var(--teal);}
+.wf-in-progress{background:var(--blue-bg);color:var(--blue);}
+.wf-submitted{background:var(--orange-bg);color:var(--orange);}
+.wf-approved{background:#ECFDF5;color:#065F46;}
+.wf-rejected{background:var(--red-bg);color:var(--red);}
+.wf-delivery{background:#FEF3C7;color:#92400E;}
+.wf-client-approved{background:var(--green-bg);color:var(--green);}
+.wf-client-rejected{background:var(--red-bg);color:var(--red);}
+.wf-done{background:var(--green-bg);color:var(--green);font-weight:700;}
+
+/* MEMBER */
+.member-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-border);padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
+.member-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.member-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--white);flex-shrink:0;}
+.member-name{font-size:14px;font-weight:700;}
+.member-role{font-size:11px;color:var(--gray);margin-top:2px;}
+.member-stats{display:flex;gap:10px;margin-bottom:8px;}
+.m-stat{flex:1;text-align:center;background:var(--gray-light);border-radius:8px;padding:8px 4px;}
+.m-stat .n{font-size:16px;font-weight:700;font-family:var(--font-en);}
+.m-stat .l{font-size:10px;color:var(--gray);margin-top:2px;}
+.m-stat.done .n{color:var(--green);}
+.m-stat.wip .n{color:var(--blue);}
+.m-stat.rem .n{color:var(--orange);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:16px;padding:28px;width:90%;max-width:560px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:modalIn 0.25s ease;}
+.modal-lg{max-width:640px;}
+@keyframes modalIn{from{transform:scale(0.94);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-size:17px;font-weight:700;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray);}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--dark2);}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 14px;border:1px solid var(--gray-border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;outline:none;transition:border 0.2s;color:var(--dark);}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold-light);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-hint{font-size:11px;color:var(--gray);margin-top:4px;}
+.checkbox-label{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
+.checkbox-label input{width:16px;height:16px;accent-color:var(--gold-light);}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;}
+
+/* NOTIFICATION PANEL */
+.notif-panel{position:fixed;top:60px;left:20px;width:360px;max-height:500px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid var(--gray-border);z-index:150;overflow-y:auto;display:none;}
+.notif-panel.open{display:block;animation:fadeDown 0.2s ease;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.notif-header{padding:14px 16px;border-bottom:1px solid var(--gray-border);display:flex;align-items:center;justify-content:space-between;}
+.notif-header-title{font-size:14px;font-weight:700;}
+.notif-item{padding:12px 16px;border-bottom:1px solid #F9FAFB;display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:background 0.15s;}
+.notif-item:hover{background:#FAFAFA;}
+.notif-item.unread{background:#FFFDF0;}
+.notif-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.notif-text{font-size:12px;line-height:1.5;}
+.notif-text strong{font-size:13px;display:block;margin-bottom:2px;}
+.notif-time{font-size:10px;color:var(--gray);margin-top:4px;font-family:var(--font-en);}
+.notif-empty{padding:32px;text-align:center;color:var(--gray);font-size:13px;}
+
+/* DRAWINGS */
+.drawings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.drawing-card{background:var(--white);border-radius:var(--radius-sm);border:1px solid var(--gray-border);padding:14px;display:flex;align-items:flex-start;gap:12px;}
+.cat-section-header{background:var(--dark2);color:var(--gold-light);padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;margin-top:20px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+
+/* CHARTS */
+.chart-container{padding:16px 20px 20px;}
+.mini-chart{margin-top:8px;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bar-name{font-size:12px;width:80px;flex-shrink:0;}
+.bar-wrap{flex:1;background:#F0F0F0;border-radius:4px;height:10px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;}
+.bar-pct{font-size:11px;color:var(--gray);width:32px;text-align:left;font-family:var(--font-en);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dark);color:var(--white);padding:10px 20px;border-radius:20px;font-size:13px;z-index:500;transition:transform 0.3s ease;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* UPLOAD */
+.upload-area{border:2px dashed var(--gray-border);border-radius:var(--radius-sm);padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.upload-area:hover{border-color:var(--gold-light);background:var(--gold-bg);}
+.upload-area input{display:none;}
+.upload-preview{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--green-bg);border:1px solid #A7F3D0;border-radius:var(--radius-sm);margin-top:8px;font-size:12px;color:var(--green);}
+.notes-box{background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--radius-sm);padding:12px 16px;font-size:12px;line-height:1.6;}
+.notes-box .notes-label{font-weight:700;color:var(--orange);margin-bottom:4px;}
+.notes-box.danger{background:#FFF5F5;border-color:#FECACA;}
+.notes-box.danger .notes-label{color:var(--red);}
+.task-type-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;margin-top:3px;display:inline-block;}
+.empty-state{text-align:center;padding:40px;color:var(--gray);}
+.empty-state .icon{font-size:40px;margin-bottom:12px;opacity:0.4;}
+.tabs{display:flex;gap:4px;background:var(--gray-light);padding:4px;border-radius:var(--radius-sm);margin-bottom:20px;}
+.tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:600;border-radius:6px;cursor:pointer;color:var(--gray);transition:all 0.2s;}
+.tab.active{background:var(--white);color:var(--dark);box-shadow:var(--shadow-sm);}
+.dur-input{width:58px;border:1px solid var(--gray-border);border-radius:6px;padding:4px 6px;font-size:12px;text-align:center;font-family:inherit;outline:none;}
+.dur-input:disabled{background:var(--gray-light);color:var(--gray);}
+.lock-btn{background:none;border:none;cursor:pointer;font-size:14px;opacity:0.5;}
+.lock-btn:hover{opacity:1;}
+.delivery-box{background:linear-gradient(135deg,#FFFDF0,#FFF);border:1px solid var(--gold-pale);border-radius:var(--radius);padding:20px;margin-top:16px;}
+.delivery-box-title{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:12px;}
+
+/* save indicator */
+.save-indicator{position:fixed;bottom:24px;right:280px;background:var(--green-bg);border:1px solid #A7F3D0;color:var(--green);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:400;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.save-indicator.show{opacity:1;}
+
+@media(max-width:768px){
+  .sidebar{width:100%;height:auto;position:relative;}
+  .main{margin-right:0;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .two-col{grid-template-columns:1fr;}
+  .notif-panel{width:calc(100vw - 32px);left:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN 1: USER SELECT ══ -->
+<div class="screen" id="screenSelect">
+  <div class="auth-box">
+    <div class="auth-logo">D</div>
+    <div class="auth-title">DARC Design Team</div>
+    <div class="auth-sub">اختر حسابك للمتابعة</div>
+    <div class="user-select-grid" id="userSelectGrid"></div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: PASSWORD ══ -->
+<div class="screen hidden" id="screenPassword">
+  <div class="auth-box">
+    <div class="pass-back" onclick="backToSelect()">← <span data-ar="العودة" data-en="Back">العودة</span></div>
+    <div class="pass-avatar" id="passAvatar"></div>
+    <div class="pass-name" id="passName"></div>
+    <div class="pass-role" id="passRole"></div>
+    <div class="otp-badge" id="otpBadge" style="display:none">
+      🔐 <span data-ar="هذه أول مرة تدخل — كلمة المرور المؤقتة هي" data-en="First login — your temporary password is">هذه أول مرة تدخل — كلمة المرور المؤقتة هي</span> <strong>D_12345678</strong><br>
+      <span data-ar="بعد الدخول ستُطلب منك تغييرها فوراً" data-en="You will be asked to change it immediately">بعد الدخول ستُطلب منك تغييرها فوراً</span>
+    </div>
+    <div class="pass-input-wrap">
+      <input class="pass-input" type="password" id="passInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitPassword()">
+      <button class="pass-toggle" onclick="togglePassVis()" id="passToggleBtn">👁️</button>
+    </div>
+    <div class="pass-error" id="passError"></div>
+    <br>
+    <button class="btn btn-primary btn-full" onclick="submitPassword()"><span data-ar="دخول ←" data-en="Login →">دخول ←</span></button>
+    <div style="margin-top:14px;">
+      <button onclick="openForgotPass()" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;">
+        <span data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3a: REGISTER EMAIL (after OTP login, before change password) ══ -->
+<div class="screen hidden" id="screenRegEmail">
+  <div class="auth-box">
+    <div class="auth-logo">📧</div>
+    <div class="auth-title" data-ar="تسجيل إيميلك" data-en="Register Your Email">تسجيل إيميلك</div>
+    <div class="auth-sub" data-ar="يُستخدم فقط لاستعادة كلمة المرور — لن يُشارك مع أي جهة" data-en="Used only for password recovery — never shared">يُستخدم فقط لاستعادة كلمة المرور — لن يُشارك مع أي جهة</div>
+    <div class="form-group" style="text-align:right;">
+      <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email Address">البريد الإلكتروني</label>
+      <input class="form-input" type="email" id="regEmail" placeholder="example@email.com" style="direction:ltr;text-align:left;">
+    </div>
+    <div style="background:var(--blue-bg);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px;text-align:right;">
+      💡 <span data-ar="إذا نسيت كلمة مرورك، سيُرسل كود استعادة على هذا الإيميل" data-en="If you forget your password, a recovery code will be sent to this email">إذا نسيت كلمة مرورك، سيُرسل كود استعادة على هذا الإيميل</span>
+    </div>
+    <div class="pass-error" id="regEmailError"></div>
+    <button class="btn btn-primary btn-full" onclick="saveRegEmail()"><span data-ar="متابعة ←" data-en="Continue →">متابعة ←</span></button>
+    <div style="margin-top:10px;">
+      <button onclick="skipRegEmail()" style="background:none;border:none;color:var(--gray);font-size:12px;cursor:pointer;font-family:inherit;">
+        <span data-ar="تخطي الآن (غير موصى به)" data-en="Skip for now (not recommended)">تخطي الآن (غير موصى به)</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 4: FORGOT PASSWORD ══ -->
+<div class="screen hidden" id="screenForgotPass">
+  <div class="auth-box">
+    <div class="pass-back" onclick="closeForgotPass()">← <span data-ar="العودة" data-en="Back">العودة</span></div>
+    <div class="auth-logo">🔑</div>
+    <div class="auth-title" data-ar="استعادة كلمة المرور" data-en="Password Recovery">استعادة كلمة المرور</div>
+    <div id="forgotStep1">
+      <div class="auth-sub" data-ar="سيُرسل كود مؤقت على إيميلك المسجل وعلى إيميل المدير" data-en="A temporary code will be sent to your registered email and the admin email">سيُرسل كود مؤقت على إيميلك المسجل وعلى إيميل المدير</div>
+      <div id="forgotUserInfo" style="background:var(--gold-bg);border:1px solid var(--gold-pale);border-radius:8px;padding:12px;margin-bottom:16px;text-align:right;font-size:13px;"></div>
+      <button class="btn btn-primary btn-full" onclick="sendResetCode()"><span data-ar="إرسال كود الاستعادة" data-en="Send Recovery Code">إرسال كود الاستعادة</span></button>
+      <div class="pass-error" id="forgotError" style="margin-top:8px;"></div>
+    </div>
+    <div id="forgotStep2" style="display:none;">
+      <div class="auth-sub" data-ar="أدخل الكود المرسل على إيميلك" data-en="Enter the code sent to your email">أدخل الكود المرسل على إيميلك</div>
+      <div style="background:var(--green-bg);border:1px solid #A7F3D0;border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--green);text-align:right;" id="resetCodeInfo"></div>
+      <div class="form-group">
+        <input class="pass-input" type="text" id="resetCodeInput" placeholder="XXXXXX" style="letter-spacing:6px;text-align:center;font-size:20px;text-transform:uppercase;" maxlength="6">
+      </div>
+      <div class="form-group" style="text-align:right;">
+        <label class="form-label" data-ar="كلمة المرور الجديدة" data-en="New Password">كلمة المرور الجديدة</label>
+        <div class="pass-input-wrap">
+          <input class="pass-input" type="password" id="resetNewPass1" placeholder="••••••••" oninput="checkResetPassRules()">
+          <button class="pass-toggle" onclick="togglePassVis2('resetNewPass1')">👁️</button>
+        </div>
+      </div>
+      <div style="text-align:right;margin-bottom:12px;">
+        <div class="pwd-rule" id="rrule-len" data-ar="8 أحرف على الأقل" data-en="At least 8 characters">8 أحرف على الأقل</div>
+        <div class="pwd-rule" id="rrule-num" data-ar="تحتوي على رقم" data-en="Contains a number">تحتوي على رقم</div>
+        <div class="pwd-rule" id="rrule-upper" data-ar="تحتوي على حرف كبير" data-en="Contains uppercase letter">تحتوي على حرف كبير</div>
+      </div>
+      <div class="form-group" style="text-align:right;">
+        <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
+        <div class="pass-input-wrap">
+          <input class="pass-input" type="password" id="resetNewPass2" placeholder="••••••••">
+          <button class="pass-toggle" onclick="togglePassVis2('resetNewPass2')">👁️</button>
+        </div>
+      </div>
+      <div class="pass-error" id="resetError"></div>
+      <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="submitResetPassword()">
+        <span data-ar="✅ تعيين كلمة المرور الجديدة" data-en="✅ Set New Password">✅ تعيين كلمة المرور الجديدة</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: CHANGE PASSWORD (first login) ══ -->
+<div class="screen hidden" id="screenChangePass">
+  <div class="auth-box">
+    <div class="auth-logo">🔐</div>
+    <div class="auth-title" data-ar="تعيين كلمة مرور جديدة" data-en="Set New Password">تعيين كلمة مرور جديدة</div>
+    <div class="auth-sub" data-ar="هذه خطوة إلزامية — ستُستخدم في كل دخول قادم" data-en="Mandatory step — will be used for all future logins">هذه خطوة إلزامية — ستُستخدم في كل دخول قادم</div>
+    <div class="form-group" style="text-align:right;">
+      <label class="form-label">كلمة المرور الجديدة</label>
+      <div class="pass-input-wrap">
+        <input class="pass-input" type="password" id="newPass1" placeholder="كلمة مرور قوية..." oninput="checkPassRules()">
+        <button class="pass-toggle" onclick="togglePassVis2('newPass1')">👁️</button>
+      </div>
+    </div>
+    <div style="text-align:right;margin-bottom:12px;">
+      <div class="pwd-rule" id="rule-len">يجب أن تكون 8 أحرف على الأقل</div>
+      <div class="pwd-rule" id="rule-num">تحتوي على رقم</div>
+      <div class="pwd-rule" id="rule-upper">تحتوي على حرف كبير (A-Z)</div>
+    </div>
+    <div class="form-group" style="text-align:right;">
+      <label class="form-label">تأكيد كلمة المرور</label>
+      <div class="pass-input-wrap">
+        <input class="pass-input" type="password" id="newPass2" placeholder="أعد كتابة كلمة المرور">
+        <button class="pass-toggle" onclick="togglePassVis2('newPass2')">👁️</button>
+      </div>
+    </div>
+    <div class="pass-error" id="changePassError"></div>
+    <br>
+    <button class="btn btn-primary btn-full" onclick="submitChangePassword()">✅ حفظ وبدء العمل</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+<!-- SAVE INDICATOR -->
+<div class="save-indicator" id="saveIndicator">💾 تم الحفظ</div>
+
+<!-- NOTIFICATIONS -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header">
+    <div class="notif-header-title">🔔 الإشعارات</div>
+    <button class="btn btn-ghost btn-sm" onclick="markAllRead()">قراءة الكل</button>
+  </div>
+  <div id="notifList"></div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">D</div>
+    <div class="logo-text"><div class="brand">DARC</div><div class="sub">المتقدمة للإنشاءات</div></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label" data-ar="الرئيسية" data-en="MAIN">الرئيسية</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span><span data-ar="لوحة التحكم" data-en="Dashboard">لوحة التحكم</span></div>
+    <div class="nav-item" onclick="showPage('projects')"><span class="nav-icon">🏗️</span><span data-ar="المشاريع" data-en="Projects">المشاريع</span></div>
+    <div class="nav-item" onclick="showPage('myTasks')">
+      <span class="nav-icon">📋</span><span data-ar="مهامي" data-en="My Tasks">مهامي</span>
+      <span class="nav-badge" id="myTasksBadge">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('drawingsDB')"><span class="nav-icon">📐</span><span data-ar="قاعدة المخططات" data-en="Drawings DB">قاعدة المخططات</span></div>
+  </div>
+  <div class="sidebar-section" id="adminNavSection" style="display:none">
+    <div class="sidebar-section-label" data-ar="إدارة" data-en="ADMIN">إدارة</div>
+    <div class="nav-item" onclick="showPage('team')"><span class="nav-icon">👥</span><span data-ar="الفريق" data-en="Team">الفريق</span></div>
+    <div class="nav-item" onclick="openNewTaskModal(null)"><span class="nav-icon">➕</span><span data-ar="مهمة جديدة" data-en="New Task">مهمة جديدة</span></div>
+    <div class="nav-item" onclick="openModal('newProjectModal')"><span class="nav-icon">🏗️</span><span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></div>
+    <div class="nav-item" onclick="showPage('adminDrawings')"><span class="nav-icon">🗂️</span><span data-ar="إدارة المخططات" data-en="Manage Drawings">إدارة المخططات</span></div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebarAvatar"></div>
+      <div class="user-info"><div class="uname" id="sidebarName"></div><div class="urole" id="sidebarRole"></div></div>
+    </div>
+    <div class="sidebar-footer-btns">
+      <button class="btn btn-ghost btn-sm btn-full" onclick="openChangePassModal()"><span data-ar="🔑 تغيير كلمة المرور" data-en="🔑 Change Password">🔑 تغيير كلمة المرور</span></button>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="logout()"><span data-ar="تسجيل الخروج" data-en="Logout">تسجيل الخروج</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title"><span id="topbarTitle">لوحة التحكم</span></div>
+    <div class="topbar-actions">
+      <button class="notif-btn" onclick="toggleNotif()" id="notifBtn">🔔<span class="notif-count" id="notifCount">0</span></button>
+      <button class="lang-btn" onclick="toggleLang()">EN / عر</button>
+      <button class="btn btn-primary btn-sm" id="adminActionBtn" style="display:none" onclick="openModal('newProjectModal')">➕ <span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="page active" id="page-dashboard">
+      <div class="section-header"><div>
+        <div class="section-title" data-ar="لوحة التحكم الرئيسية" data-en="Main Dashboard">لوحة التحكم الرئيسية</div>
+        <div class="section-sub" data-ar="فريق التصميم — شركة دارك المتقدمة" data-en="Design Team — DARC Advanced Construction">فريق التصميم — شركة دارك المتقدمة</div>
+      </div></div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card"><div class="card-header"><div class="card-title" data-ar="نسبة إنجاز المشاريع" data-en="Projects Progress">نسبة إنجاز المشاريع</div></div><div class="chart-container" id="projectsChart"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title" data-ar="إنجاز أعضاء الفريق" data-en="Team Members Progress">إنجاز أعضاء الفريق</div></div><div class="chart-container" id="teamChart"></div></div>
+      </div>
+    </div>
+    <div class="page" id="page-projects">
+      <div class="section-header">
+        <div>
+          <div class="section-title" data-ar="المشاريع" data-en="Projects">المشاريع</div>
+          <div class="section-sub" data-ar="جميع مشاريع فريق التصميم" data-en="All design team projects">جميع مشاريع فريق التصميم</div>
+        </div>
+        <div id="adminProjectBtn" style="display:none"><button class="btn btn-primary" onclick="openModal('newProjectModal')">➕ <span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></button></div>
+      </div>
+      <div class="projects-grid" id="projectsGrid"></div>
+    </div>
+    <div class="page" id="page-projectDetail">
+      <div class="back-btn" onclick="showPage('projects')">← <span data-ar="العودة للمشاريع" data-en="Back to Projects">العودة للمشاريع</span></div>
+      <div id="projectDetailContent"></div>
+    </div>
+    <div class="page" id="page-myTasks">
+      <div class="section-header"><div>
+        <div class="section-title" data-ar="📋 مهامي" data-en="📋 My Tasks">📋 مهامي</div>
+        <div class="section-sub" data-ar="جميع المهام المعينة لي" data-en="All tasks assigned to me">جميع المهام المعينة لي</div>
+      </div></div>
+      <div id="myTasksContent"></div>
+    </div>
+    <div class="page" id="page-drawingsDB">
+      <div class="section-header"><div>
+        <div class="section-title" data-ar="قاعدة بيانات المخططات" data-en="Drawings Database">قاعدة بيانات المخططات</div>
+        <div class="section-sub" data-ar="جميع أنواع المخططات والمهام المعتمدة" data-en="All approved drawing & task types">جميع أنواع المخططات والمهام المعتمدة</div>
+      </div></div>
+      <div id="drawingsDBContent"></div>
+    </div>
+    <div class="page" id="page-team">
+      <div class="section-header"><div>
+        <div class="section-title" data-ar="فريق التصميم" data-en="Design Team">فريق التصميم</div>
+        <div class="section-sub" data-ar="أداء الأعضاء عبر جميع المشاريع" data-en="Member performance across all projects">أداء الأعضاء عبر جميع المشاريع</div>
+      </div></div>
+      <div id="teamPage"></div>
+    </div>
+    <div class="page" id="page-adminDrawings">
+      <div class="section-header">
+        <div>
+          <div class="section-title" data-ar="🗂️ إدارة قاعدة المخططات" data-en="🗂️ Manage Drawings DB">🗂️ إدارة قاعدة المخططات</div>
+          <div class="section-sub" data-ar="إضافة وحذف المخططات والمهام" data-en="Add and remove drawing & task types">إضافة وحذف المخططات والمهام</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('addDrawingModal')">➕ <span data-ar="إضافة نوع جديد" data-en="Add New Type">إضافة نوع جديد</span></button>
+      </div>
+      <div id="adminDrawingsContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+<!-- New Project -->
+<div class="modal-overlay" id="newProjectModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🏗️ إنشاء مشروع جديد</div><button class="modal-close" onclick="closeModal('newProjectModal')">×</button></div>
+    <div class="form-group"><label class="form-label">اسم المشروع</label><input class="form-input" id="np_name" placeholder="مثال: صالون الخالدية"></div>
+    <div class="form-group"><label class="form-label">اسم العميل</label><input class="form-input" id="np_client" placeholder="اسم العميل أو الشركة"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">تاريخ البداية</label><input class="form-input" type="date" id="np_start"></div>
+      <div class="form-group"><label class="form-label">تاريخ التسليم</label><input class="form-input" type="date" id="np_end"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">اختر المخططات / المهام (اختياري)</label>
+      <div id="drawingsCheckboxes" style="max-height:240px;overflow-y:auto;padding:6px;border:1px solid var(--gray-border);border-radius:8px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('newProjectModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="createProject()">✅ إنشاء المشروع</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Task -->
+<div class="modal-overlay" id="assignTaskModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title" id="assignModalTitle">🎯 تعيين مهمة</div><button class="modal-close" onclick="closeModal('assignTaskModal')">×</button></div>
+    <div id="taskSourceSection">
+      <div class="tabs" id="taskSourceTabs">
+        <div class="tab active" onclick="switchTaskSource('drawing')">📐 من قاعدة المخططات</div>
+        <div class="tab" onclick="switchTaskSource('free')">✏️ مهمة حرة</div>
+      </div>
+      <div id="taskSourceDrawing">
+        <div class="form-group"><label class="form-label">المشروع</label><select class="form-select" id="assign_project" onchange="populateDrawingSelect()"></select></div>
+        <div class="form-group"><label class="form-label">المخطط / المهمة</label><select class="form-select" id="assign_drawing"></select></div>
+      </div>
+      <div id="taskSourceFree" style="display:none">
+        <div class="form-group"><label class="form-label">المشروع</label><select class="form-select" id="assign_project_free"></select></div>
+        <div class="form-group"><label class="form-label">اسم المهمة (عربي)</label><input class="form-input" id="free_name_ar" placeholder="مثال: إعداد عرض سعر"></div>
+        <div class="form-group"><label class="form-label">Task Name (English)</label><input class="form-input" id="free_name_en" style="direction:ltr;font-family:var(--font-en);"></div>
+        <div class="form-group"><label class="form-label">نوع المهمة</label>
+          <select class="form-select" id="free_type">
+            <option value="general">عام</option><option value="drawing">مخطط</option>
+            <option value="table">جدول كميات</option><option value="letter">خطاب</option>
+            <option value="offer">عرض سعر</option><option value="report">تقرير</option>
+            <option value="meeting">اجتماع / محضر</option><option value="other">أخرى</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">وصف المهمة</label><textarea class="form-textarea" id="free_desc" rows="2"></textarea></div>
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--gray-border);margin:16px 0;">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">المنفذ (مطلوب)</label><select class="form-select" id="assignMember"></select></div>
+      <div class="form-group"><label class="form-label">المراجع عند الانتهاء</label><select class="form-select" id="assignReviewer"></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">المدة المقترحة (أيام)</label><input class="form-input" type="number" id="assignDuration" min="1"></div>
+      <div class="form-group"><label class="form-label">تاريخ البداية</label><input class="form-input" type="date" id="assignStart"></div>
+    </div>
+    <div class="form-group"><label class="form-label">جهة التسليم النهائي</label>
+      <select class="form-select" id="assignDeliveryTo">
+        <option value="client">المالك / العميل</option><option value="site">مهندس الموقع</option>
+        <option value="internal">داخلي</option><option value="both">الاثنان</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">ملاحظات للمنفذ</label><textarea class="form-textarea" id="assignAdminNotes" rows="2"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('assignTaskModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveAssignment()">💾 حفظ وإرسال الإشعار</button>
+    </div>
+  </div>
+</div>
+
+<!-- Task Accept -->
+<div class="modal-overlay" id="taskAcceptModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📋 مراجعة المهمة المعيّنة</div><button class="modal-close" onclick="closeModal('taskAcceptModal')">×</button></div>
+    <div id="taskAcceptContent"></div><div class="modal-footer" id="taskAcceptFooter"></div>
+  </div>
+</div>
+
+<!-- Duration Negotiation -->
+<div class="modal-overlay" id="negResponseModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">⏱️ رد على طلب تعديل المدة</div><button class="modal-close" onclick="closeModal('negResponseModal')">×</button></div>
+    <div id="negResponseContent"></div><div class="modal-footer" id="negResponseFooter"></div>
+  </div>
+</div>
+
+<!-- Submit Task -->
+<div class="modal-overlay" id="submitTaskModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title" id="submitTaskTitle">📤 تسليم المهمة</div><button class="modal-close" onclick="closeModal('submitTaskModal')">×</button></div>
+    <div id="submitTaskContent"></div><div class="modal-footer" id="submitTaskFooter"></div>
+  </div>
+</div>
+
+<!-- Review -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">🔍 مراجعة المهمة</div><button class="modal-close" onclick="closeModal('reviewModal')">×</button></div>
+    <div id="reviewContent"></div><div class="modal-footer" id="reviewFooter"></div>
+  </div>
+</div>
+
+<!-- Delivery -->
+<div class="modal-overlay" id="deliveryModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📦 تسليم المخططات</div><button class="modal-close" onclick="closeModal('deliveryModal')">×</button></div>
+    <div id="deliveryContent"></div><div class="modal-footer" id="deliveryFooter"></div>
+  </div>
+</div>
+
+<!-- Add Drawing -->
+<div class="modal-overlay" id="addDrawingModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">➕ إضافة نوع مهمة / مخطط</div><button class="modal-close" onclick="closeModal('addDrawingModal')">×</button></div>
+    <div class="form-group"><label class="form-label">الفئة</label><select class="form-select" id="nd_category"></select></div>
+    <div class="form-group"><label class="form-label">الاسم بالعربي</label><input class="form-input" id="nd_ar"></div>
+    <div class="form-group"><label class="form-label">Name in English</label><input class="form-input" id="nd_en" style="direction:ltr;font-family:var(--font-en);"></div>
+    <div class="form-group"><label class="form-label">النوع</label>
+      <select class="form-select" id="nd_type">
+        <option value="drawing">مخطط</option><option value="table">جدول كميات</option>
+        <option value="report">تقرير</option><option value="letter">خطاب</option>
+        <option value="offer">عرض سعر</option><option value="other">أخرى</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('addDrawingModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="addNewDrawing()">✅ إضافة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Member -->
+<div class="modal-overlay" id="addMemberModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">➕ إضافة موظف جديد</div><button class="modal-close" onclick="closeModal('addMemberModal')">×</button></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">الاسم الكامل (عربي) *</label><input class="form-input" id="nm_name" placeholder="مثال: محمد العمري"></div>
+      <div class="form-group"><label class="form-label">Full Name (English)</label><input class="form-input" id="nm_nameEn" placeholder="Mohammed Al-Omari" style="direction:ltr;font-family:var(--font-en);"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">المنصب / التخصص *</label><input class="form-input" id="nm_role" placeholder="مثال: مهندس معماري"></div>
+      <div class="form-group"><label class="form-label">Role (English)</label><input class="form-input" id="nm_roleEn" placeholder="Architectural Engineer" style="direction:ltr;font-family:var(--font-en);"></div>
+    </div>
+    <div class="form-group"><label class="form-label">كلمة المرور المؤقتة للموظف</label>
+      <input class="form-input" id="nm_otp" value="D_12345678" style="direction:ltr;font-family:var(--font-en);">
+      <div class="form-hint">⚠️ أعطِ الموظف هذه الكلمة — سيُطلب منه تغييرها فور أول دخول</div>
+    </div>
+    <div style="background:var(--blue-bg);border-radius:8px;padding:12px;font-size:12px;color:var(--blue);margin-top:4px;">
+      💡 بعد الإضافة، الموظف يختار اسمه من شاشة الدخول ويكتب كلمة المرور المؤقتة
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('addMemberModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveNewMember()">✅ إضافة للفريق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Project -->
+<div class="modal-overlay" id="editProjectModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">✏️ تعديل بيانات المشروع</div><button class="modal-close" onclick="closeModal('editProjectModal')">×</button></div>
+    <input type="hidden" id="ep_id">
+    <div class="form-group"><label class="form-label">اسم المشروع</label><input class="form-input" id="ep_name"></div>
+    <div class="form-group"><label class="form-label">اسم العميل</label><input class="form-input" id="ep_client"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">تاريخ البداية</label><input class="form-input" type="date" id="ep_start"></div>
+      <div class="form-group"><label class="form-label">تاريخ التسليم</label><input class="form-input" type="date" id="ep_end"></div>
+    </div>
+    <div class="form-group"><label class="form-label">الحالة</label>
+      <select class="form-select" id="ep_status">
+        <option value="active">جاري</option><option value="delayed">متأخر</option>
+        <option value="done">منجز</option><option value="pending">معلق</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('editProjectModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveProjectEdit()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal (from sidebar) -->
+<div class="modal-overlay" id="changePassModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🔑 تغيير كلمة المرور</div><button class="modal-close" onclick="closeModal('changePassModal')">×</button></div>
+    <div class="form-group"><label class="form-label">كلمة المرور الحالية</label>
+      <input class="form-input" type="password" id="cp_current" placeholder="••••••••">
+    </div>
+    <div class="form-group"><label class="form-label">كلمة المرور الجديدة</label>
+      <input class="form-input" type="password" id="cp_new1" placeholder="كلمة مرور قوية..." oninput="checkPassRulesModal()">
+    </div>
+    <div style="margin-bottom:12px;">
+      <div class="pwd-rule" id="mrule-len">يجب أن تكون 8 أحرف على الأقل</div>
+      <div class="pwd-rule" id="mrule-num">تحتوي على رقم</div>
+      <div class="pwd-rule" id="mrule-upper">تحتوي على حرف كبير</div>
+    </div>
+    <div class="form-group"><label class="form-label">تأكيد كلمة المرور الجديدة</label>
+      <input class="form-input" type="password" id="cp_new2" placeholder="••••••••">
+    </div>
+    <div class="pass-error" id="cpError"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('changePassModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveChangedPassword()">✅ حفظ كلمة المرور</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// PASSWORD SYSTEM
+// ══════════════════════════════════════════════════════
+const DEFAULT_OTP = "D_12345678";
+
+// Simple hash (not cryptographic — for offline HTML use only)
+function hashPass(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){h=Math.imul(31,h)+str.charCodeAt(i)|0;}
+  return "h"+Math.abs(h).toString(36);
+}
+
+// Load/save passwords from localStorage
+function loadPasswords(){
+  try{ return JSON.parse(localStorage.getItem("darc_passwords")||"{}"); }
+  catch(e){ return {}; }
+}
+function savePasswords(obj){
+  localStorage.setItem("darc_passwords", JSON.stringify(obj));
+}
+function getPassHash(userId){ return loadPasswords()[userId] || null; }
+function setPassHash(userId, plain){
+  const obj = loadPasswords();
+  obj[userId] = hashPass(plain);
+  savePasswords(obj);
+}
+function isFirstLogin(userId){ return !loadPasswords()[userId]; }
+function checkPassword(userId, plain){
+  const stored = getPassHash(userId);
+  if(!stored) return plain === DEFAULT_OTP; // first time
+  return stored === hashPass(plain);
+}
+
+// ── Password UI state ──
+let _loginUser = null;
+
+function backToSelect(){
+  _loginUser = null;
+  document.getElementById("screenPassword").classList.add("hidden");
+  document.getElementById("screenSelect").classList.remove("hidden");
+  document.getElementById("passInput").value="";
+  document.getElementById("passError").textContent="";
+}
+
+function selectUser(uid){
+  const u = USERS.find(x=>x.id===uid); if(!u) return;
+  _loginUser = u;
+  document.getElementById("screenSelect").classList.add("hidden");
+  const s = document.getElementById("screenPassword");
+  s.classList.remove("hidden");
+  const av = document.getElementById("passAvatar");
+  av.textContent = u.name[0]; av.style.background = u.color;
+  document.getElementById("passName").textContent = u.name;
+  document.getElementById("passRole").textContent = u.role;
+  document.getElementById("otpBadge").style.display = isFirstLogin(u.id)?"":"none";
+  document.getElementById("passInput").value="";
+  document.getElementById("passError").textContent="";
+  setTimeout(()=>document.getElementById("passInput").focus(),200);
+}
+
+function togglePassVis(){
+  const inp=document.getElementById("passInput");
+  inp.type = inp.type==="password"?"text":"password";
+}
+function togglePassVis2(id){
+  const inp=document.getElementById(id);
+  inp.type = inp.type==="password"?"text":"password";
+}
+
+function submitPassword(){
+  const plain = document.getElementById("passInput").value;
+  if(!plain){ document.getElementById("passError").textContent="يرجى إدخال كلمة المرور"; return; }
+  if(!checkPassword(_loginUser.id, plain)){
+    const inp=document.getElementById("passInput");
+    inp.classList.add("error");
+    document.getElementById("passError").textContent="كلمة المرور غير صحيحة ❌";
+    setTimeout(()=>inp.classList.remove("error"),400);
+    return;
+  }
+  // Check if first login (OTP)
+  if(isFirstLogin(_loginUser.id)){
+    // Show email registration first, then change password
+    showEmailRegistration();
+    return;
+  }
+  finishLogin(_loginUser);
+}
+
+function checkPassRules(){
+  const v = document.getElementById("newPass1").value;
+  const rules=[
+    {id:"rule-len",  ok:v.length>=8},
+    {id:"rule-num",  ok:/\d/.test(v)},
+    {id:"rule-upper",ok:/[A-Z]/.test(v)},
+  ];
+  rules.forEach(r=>{
+    const el=document.getElementById(r.id);
+    el.classList.toggle("ok",r.ok);
+    el.classList.toggle("bad",!r.ok&&v.length>0);
+  });
+}
+function checkPassRulesModal(){
+  const v = document.getElementById("cp_new1").value;
+  const rules=[
+    {id:"mrule-len",  ok:v.length>=8},
+    {id:"mrule-num",  ok:/\d/.test(v)},
+    {id:"mrule-upper",ok:/[A-Z]/.test(v)},
+  ];
+  rules.forEach(r=>{
+    const el=document.getElementById(r.id);
+    if(!el) return;
+    el.classList.toggle("ok",r.ok);
+    el.classList.toggle("bad",!r.ok&&v.length>0);
+  });
+}
+
+function submitChangePassword(){
+  const p1=document.getElementById("newPass1").value;
+  const p2=document.getElementById("newPass2").value;
+  const err=document.getElementById("changePassError");
+  if(p1.length<8){err.textContent="يجب أن تكون 8 أحرف على الأقل"; return;}
+  if(!/\d/.test(p1)){err.textContent="يجب أن تحتوي على رقم"; return;}
+  if(!/[A-Z]/.test(p1)){err.textContent="يجب أن تحتوي على حرف كبير"; return;}
+  if(p1!==p2){err.textContent="كلمتا المرور غير متطابقتين"; return;}
+  setPassHash(_loginUser.id, p1);
+  document.getElementById("screenChangePass").classList.add("hidden");
+  document.getElementById("screenRegEmail").classList.add("hidden");
+  finishLogin(_loginUser);
+  showToast(t("✅ تم تعيين كلمة المرور بنجاح — مرحباً!","✅ Password set successfully — Welcome!"));
+}
+
+function openChangePassModal(){
+  document.getElementById("cp_current").value="";
+  document.getElementById("cp_new1").value="";
+  document.getElementById("cp_new2").value="";
+  document.getElementById("cpError").textContent="";
+  checkPassRulesModal();
+  openModal("changePassModal");
+}
+function saveChangedPassword(){
+  const cur=document.getElementById("cp_current").value;
+  const p1=document.getElementById("cp_new1").value;
+  const p2=document.getElementById("cp_new2").value;
+  const err=document.getElementById("cpError");
+  if(!checkPassword(currentUser.id,cur)){err.textContent="كلمة المرور الحالية غير صحيحة"; return;}
+  if(p1.length<8){err.textContent="يجب أن تكون 8 أحرف على الأقل"; return;}
+  if(!/\d/.test(p1)){err.textContent="يجب أن تحتوي على رقم"; return;}
+  if(!/[A-Z]/.test(p1)){err.textContent="يجب أن تحتوي على حرف كبير"; return;}
+  if(p1!==p2){err.textContent="كلمتا المرور غير متطابقتين"; return;}
+  setPassHash(currentUser.id, p1);
+  closeModal("changePassModal");
+  showToast("✅ تم تغيير كلمة المرور");
+}
+
+function finishLogin(u){
+  currentUser=u;
+  document.getElementById("screenSelect").classList.add("hidden");
+  document.getElementById("screenPassword").classList.add("hidden");
+  document.getElementById("screenChangePass").classList.add("hidden");
+  const av=document.getElementById("sidebarAvatar");
+  av.textContent=u.name[0]; av.style.background=u.color;
+  document.getElementById("sidebarName").textContent=u.name;
+  document.getElementById("sidebarRole").textContent=u.isAdmin?"Admin":u.role;
+  if(u.isAdmin){
+    document.getElementById("adminNavSection").style.display="";
+    document.getElementById("adminActionBtn").style.display="";
+    document.getElementById("adminProjectBtn").style.display="";
+  }
+  loadFromStorage();
+  updateNotifBadge();
+  checkDelays();
+  showPage("dashboard");
+}
+
+function logout(){
+  saveToStorage();
+  currentUser=null;
+  document.getElementById("adminNavSection").style.display="none";
+  document.getElementById("adminActionBtn").style.display="none";
+  document.getElementById("adminProjectBtn").style.display="none";
+  document.getElementById("notifPanel").classList.remove("open");
+  document.getElementById("screenSelect").classList.remove("hidden");
+}
+
+// ══════════════════════════════════════════════════════
+// LOCAL STORAGE — SAVE & LOAD
+// ══════════════════════════════════════════════════════
+function saveToStorage(){
+  try{
+    localStorage.setItem("darc_projects", JSON.stringify(projects));
+    localStorage.setItem("darc_team", JSON.stringify(TEAM));
+    localStorage.setItem("darc_drawings", JSON.stringify(DRAWINGS_DB));
+    localStorage.setItem("darc_notifications", JSON.stringify(notifications.slice(0,200)));
+    localStorage.setItem("darc_nextDrawingId", String(nextDrawingId));
+    flashSave();
+  }catch(e){ console.warn("Storage error",e); }
+}
+function loadFromStorage(){
+  try{
+    const p=localStorage.getItem("darc_projects");
+    if(p) projects=JSON.parse(p);
+    const tm=localStorage.getItem("darc_team");
+    if(tm){ TEAM.length=0; JSON.parse(tm).forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
+    const dr=localStorage.getItem("darc_drawings");
+    if(dr) DRAWINGS_DB=JSON.parse(dr);
+    const no=localStorage.getItem("darc_notifications");
+    if(no) notifications=JSON.parse(no);
+    const ndi=localStorage.getItem("darc_nextDrawingId");
+    if(ndi) nextDrawingId=parseInt(ndi)||nextDrawingId;
+    renderDrawingCheckboxes();
+    initAddDrawingCategorySelect();
+  }catch(e){ console.warn("Load error",e); }
+}
+function flashSave(){
+  const el=document.getElementById("saveIndicator");
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),1800);
+}
+// Auto-save every 60 seconds and on page unload
+setInterval(()=>{ if(currentUser) saveToStorage(); },60000);
+window.addEventListener("beforeunload",()=>{ if(currentUser) saveToStorage(); });
+
+// ══════════════════════════════════════════════════════
+// DRAWING CATEGORIES
+// ══════════════════════════════════════════════════════
+const DRAWING_CATEGORIES = [
+  {id:"arch",    ar:"معماري",                  en:"Architectural",              icon:"🏛️", color:"#2563EB"},
+  {id:"em_elec", ar:"كهرباء — إلكتروميكانيك",  en:"Electrical – Electromech",   icon:"⚡", color:"#7C3AED"},
+  {id:"em_plumb",ar:"سباكة — إلكتروميكانيك",   en:"Plumbing – Electromech",     icon:"💧", color:"#0369A1"},
+  {id:"em_hvac", ar:"تكييف — إلكتروميكانيك",   en:"HVAC – Electromech",         icon:"🌡️", color:"#065F46"},
+  {id:"em_fire", ar:"حريق — إلكتروميكانيك",    en:"Fire Fighting – Electromech",icon:"🧯", color:"#991B1B"},
+  {id:"em_low",  ar:"تيار خفيف",               en:"Low Current Systems",        icon:"📡", color:"#5B21B6"},
+  {id:"sections",ar:"مقاطع",                   en:"Sections",                   icon:"✂️", color:"#374151"},
+  {id:"detail",  ar:"تفصيلي",                  en:"Detailed Plans",             icon:"🔍", color:"#6B7280"},
+  {id:"site",    ar:"موقع عام",                en:"Site Plan",                  icon:"🗺️", color:"#92400E"},
+  {id:"qty",     ar:"جداول كميات",             en:"Quantity Tables",            icon:"📊", color:"#1D4ED8"},
+  {id:"docs",    ar:"وثائق وخطابات",           en:"Documents & Letters",        icon:"📄", color:"#4B5563"},
+  {id:"other",   ar:"أخرى",                    en:"Other",                      icon:"📌", color:"#6B7280"},
+];
+
+let DRAWINGS_DB = [
+  {id:1,  cat:"arch",    ar:"مخططات معمارية كاملة",                       en:"Complete Architectural Drawings",            type:"drawing"},
+  {id:2,  cat:"arch",    ar:"مخططات الجدران وأنواعها وتشطيبها",           en:"Wall Types & Finishing Plans",               type:"drawing"},
+  {id:3,  cat:"arch",    ar:"مخططات الأسقف (إنارة، غريلات، رشاشات)",    en:"Ceiling Plans",                              type:"drawing"},
+  {id:4,  cat:"arch",    ar:"مخططات الأعمال الخشبية",                     en:"Carpentry & Woodwork Plans",                 type:"drawing"},
+  {id:5,  cat:"arch",    ar:"مخطط توزيع الأفياش على الفرش",              en:"Furniture Layout – Power Outlets",           type:"drawing"},
+  {id:6,  cat:"arch",    ar:"مخططات الأرضيات",                            en:"Flooring Plans",                             type:"drawing"},
+  {id:7,  cat:"em_elec", ar:"مخططات الإنارة الكهربائية",                  en:"Electrical Lighting Plans",                  type:"drawing"},
+  {id:8,  cat:"em_elec", ar:"مخططات الأفياش والمقابس",                    en:"Power Outlets Plans",                        type:"drawing"},
+  {id:9,  cat:"em_elec", ar:"مخططات الأحمال الميكانيكية",                 en:"Mechanical Loads Plans",                     type:"drawing"},
+  {id:10, cat:"em_elec", ar:"مخططات التأريض",                             en:"Grounding Plans",                            type:"drawing"},
+  {id:11, cat:"em_elec", ar:"مخططات اللوحات والكابلات",                   en:"Panels & Cables Plans",                      type:"drawing"},
+  {id:12, cat:"em_plumb",ar:"مخططات السباكة (مياه باردة وساخنة)",         en:"Plumbing Plans",                             type:"drawing"},
+  {id:13, cat:"em_plumb",ar:"مخططات الصرف الصحي",                         en:"Drainage & Sanitary Plans",                  type:"drawing"},
+  {id:14, cat:"em_hvac", ar:"مخططات التكييف والتهوية",                    en:"HVAC & Ventilation Plans",                   type:"drawing"},
+  {id:15, cat:"em_hvac", ar:"مخططات مجاري الهواء (Ducting)",             en:"Air Duct Plans",                             type:"drawing"},
+  {id:16, cat:"em_fire", ar:"مخططات رشاشات الحريق (Sprinklers)",          en:"Fire Sprinkler Plans",                       type:"drawing"},
+  {id:17, cat:"em_fire", ar:"مخططات إنذار الحريق (Fire Alarm)",           en:"Fire Alarm Plans",                           type:"drawing"},
+  {id:18, cat:"em_fire", ar:"مخططات طفايات الحريق",                       en:"Fire Extinguisher Layout",                   type:"drawing"},
+  {id:19, cat:"em_low",  ar:"مخططات شبكة الإنترنت (WiFi)",               en:"WiFi Network Plans",                         type:"drawing"},
+  {id:20, cat:"em_low",  ar:"مخططات الكاميرات (CCTV)",                   en:"CCTV Camera Plans",                          type:"drawing"},
+  {id:21, cat:"em_low",  ar:"مخططات نظام الصوت والسماعات",               en:"Sound System & Speaker Plans",               type:"drawing"},
+  {id:22, cat:"em_low",  ar:"مخططات نظام التحكم بالدخول",               en:"Access Control System Plans",                type:"drawing"},
+  {id:23, cat:"sections",ar:"مقاطع عرضية وطولية — معماري",               en:"Cross & Long. Sections – Arch",              type:"drawing"},
+  {id:24, cat:"sections",ar:"مقاطع عرضية وطولية — إلكتروميكانيك",        en:"Cross & Long. Sections – Electromech",       type:"drawing"},
+  {id:25, cat:"detail",  ar:"مخططات تفصيلية لكل غرفة",                  en:"Detailed Room Plans",                        type:"drawing"},
+  {id:26, cat:"site",    ar:"مخططات الموقع العام",                        en:"Site Plan",                                  type:"drawing"},
+  {id:27, cat:"qty",     ar:"جدول كميات — معماري",                        en:"Architectural Quantity Table",               type:"table"},
+  {id:28, cat:"qty",     ar:"جدول كميات — كهرباء",                        en:"Electrical Quantity Table",                  type:"table"},
+  {id:29, cat:"qty",     ar:"جدول كميات — ميكانيك",                       en:"Mechanical Quantity Table",                  type:"table"},
+  {id:30, cat:"docs",    ar:"خطاب للعميل",                                 en:"Client Letter",                              type:"letter"},
+  {id:31, cat:"docs",    ar:"عرض سعر",                                     en:"Price Offer",                                type:"offer"},
+  {id:32, cat:"docs",    ar:"تقرير متابعة المشروع",                        en:"Project Follow-up Report",                   type:"report"},
+];
+let nextDrawingId = 33;
+
+// ══════════════════════════════════════════════════════
+// TEAM — starts with your 5 employees
+// ══════════════════════════════════════════════════════
+let TEAM = [
+  {id:"tariq",     name:"طارق",              nameEn:"Tariq",          role:"منفذ تصاميم 3D",      roleEn:"3D Designer",           color:"#7C3AED"},
+  {id:"hanan",     name:"حنان",              nameEn:"Hanan",          role:"مهندسة معمارية",       roleEn:"Arch. Engineer",        color:"#DB2777"},
+  {id:"mohanad",   name:"مهند",              nameEn:"Mohanad",        role:"مهندس معماري",         roleEn:"Arch. Engineer",        color:"#2563EB"},
+  {id:"hakeem",    name:"عبد الحكيم",        nameEn:"Abd Al-Hakeem",  role:"رسام",                 roleEn:"Draftsman",             color:"#059669"},
+  {id:"abdrahman", name:"عبدالرحمن شيط",     nameEn:"Abd Al-Rahman",  role:"مهندس إلكتروميكانيك", roleEn:"Electromechanical Eng.", color:"#D97706"},
+];
+let USERS = [];
+function syncUsersFromTeam(){
+  USERS = [
+    {id:"radwan",name:"رضوان",           nameEn:"Radwan",       role:"مدير",    roleEn:"Admin",           isAdmin:true, color:"#B8960C"},
+    {id:"jihad", name:"م. جهاد مسلاتي", nameEn:"Eng. Jihad",  role:"مدير عام",roleEn:"General Manager", isAdmin:true, color:"#1A1A1A"},
+    ...TEAM.map(m=>({...m,isAdmin:false}))
+  ];
+}
+syncUsersFromTeam();
+
+// ══════════════════════════════════════════════════════
+// WF STATUS
+// ══════════════════════════════════════════════════════
+const WF = {
+  "not-started":     {ar:"لم يُعيَّن بعد",        icon:"⬜",cls:"wf-not-started"},
+  "pending-accept":  {ar:"بانتظار القبول",          icon:"⏳",cls:"wf-pending-accept"},
+  "negotiating":     {ar:"جارٍ التفاوض على المدة", icon:"🔄",cls:"wf-negotiating"},
+  "accepted":        {ar:"مقبولة — لم تبدأ",        icon:"✅",cls:"wf-accepted"},
+  "in-progress":     {ar:"جاري التنفيذ",            icon:"🔵",cls:"wf-in-progress"},
+  "submitted":       {ar:"مُسلَّمة للمراجعة",       icon:"📤",cls:"wf-submitted"},
+  "approved":        {ar:"معتمدة داخلياً",           icon:"✅",cls:"wf-approved"},
+  "rejected":        {ar:"مرجَّعة — تحتاج تعديل",  icon:"❌",cls:"wf-rejected"},
+  "delivery":        {ar:"مرحلة التسليم",            icon:"📦",cls:"wf-delivery"},
+  "client-approved": {ar:"معتمدة من المالك",         icon:"🏆",cls:"wf-client-approved"},
+  "client-rejected": {ar:"مرجَّعة من المالك",        icon:"🔴",cls:"wf-client-rejected"},
+  "done":            {ar:"مكتملة ١٠٠٪",             icon:"🎉",cls:"wf-done"},
+};
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let currentUser = null;
+let currentLang = "ar";
+let projects    = [];
+let notifications = [];
+let currentProjectId = null;
+let currentAssignContext = null;
+let notifId = 1;
+let taskSource = "drawing";
+
+// ══════════════════════════════════════════════════════
+// INIT PROJECTS — your 8 real projects, empty tasks
+// ══════════════════════════════════════════════════════
+function initSampleData(){
+  // Only set if localStorage is empty
+  if(localStorage.getItem("darc_projects")) return;
+  projects = [
+    {id:"p1",name:"صالون لمسات الخالدية",        nameEn:"Lamasat Salon Al-Khalidiya",     client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p2",name:"صالون لي لي الرياض",           nameEn:"Li Li Salon Riyadh",             client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p3",name:"صالون لي لي جدة",              nameEn:"Li Li Salon Jeddah",             client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p4",name:"برج صاري",                      nameEn:"Sari Tower",                     client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p5",name:"لمسات المدينة المنورة",         nameEn:"Lamasat Al-Madinah",             client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p6",name:"مشروع شقة د. ماجدة أبو راس",  nameEn:"Dr. Majda Apartment",            client:"د. ماجدة أبو راس",start:"",end:"",status:"active",tasks:[]},
+    {id:"p7",name:"مشروع فيلا الزعيم بالرياض",   nameEn:"Al-Za'eem Villa Riyadh",         client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p8",name:"مخططات تفصيلية مرسيدس أتومول",nameEn:"Mercedes Automall Detailed Plans",client:"مرسيدس أتومول",start:"",end:"",status:"active",tasks:[]},
+  ];
+}
+
+function mkTask(id,drawingId,assignee,reviewer,duration,taskStart,wfStatus,deliveryTo,notes=""){
+  return {id:id||("t"+Date.now()+Math.random()),type:"drawing",drawingId,
+    freeNameAr:null,freeNameEn:null,freeType:null,freeDesc:null,
+    assignee,reviewer,duration,proposedDuration:null,
+    durationLocked:!!duration,allowSelfDuration:!duration,
+    taskStart,wfStatus:wfStatus||"not-started",adminNotes:"",notes,
+    deliveryTo:deliveryTo||"client",deliveryLink:"",deliveryDocName:"",
+    clientNotes:"",submittedAt:null,approvedAt:null,deliveredAt:null,
+    startedAt:null,delayNotified:false};
+}
+function mkFreeTask(projId,arName,enName,freeType,desc,assignee,reviewer,duration,taskStart,wfStatus,deliveryTo){
+  return {id:"t"+Date.now()+Math.random(),type:"free",drawingId:null,
+    freeNameAr:arName,freeNameEn:enName||arName,freeType,freeDesc:desc,
+    assignee,reviewer,duration,proposedDuration:null,
+    durationLocked:!!duration,allowSelfDuration:!duration,
+    taskStart,wfStatus:wfStatus||"not-started",adminNotes:"",notes:"",
+    deliveryTo:deliveryTo||"client",deliveryLink:"",deliveryDocName:"",
+    clientNotes:"",submittedAt:null,approvedAt:null,deliveredAt:null,
+    startedAt:null,delayNotified:false};
+}
+
+// ══════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════════════════════════
+function addNotif(toUserId,icon,title,body,fromUserId="system"){
+  notifications.unshift({id:notifId++,to:toUserId,from:fromUserId,icon,title,body,time:new Date().toISOString(),read:false});
+  updateNotifBadge();
+  saveToStorage();
+}
+function updateNotifBadge(){
+  if(!currentUser) return;
+  const unread=notifications.filter(n=>n.to===currentUser.id&&!n.read).length;
+  const c=document.getElementById("notifCount");
+  c.textContent=unread; unread>0?c.classList.add("visible"):c.classList.remove("visible");
+  const pending=getMyPendingCount();
+  const b=document.getElementById("myTasksBadge");
+  if(b){b.textContent=pending; pending>0?b.classList.add("vis"):b.classList.remove("vis");}
+}
+function getMyPendingCount(){
+  if(!currentUser||currentUser.isAdmin) return 0;
+  let c=0;
+  projects.forEach(p=>p.tasks.forEach(t=>{
+    if(t.assignee===currentUser.id&&["pending-accept","negotiating","rejected","client-rejected"].includes(t.wfStatus)) c++;
+    if(t.reviewer===currentUser.id&&t.wfStatus==="submitted") c++;
+  }));
+  return c;
+}
+function toggleNotif(){
+  const p=document.getElementById("notifPanel");
+  p.classList.toggle("open");
+  if(p.classList.contains("open")) renderNotifList();
+}
+function renderNotifList(){
+  const mine=notifications.filter(n=>n.to===currentUser?.id);
+  const list=document.getElementById("notifList");
+  if(!mine.length){list.innerHTML=`<div class="notif-empty">لا توجد إشعارات</div>`;return;}
+  list.innerHTML=mine.map(n=>`
+    <div class="notif-item ${n.read?'':'unread'}" onclick="readNotif(${n.id})">
+      <div class="notif-icon">${n.icon}</div>
+      <div class="notif-text"><strong>${n.title}</strong>${n.body}<div class="notif-time">${fmtTime(n.time)}</div></div>
+    </div>`).join("");
+}
+function readNotif(id){const n=notifications.find(x=>x.id===id);if(n)n.read=true;renderNotifList();updateNotifBadge();}
+function markAllRead(){notifications.filter(n=>n.to===currentUser?.id).forEach(n=>n.read=true);renderNotifList();updateNotifBadge();}
+function fmtTime(iso){if(!iso)return"";const d=new Date(iso);return d.toLocaleDateString("ar-SA")+" "+d.toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"});}
+
+// ══════════════════════════════════════════════════════
+// DELAY CHECKER
+// ══════════════════════════════════════════════════════
+function checkDelays(){
+  const now=new Date();
+  projects.forEach(p=>{
+    p.tasks.forEach(t=>{
+      if(t.delayNotified||!["in-progress","accepted"].includes(t.wfStatus)||!t.startedAt||!t.duration) return;
+      const due=new Date(new Date(t.startedAt).getTime()+t.duration*86400000);
+      if(now>due){
+        t.delayNotified=true;
+        const name=getTaskDisplayName(t);
+        addNotif(t.assignee,"⚠️","مهمتك تجاوزت الموعد!",`${name} في ${p.name} — تجاوزت المدة (${t.duration} أيام)`,null);
+        USERS.filter(u=>u.isAdmin).forEach(a=>{
+          addNotif(a.id,"⚠️","مهمة متأخرة",`${getMember(t.assignee)?.name||"؟"}: ${name} في ${p.name} تجاوزت المدة`,null);
+        });
+      }
+    });
+  });
+}
+setInterval(()=>{if(currentUser)checkDelays();},30000);
+
+// ══════════════════════════════════════════════════════
+// LANG
+// ══════════════════════════════════════════════════════
+function toggleLang(){
+  currentLang=currentLang==="ar"?"en":"ar";
+  document.documentElement.lang=currentLang;
+  document.documentElement.dir=currentLang==="ar"?"rtl":"ltr";
+  document.body.style.fontFamily=currentLang==="ar"?"'Cairo',sans-serif":"'Montserrat',sans-serif";
+  // Update all static elements with data-ar / data-en
+  document.querySelectorAll("[data-ar]").forEach(el=>{
+    el.textContent=currentLang==="ar"?el.dataset.ar:el.dataset.en;
+  });
+  // Re-render current page so all JS-generated content is also translated
+  renderCurrentPage();
+  // Update topbar title
+  const active=document.querySelector(".page.active");
+  if(active){
+    const id=active.id.replace("page-","");
+    const titles={
+      dashboard:t("لوحة التحكم","Dashboard"),
+      projects:t("المشاريع","Projects"),
+      projectDetail:t("تفاصيل المشروع","Project Detail"),
+      drawingsDB:t("قاعدة المخططات","Drawings DB"),
+      team:t("الفريق","Team"),
+      myTasks:t("مهامي","My Tasks"),
+      adminDrawings:t("إدارة المخططات","Manage Drawings"),
+    };
+    document.getElementById("topbarTitle").textContent=titles[id]||"";
+  }
+  // Refresh login screen if visible
+  if(!document.getElementById("screenSelect").classList.contains("hidden")) initLogin();
+}
+function t(ar,en){return currentLang==="ar"?ar:en;}
+function teamName(m){return currentLang==="ar"?m.name:(m.nameEn||m.name);}
+function roleName(m){return currentLang==="ar"?m.role:(m.roleEn||m.role);}
+
+// ══════════════════════════════════════════════════════
+// LOGIN INIT
+// ══════════════════════════════════════════════════════
+function initLogin(){
+  const g=document.getElementById("userSelectGrid"); g.innerHTML="";
+  USERS.forEach(u=>{
+    const d=document.createElement("div"); d.className="user-option";
+    d.innerHTML=`<div class="uav" style="background:${u.color}">${u.name[0]}</div>
+      <div class="uinfo"><div class="un">${u.name}</div><div class="ur">${u.role}</div></div>
+      ${u.isAdmin?'<div class="badge-adm">Admin</div>':''}`;
+    d.onclick=()=>selectUser(u.id); g.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+name).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  document.getElementById("notifPanel").classList.remove("open");
+  const titles={
+    dashboard:t("لوحة التحكم","Dashboard"),
+    projects:t("المشاريع","Projects"),
+    projectDetail:t("تفاصيل المشروع","Project Detail"),
+    drawingsDB:t("قاعدة المخططات","Drawings DB"),
+    team:t("الفريق","Team"),
+    myTasks:t("مهامي","My Tasks"),
+    adminDrawings:t("إدارة المخططات","Manage Drawings"),
+  };
+  document.getElementById("topbarTitle").textContent=titles[name]||"";
+  renderCurrentPage();
+}
+function renderCurrentPage(){
+  const active=document.querySelector(".page.active"); if(!active) return;
+  const id=active.id.replace("page-","");
+  if(id==="dashboard") renderDashboard();
+  else if(id==="projects") renderProjects();
+  else if(id==="drawingsDB") renderDrawingsDB();
+  else if(id==="team") renderTeamPage();
+  else if(id==="projectDetail") renderProjectDetail(currentProjectId);
+  else if(id==="myTasks") renderMyTasks();
+  else if(id==="adminDrawings") renderAdminDrawings();
+}
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+function getDrawing(id){return DRAWINGS_DB.find(d=>d.id===id);}
+function getCategory(id){return DRAWING_CATEGORIES.find(c=>c.id===id);}
+function getMember(id){return USERS.find(u=>u.id===id);}
+function getTaskDisplayName(task){return task.type==="free"?task.freeNameAr||"مهمة":(getDrawing(task.drawingId)?.ar||"مهمة");}
+function getTaskCatColor(task){if(task.type==="free")return"#6B7280";const d=getDrawing(task.drawingId);return d?getCategory(d.cat)?.color||"#6B7280":"#6B7280";}
+function calcProgress(p){if(!p.tasks.length)return 0;return Math.round(p.tasks.filter(t=>["done","client-approved"].includes(t.wfStatus)).length/p.tasks.length*100);}
+function isDelayed(p){return p.end&&new Date(p.end)<new Date()&&calcProgress(p)<100;}
+function memberTasks(uid){return projects.flatMap(p=>p.tasks.filter(t=>t.assignee===uid));}
+function wfBadge(s){const w=WF[s]||WF["not-started"];return`<span class="wf-badge ${w.cls}">${w.icon} ${w.ar}</span>`;}
+function typeIcon(type){const m={drawing:"📐",table:"📊",letter:"📄",offer:"💰",report:"📋",meeting:"📅",general:"📌",other:"📌"};return m[type]||"📌";}
+
+// ══════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════
+function renderDashboard(){
+  const all=projects.flatMap(p=>p.tasks);
+  const done=all.filter(t=>["done","client-approved"].includes(t.wfStatus)).length;
+  const wip=all.filter(t=>["in-progress","submitted","approved","delivery"].includes(t.wfStatus)).length;
+  const delayed=projects.filter(p=>isDelayed(p)).length;
+  const needAction=all.filter(t=>["pending-accept","negotiating","rejected","client-rejected"].includes(t.wfStatus)).length;
+  document.getElementById("kpiGrid").innerHTML=`
+    <div class="kpi-card gold"><div class="kpi-icon">🏗️</div><div class="kpi-label">إجمالي المشاريع</div><div class="kpi-value">${projects.length}</div></div>
+    <div class="kpi-card green"><div class="kpi-icon">✅</div><div class="kpi-label">مهام مكتملة</div><div class="kpi-value">${done}</div></div>
+    <div class="kpi-card blue"><div class="kpi-icon">⚙️</div><div class="kpi-label">مهام جارية</div><div class="kpi-value">${wip}</div></div>
+    <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-label">تأخير / تحتاج إجراء</div><div class="kpi-value">${delayed+needAction}</div></div>`;
+  document.getElementById("projectsChart").innerHTML=`<div class="mini-chart">`+
+    projects.map(p=>{const pct=calcProgress(p);const del=isDelayed(p);
+      return`<div class="bar-row"><div class="bar-name" style="font-size:11px;">${p.name.length>10?p.name.slice(0,10)+"…":p.name}</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${del?"var(--red)":"var(--gold-light)"}"></div></div>
+        <div class="bar-pct">${pct}%${del?' 🔴':''}</div></div>`;
+    }).join("")+`</div>`;
+  document.getElementById("teamChart").innerHTML=`<div class="mini-chart">`+
+    TEAM.map(m=>{
+      const mt=memberTasks(m.id);const md=mt.filter(t=>["done","client-approved"].includes(t.wfStatus)).length;
+      const pct=mt.length?Math.round(md/mt.length*100):0;
+      const hasDelay=mt.some(t=>{const pr=projects.find(p=>p.tasks.includes(t));return!["done","client-approved"].includes(t.wfStatus)&&pr&&pr.end&&new Date(pr.end)<new Date();});
+      return`<div class="bar-row"><div class="bar-name" style="display:flex;align-items:center;gap:4px;">
+        <div style="width:10px;height:10px;border-radius:50%;background:${m.color};flex-shrink:0;"></div>
+        <span style="font-size:11px;">${teamName(m).split(" ")[0]}</span>${hasDelay?'<span>🔴</span>':''}
+      </div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${m.color}"></div></div>
+      <div class="bar-pct">${pct}%</div></div>`;
+    }).join("")+`</div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════════════════════
+function renderProjects(){
+  const g=document.getElementById("projectsGrid");
+  if(!projects.length){g.innerHTML=`<div class="empty-state"><div class="icon">📁</div><div>لا توجد مشاريع</div></div>`;return;}
+  g.innerHTML=projects.map(p=>{
+    const pct=calcProgress(p),del=isDelayed(p);
+    const assignees=[...new Set(p.tasks.map(t=>t.assignee).filter(Boolean))].slice(0,4);
+    const bc=del?"badge-delayed":p.status==="active"?"badge-active":p.status==="done"?"badge-done":"badge-pending";
+    const bt=del?"متأخر":p.status==="active"?"جاري":p.status==="done"?"منجز":"معلق";
+    const col=pct>=80?"green":pct>=40?"blue":"gold";
+    const pr=p.tasks.filter(t=>t.wfStatus==="submitted"&&t.reviewer===currentUser?.id).length;
+    const pa=p.tasks.filter(t=>t.wfStatus==="pending-accept"&&t.assignee===currentUser?.id).length;
+    return`<div class="project-card" onclick="openProject('${p.id}')">
+      <div class="project-card-header">
+        <div>
+          <div class="project-name">${p.name}
+            ${pr?`<span style="color:var(--purple);font-size:11px;"> ⚡${pr} مراجعة</span>`:''}
+            ${pa?`<span style="color:var(--orange);font-size:11px;"> ⏳${pa} قبول</span>`:''}
+          </div>
+          <div class="project-client">${p.client?'👤 '+p.client:''}</div>
+        </div>
+        <span class="status-badge ${bc}">${bt}</span>
+      </div>
+      <div class="project-card-body">
+        <div class="progress-label"><span>نسبة الإنجاز</span><strong>${pct}%</strong></div>
+        <div class="progress-bar"><div class="progress-fill ${col}" style="width:${pct}%"></div></div>
+        <div class="project-meta">
+          <div class="project-meta-item">📋 ${p.tasks.length} مهمة</div>
+          <div class="project-meta-item">✅ ${p.tasks.filter(t=>["done","client-approved"].includes(t.wfStatus)).length} مكتمل</div>
+          ${p.end?`<div class="project-meta-item">📅 ${p.end}</div>`:''}
+        </div>
+        <div class="team-avatars">${assignees.map(aid=>{const m=getMember(aid);return m?`<div class="team-avatar" style="background:${m.color}">${m.name[0]}</div>`:''}).join("")}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+function openProject(id){currentProjectId=id;showPage("projectDetail");}
+
+// ══════════════════════════════════════════════════════
+// PROJECT DETAIL
+// ══════════════════════════════════════════════════════
+function renderProjectDetail(id){
+  const p=projects.find(x=>x.id===id); if(!p) return;
+  const pct=calcProgress(p),del=isDelayed(p),isAdmin=currentUser?.isAdmin;
+  const teamInProj=[...new Set(p.tasks.map(t=>t.assignee).filter(Boolean))].map(getMember).filter(Boolean);
+  const tasksHtml=p.tasks.map((task,i)=>{
+    const name=getTaskDisplayName(task);
+    const catColor=getTaskCatColor(task);
+    const member=getMember(task.assignee);
+    const reviewer=getMember(task.reviewer);
+    const isMyTask=currentUser?.id===task.assignee;
+    const isMyReview=currentUser?.id===task.reviewer;
+    const durationEditable=isAdmin||(task.allowSelfDuration&&!task.durationLocked);
+    const isDelayedTask=task.startedAt&&task.duration&&new Date()>new Date(new Date(task.startedAt).getTime()+task.duration*86400000)&&!["done","client-approved"].includes(task.wfStatus);
+    return`<tr ${isDelayedTask?'style="background:#FFF5F5;"':''}>
+      <td style="color:var(--gray);font-size:12px;">${i+1}</td>
+      <td style="max-width:220px;">
+        <div class="task-name">${name}</div>
+        ${task.type==="free"?`<span class="task-type-badge" style="background:${catColor}18;color:${catColor};">${typeIcon(task.freeType)} ${task.freeType||"عام"}</span>`:''}
+        ${task.type==="drawing"?(()=>{const d=getDrawing(task.drawingId);const cat=d?getCategory(d.cat):null;return cat?`<span class="task-type-badge" style="background:${cat.color}18;color:${cat.color};">${cat.icon} ${cat.ar}</span>`:''})():''}
+        ${task.notes?`<div style="color:var(--red);font-size:10px;margin-top:3px;">💬 ملاحظات إرجاع</div>`:''}
+        ${isDelayedTask?`<div style="color:var(--red);font-size:10px;">⚠️ تجاوزت المدة</div>`:''}
+      </td>
+      <td>${member?`<div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:22px;height:22px;border-radius:50%;background:${member.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;">${member.name[0]}</div>
+        <span style="font-size:12px;">${member.name.split(" ")[0]}</span></div>`:
+        isAdmin?`<button class="btn btn-ghost btn-sm" onclick="openEditTaskModal('${p.id}',${i})">تعيين</button>`:
+        `<span style="color:var(--gray);font-size:12px;">—</span>`}</td>
+      <td>${reviewer?`<span style="font-size:12px;color:var(--gray);">${reviewer.name.split(" ")[0]}</span>`:`<span style="color:var(--gray-border);font-size:11px;">—</span>`}</td>
+      <td><div style="display:flex;align-items:center;gap:4px;">
+        <input class="dur-input" type="number" min="1" value="${task.duration||''}" ${durationEditable?'':'disabled'} onchange="setDuration('${p.id}',${i},this.value)">
+        <span style="font-size:11px;color:var(--gray);">يوم</span>
+        ${task.proposedDuration?`<span style="font-size:10px;color:var(--orange);">⏱️${task.proposedDuration}</span>`:''}
+        ${isAdmin&&task.durationLocked?`<button class="lock-btn" onclick="unlockDuration('${p.id}',${i})">🔒</button>`:''}
+        ${isAdmin&&!task.durationLocked&&task.duration?`<button class="lock-btn" onclick="lockDuration('${p.id}',${i})">🔓</button>`:''}
+      </div></td>
+      <td>${wfBadge(task.wfStatus)}</td>
+      <td>${buildActionBtn(task,i,p.id,isAdmin,isMyTask,isMyReview)}</td>
+    </tr>`;
+  }).join("");
+
+  document.getElementById("projectDetailContent").innerHTML=`
+  <div class="detail-header">
+    <div class="detail-top">
+      <div>
+        <div class="detail-title">${p.name} ${del?'<span style="color:var(--red);font-size:14px;">⚠️ متأخر</span>':''}</div>
+        <div class="detail-client">${p.client?'👤 '+p.client+' &nbsp;|&nbsp; ':''} 📅 ${p.start||'—'} → ${p.end||'—'}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${isAdmin?`<button class="btn btn-ghost btn-sm" onclick="openEditProjectModal('${p.id}')">✏️ تعديل المشروع</button>
+        <button class="btn btn-primary btn-sm" onclick="openNewTaskModal('${p.id}')">🎯 إضافة مهمة</button>`:''}
+      </div>
+    </div>
+    <div class="progress-label"><span style="font-weight:600;">الإنجاز الكلي</span><strong>${pct}%</strong></div>
+    <div class="progress-bar" style="height:12px;"><div class="progress-fill ${pct>=80?"green":pct>=40?"blue":"gold"}" style="width:${pct}%"></div></div>
+    <div class="detail-stats" style="margin-top:16px;">
+      <div class="detail-stat"><div class="num">${p.tasks.length}</div><div class="lbl">إجمالي</div></div>
+      <div class="detail-stat"><div class="num" style="color:var(--green)">${p.tasks.filter(t=>["done","client-approved"].includes(t.wfStatus)).length}</div><div class="lbl">مكتمل</div></div>
+      <div class="detail-stat"><div class="num" style="color:var(--blue)">${p.tasks.filter(t=>["in-progress","submitted","approved","delivery"].includes(t.wfStatus)).length}</div><div class="lbl">جاري</div></div>
+      <div class="detail-stat"><div class="num" style="color:var(--orange)">${p.tasks.filter(t=>t.wfStatus==="pending-accept").length}</div><div class="lbl">بانتظار قبول</div></div>
+      <div class="detail-stat"><div class="num" style="color:var(--red)">${p.tasks.filter(t=>["rejected","client-rejected","negotiating"].includes(t.wfStatus)).length}</div><div class="lbl">مرجَّع/تفاوض</div></div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 قائمة المهام</div>
+        ${isAdmin?`<button class="btn btn-ghost btn-sm" onclick="openNewTaskModal('${p.id}')">➕</button>`:''}
+      </div>
+      <div style="overflow-x:auto;">
+      <table class="tasks-table">
+        <thead><tr><th>#</th><th>المهمة</th><th>المنفذ</th><th>المراجع</th><th>المدة</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody>${tasksHtml||`<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--gray);">لا توجد مهام — اضغط ➕ لإضافة مهمة</td></tr>`}</tbody>
+      </table></div>
+    </div>
+    <div>${teamInProj.length?teamInProj.map(m=>{
+      const mt=p.tasks.filter(t=>t.assignee===m.id);
+      const md=mt.filter(t=>["done","client-approved"].includes(t.wfStatus)).length;
+      const mw=mt.filter(t=>["in-progress","submitted","approved","delivery"].includes(t.wfStatus)).length;
+      const mp=mt.length?Math.round(md/mt.length*100):0;
+      const hd=del&&mt.some(t=>!["done","client-approved"].includes(t.wfStatus));
+      return`<div class="member-card">
+        <div class="member-header">
+          <div class="member-avatar" style="background:${m.color}">${m.name[0]}</div>
+          <div><div class="member-name">${teamName(m)}</div><div class="member-role">${m.role}</div></div>
+          <div style="margin-right:auto;color:${hd?'var(--red)':'var(--green)'};font-size:12px;">${hd?'⚠️ تأخير':'✅'}</div>
+        </div>
+        <div class="member-stats">
+          <div class="m-stat done"><div class="n">${md}</div><div class="l">مكتمل</div></div>
+          <div class="m-stat wip"><div class="n">${mw}</div><div class="l">جاري</div></div>
+          <div class="m-stat rem"><div class="n">${mt.length-md-mw}</div><div class="l">متبقي</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${mp}%;background:${m.color}"></div></div>
+        <div style="text-align:left;font-size:11px;color:var(--gray);margin-top:4px;">${mp}%</div>
+      </div>`;
+    }).join(""):`<div class="empty-state" style="padding:20px;"><div class="icon" style="font-size:28px;">👥</div><div style="font-size:12px;">لا يوجد فريق معيّن بعد</div></div>`}
+    </div>
+  </div>`;
+}
+
+function buildActionBtn(task,taskIdx,projId,isAdmin,isMyTask,isMyReview){
+  const s=task.wfStatus;
+  if(isMyTask){
+    if(s==="pending-accept"||s==="negotiating") return`<button class="btn btn-primary btn-sm" onclick="openTaskAccept('${projId}',${taskIdx})">📋 مراجعة</button>`;
+    if(s==="accepted") return`<button class="btn btn-success btn-sm" onclick="startTask('${projId}',${taskIdx})">▶️ بدء</button>`;
+    if(s==="in-progress") return`<button class="btn btn-orange btn-sm" onclick="openSubmitTask('${projId}',${taskIdx})">📤 تسليم</button>`;
+    if(s==="rejected"||s==="client-rejected") return`<div><button class="btn btn-primary btn-sm" onclick="openSubmitTask('${projId}',${taskIdx})">🔄 إعادة تسليم</button></div>`;
+    if(s==="submitted") return`<span style="font-size:11px;color:var(--orange);">⏳ بانتظار المراجع</span>`;
+  }
+  if(isMyReview&&s==="submitted") return`<button class="btn btn-primary btn-sm" onclick="openReview('${projId}',${taskIdx})">🔍 مراجعة</button>`;
+  if(isAdmin){
+    if(s==="submitted") return`<button class="btn btn-primary btn-sm" onclick="openReview('${projId}',${taskIdx})">🔍 راجع</button>`;
+    if(s==="delivery"||s==="approved") return`<button class="btn btn-success btn-sm" onclick="openDelivery('${projId}',${taskIdx})">📦 تسليم</button>`;
+    if(s==="negotiating") return`<button class="btn btn-orange btn-sm" onclick="openNegResponse('${projId}',${taskIdx})">⏱️ رد على المدة</button>`;
+    if(s==="client-rejected") return`<button class="btn btn-ghost btn-sm" onclick="openReview('${projId}',${taskIdx})">📋 ملاحظات</button>`;
+    return`<button class="btn btn-ghost btn-sm" onclick="openEditTaskModal('${projId}',${taskIdx})">✏️</button>`;
+  }
+  return`<span style="color:var(--gray-border);font-size:11px;">—</span>`;
+}
+
+// ══════════════════════════════════════════════════════
+// MY TASKS
+// ══════════════════════════════════════════════════════
+function renderMyTasks(){
+  if(!currentUser||currentUser.isAdmin){
+    document.getElementById("myTasksContent").innerHTML=`<div class="empty-state"><div class="icon">📋</div><div>هذه الصفحة للموظفين فقط</div></div>`;return;
+  }
+  const uid=currentUser.id;
+  const allMy=[];
+  projects.forEach(p=>p.tasks.forEach((task,i)=>{
+    if(task.assignee===uid||task.reviewer===uid) allMy.push({task,project:p,taskIdx:i});
+  }));
+  if(!allMy.length){document.getElementById("myTasksContent").innerHTML=`<div class="empty-state"><div class="icon">📋</div><div>لا توجد مهام معينة لك بعد</div></div>`;return;}
+  const groups=[
+    {label:"⚡ تحتاج إجراءً منك",color:"var(--red)",filter:x=>(x.task.assignee===uid&&["pending-accept","negotiating","rejected","client-rejected"].includes(x.task.wfStatus))||(x.task.reviewer===uid&&x.task.wfStatus==="submitted")},
+    {label:"✅ مقبولة — لم تبدأ بعد",color:"var(--teal)",filter:x=>x.task.assignee===uid&&x.task.wfStatus==="accepted"},
+    {label:"🔵 جاري التنفيذ",color:"var(--blue)",filter:x=>x.task.assignee===uid&&x.task.wfStatus==="in-progress"},
+    {label:"📤 مُسلَّمة / قيد المعالجة",color:"var(--purple)",filter:x=>x.task.assignee===uid&&["submitted","approved","delivery"].includes(x.task.wfStatus)},
+    {label:"🎉 مكتملة",color:"var(--green)",filter:x=>x.task.assignee===uid&&["done","client-approved"].includes(x.task.wfStatus)},
+  ];
+  let html='';
+  groups.forEach(g=>{
+    const items=allMy.filter(g.filter);
+    if(!items.length) return;
+    html+=`<div style="font-size:13px;font-weight:700;color:${g.color};margin:16px 0 10px;">${g.label} (${items.length})</div>`;
+    items.forEach(x=>{
+      const{task,project,taskIdx}=x;
+      const name=getTaskDisplayName(task);
+      const isMyTask=task.assignee===uid;
+      const isMyReview=task.reviewer===uid;
+      const isDelayedTask=task.startedAt&&task.duration&&new Date()>new Date(new Date(task.startedAt).getTime()+task.duration*86400000)&&!["done","client-approved"].includes(task.wfStatus);
+      html+=`<div class="card" style="margin-bottom:12px;padding:16px 20px;${isDelayedTask?'border-color:var(--red);':''}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+            <div style="font-size:14px;font-weight:700;">${name}</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:3px;">📁 ${project.name} ${project.client?'| 👤 '+project.client:''}</div>
+            ${task.duration?`<div style="font-size:11px;color:var(--gray);margin-top:3px;">⏱️ المدة: ${task.duration} أيام ${isDelayedTask?'<span style="color:var(--red);font-weight:700;">— تجاوزت الموعد ⚠️</span>':''}</div>`:''}
+            ${task.notes?`<div class="notes-box" style="margin-top:8px;"><div class="notes-label">💬 ملاحظات الإرجاع:</div>${task.notes}</div>`:''}
+            ${task.adminNotes&&["pending-accept","negotiating"].includes(task.wfStatus)?`<div class="notes-box" style="margin-top:8px;background:var(--blue-bg);border-color:#93C5FD;"><div class="notes-label" style="color:var(--blue);">📌 تعليمات:</div>${task.adminNotes}</div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            ${wfBadge(task.wfStatus)}
+            ${buildActionBtn(task,taskIdx,project.id,false,isMyTask,isMyReview)}
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById("myTasksContent").innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════
+// TASK ACCEPT/NEGOTIATE
+// ══════════════════════════════════════════════════════
+function openTaskAccept(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const name=getTaskDisplayName(task);
+  document.getElementById("taskAcceptContent").innerHTML=`
+    <div style="background:var(--gold-bg);border:1px solid var(--gold-pale);border-radius:8px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px;">📋 ${name}</div>
+      <div style="font-size:12px;color:var(--gray);">📁 ${p.name} ${p.client?'| 👤 '+p.client:''}</div>
+      ${task.duration?`<div style="font-size:13px;margin-top:8px;font-weight:600;">⏱️ المدة المطلوبة: <span style="color:var(--gold);font-family:var(--font-en);">${task.duration}</span> أيام</div>`:'<div style="font-size:13px;margin-top:8px;color:var(--orange);">⏱️ لم تحدد المدة</div>'}
+      ${task.adminNotes?`<div style="font-size:12px;margin-top:8px;padding:8px 12px;background:var(--white);border-radius:6px;">📌 ${task.adminNotes}</div>`:''}
+    </div>
+    <div class="form-group"><label class="form-label">مدة الإنجاز المقترحة منك (أيام)</label>
+      <input class="form-input" type="number" id="acceptDuration" value="${task.proposedDuration||task.duration||''}" min="1">
+    </div>
+    <div class="form-group"><label class="form-label">ملاحظة (اختياري)</label>
+      <textarea class="form-textarea" id="acceptNote" rows="2" placeholder="أي ملاحظة على القبول أو طلب تعديل المدة..."></textarea>
+    </div>`;
+  document.getElementById("taskAcceptFooter").innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal('taskAcceptModal')">إلغاء</button>
+    <button class="btn btn-danger" onclick="rejectTaskByWorker('${projId}',${taskIdx})">❌ رفض المهمة</button>
+    <button class="btn btn-orange" onclick="requestDurationChange('${projId}',${taskIdx})">⏱️ طلب تعديل المدة</button>
+    <button class="btn btn-success" onclick="acceptTask('${projId}',${taskIdx})">✅ قبول المهمة</button>`;
+  openModal("taskAcceptModal");
+}
+function acceptTask(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const dur=parseInt(document.getElementById("acceptDuration").value)||task.duration;
+  task.wfStatus="accepted"; task.duration=dur; task.durationLocked=true; task.proposedDuration=null;
+  const name=getTaskDisplayName(task);
+  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"✅","قبِل الموظف المهمة",`${currentUser.name} قبِل: ${name} في ${p.name} — المدة: ${dur} أيام`,currentUser.id));
+  closeModal("taskAcceptModal"); saveToStorage(); showToast("✅ تم قبول المهمة"); renderCurrentPage(); updateNotifBadge();
+}
+function requestDurationChange(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const newDur=parseInt(document.getElementById("acceptDuration").value);
+  const note=document.getElementById("acceptNote").value.trim();
+  if(!newDur||newDur===(task.duration||0)){showToast("⚠️ يرجى إدخال مدة مختلفة");return;}
+  task.wfStatus="negotiating"; task.proposedDuration=newDur;
+  const name=getTaskDisplayName(task);
+  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"⏱️","طلب تعديل مدة",`${currentUser.name} يطلب ${newDur} يوم لـ: ${name} في ${p.name}${note?" — "+note:""}`,currentUser.id));
+  closeModal("taskAcceptModal"); saveToStorage(); showToast("⏱️ تم إرسال طلب تعديل المدة"); renderCurrentPage(); updateNotifBadge();
+}
+function rejectTaskByWorker(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const note=document.getElementById("acceptNote").value.trim();
+  const prevAssignee=task.assignee;
+  task.wfStatus="not-started"; task.assignee=null; task.proposedDuration=null;
+  const name=getTaskDisplayName(task);
+  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"❌","رفض موظف مهمة",`${currentUser.name} رفض: ${name} في ${p.name}${note?" — "+note:""}`,currentUser.id));
+  closeModal("taskAcceptModal"); saveToStorage(); showToast("❌ تم رفض المهمة — تم إشعار المدير"); renderCurrentPage(); updateNotifBadge();
+}
+function openNegResponse(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const assignee=getMember(task.assignee);
+  const name=getTaskDisplayName(task);
+  document.getElementById("negResponseContent").innerHTML=`
+    <div style="font-size:14px;font-weight:700;margin-bottom:12px;">${name} — ${p.name}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="background:var(--blue-bg);border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">مدتك الأصلية</div>
+        <div style="font-size:22px;font-weight:700;color:var(--blue);">${task.duration||"—"}</div>
+        <div style="font-size:11px;color:var(--gray);">يوم</div>
+      </div>
+      <div style="background:var(--orange-bg);border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">طلب ${assignee?.name.split(" ")[0]||"الموظف"}</div>
+        <div style="font-size:22px;font-weight:700;color:var(--orange);">${task.proposedDuration}</div>
+        <div style="font-size:11px;color:var(--gray);">يوم</div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">المدة المعتمدة النهائية</label>
+      <input class="form-input" type="number" id="negFinalDur" value="${task.proposedDuration}" min="1"></div>
+    <div class="form-group"><label class="form-label">رسالة للموظف</label>
+      <textarea class="form-textarea" id="negAdminNote" rows="2"></textarea></div>`;
+  document.getElementById("negResponseFooter").innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal('negResponseModal')">إلغاء</button>
+    <button class="btn btn-danger" onclick="adminRejectNeg('${projId}',${taskIdx})">❌ رفض — إبقاء المدة الأصلية</button>
+    <button class="btn btn-success" onclick="adminAcceptNeg('${projId}',${taskIdx})">✅ قبول المدة الجديدة</button>`;
+  openModal("negResponseModal");
+}
+function adminAcceptNeg(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const dur=parseInt(document.getElementById("negFinalDur").value)||task.proposedDuration;
+  const note=document.getElementById("negAdminNote").value.trim();
+  task.duration=dur; task.durationLocked=true; task.proposedDuration=null; task.wfStatus="pending-accept";
+  const name=getTaskDisplayName(task);
+  addNotif(task.assignee,"✅","تم قبول طلب تعديل المدة",`${currentUser.name} وافق على ${dur} يوم لـ: ${name}${note?" — "+note:""}. يرجى التأكيد النهائي.`,currentUser.id);
+  closeModal("negResponseModal"); saveToStorage(); showToast("✅ تم قبول المدة الجديدة"); renderCurrentPage(); updateNotifBadge();
+}
+function adminRejectNeg(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const note=document.getElementById("negAdminNote").value.trim();
+  task.proposedDuration=null; task.wfStatus="pending-accept";
+  const name=getTaskDisplayName(task);
+  addNotif(task.assignee,"❌","طلب تعديل المدة مرفوض",`المدة تبقى ${task.duration} يوم لـ: ${name}${note?" — "+note:""}`,currentUser.id);
+  closeModal("negResponseModal"); saveToStorage(); showToast("❌ تم رفض طلب التعديل"); renderCurrentPage(); updateNotifBadge();
+}
+
+// ══════════════════════════════════════════════════════
+// START / SUBMIT / REVIEW / DELIVERY
+// ══════════════════════════════════════════════════════
+function startTask(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  task.wfStatus="in-progress"; task.startedAt=new Date().toISOString(); task.delayNotified=false;
+  const name=getTaskDisplayName(task);
+  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"▶️","بدأ تنفيذ مهمة",`${currentUser.name} بدأ: ${name} في ${p.name}`,currentUser.id));
+  saveToStorage(); showToast("▶️ بدأت المهمة"); renderCurrentPage(); updateNotifBadge();
+}
+function openSubmitTask(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const name=getTaskDisplayName(task);
+  const reviewer=getMember(task.reviewer);
+  document.getElementById("submitTaskTitle").textContent=`📤 تسليم: ${name}`;
+  document.getElementById("submitTaskContent").innerHTML=`
+    ${task.notes?`<div class="notes-box danger" style="margin-bottom:16px;"><div class="notes-label">💬 ملاحظات الإرجاع:</div>${task.notes}</div>`:''}
+    <div class="form-group"><label class="form-label">رابط الملف (Drive / OneDrive / غيره)</label>
+      <input class="form-input" id="submitLink" placeholder="https://..." value="${task.deliveryLink||''}" style="direction:ltr;"></div>
+    <div class="form-group"><label class="form-label">ملاحظات التسليم</label>
+      <textarea class="form-textarea" id="submitNotes" rows="2"></textarea></div>
+    ${reviewer?`<div style="background:var(--purple-bg);border-radius:8px;padding:12px;font-size:13px;color:var(--purple);">🔍 ستُرسل للمراجعة إلى: <strong>${reviewer.name}</strong></div>`:''}`;
+  document.getElementById("submitTaskFooter").innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal('submitTaskModal')">إلغاء</button>
+    <button class="btn btn-primary" onclick="submitTask('${projId}',${taskIdx})">📤 إرسال للمراجعة</button>`;
+  openModal("submitTaskModal");
+}
+function submitTask(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  task.wfStatus="submitted";
+  task.deliveryLink=document.getElementById("submitLink").value.trim();
+  task.submissionNotes=document.getElementById("submitNotes").value||"";
+  task.submittedAt=new Date().toISOString();
+  const name=getTaskDisplayName(task);
+  const notifyTo=task.reviewer||(USERS.find(u=>u.isAdmin)?.id);
+  if(notifyTo) addNotif(notifyTo,"📤","مهمة جديدة للمراجعة",`${currentUser.name} أنهى: ${name} في ${p.name} — تحتاج مراجعتك`,currentUser.id);
+  USERS.filter(u=>u.isAdmin&&u.id!==notifyTo).forEach(a=>addNotif(a.id,"📤","تسليم مهمة",`${currentUser.name} سلّم: ${name} في ${p.name}`,currentUser.id));
+  closeModal("submitTaskModal"); saveToStorage(); showToast("✅ تم الإرسال للمراجعة"); renderCurrentPage(); updateNotifBadge();
+}
+function openReview(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const assignee=getMember(task.assignee);
+  const name=getTaskDisplayName(task);
+  document.getElementById("reviewContent").innerHTML=`
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px;">${name}</div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:16px;">📁 ${p.name} | منفذ: ${assignee?assignee.name:"—"}</div>
+    ${task.deliveryLink?`<div class="form-group"><label class="form-label">الملف المُسلَّم</label>
+      <a href="${task.deliveryLink}" target="_blank" class="btn btn-ghost btn-sm">🔗 فتح الرابط</a></div>`:''}
+    ${task.submissionNotes?`<div class="notes-box" style="margin-bottom:12px;"><div class="notes-label">ملاحظات المنفذ:</div>${task.submissionNotes}</div>`:''}
+    <div class="form-group" style="margin-top:8px;"><label class="form-label">ملاحظات المراجعة (مطلوب عند الرفض)</label>
+      <textarea class="form-textarea" id="reviewNotes" rows="4">${task.notes||''}</textarea></div>`;
+  document.getElementById("reviewFooter").innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal('reviewModal')">إلغاء</button>
+    <button class="btn btn-danger" onclick="rejectTask('${projId}',${taskIdx})">❌ إرجاع مع ملاحظات</button>
+    <button class="btn btn-success" onclick="approveTask('${projId}',${taskIdx})">✅ اعتماد</button>`;
+  openModal("reviewModal");
+}
+function approveTask(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  task.wfStatus=task.deliveryTo==="internal"?"done":"delivery";
+  task.notes=""; task.approvedAt=new Date().toISOString();
+  const name=getTaskDisplayName(task);
+  addNotif(task.assignee,"✅",task.deliveryTo==="internal"?"مهمتك مكتملة!":"مهمتك اعتُمدت!",
+    task.deliveryTo==="internal"?`${name} في ${p.name} مكتملة (داخلي)`:`${name} في ${p.name} اعتُمدت — تنتظر التسليم للعميل`,currentUser.id);
+  if(!currentUser.isAdmin) USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"✅","اعتُمدت مهمة",`${currentUser.name} اعتمد: ${name} في ${p.name}`,currentUser.id));
+  closeModal("reviewModal"); saveToStorage(); showToast(task.deliveryTo==="internal"?"🎉 مكتملة داخلياً":"✅ اعتُمدت — جاهزة للتسليم"); renderCurrentPage(); updateNotifBadge();
+}
+function rejectTask(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const notes=document.getElementById("reviewNotes").value.trim();
+  if(!notes){showToast("⚠️ يرجى كتابة سبب الإرجاع");return;}
+  task.wfStatus="rejected"; task.notes=notes;
+  const name=getTaskDisplayName(task);
+  addNotif(task.assignee,"❌","مهمتك تحتاج تعديل",`${name} في ${p.name} أُرجعت مع ملاحظات`,currentUser.id);
+  if(!currentUser.isAdmin) USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"❌","إرجاع مهمة",`${currentUser.name} أرجع: ${name} في ${p.name}`,currentUser.id));
+  closeModal("reviewModal"); saveToStorage(); showToast("📋 تم الإرجاع مع الملاحظات"); renderCurrentPage(); updateNotifBadge();
+}
+function openDelivery(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const name=getTaskDisplayName(task);
+  document.getElementById("deliveryContent").innerHTML=`
+    <div style="font-size:15px;font-weight:700;margin-bottom:16px;">${name} — ${p.name}</div>
+    <div class="delivery-box">
+      <div class="delivery-box-title">📦 مرحلة التسليم النهائي</div>
+      <div class="form-group"><label class="form-label">جهة التسليم</label>
+        <select class="form-select" id="finalDeliveryTo">
+          <option value="client" ${task.deliveryTo==="client"?"selected":""}>المالك / العميل</option>
+          <option value="site" ${task.deliveryTo==="site"?"selected":""}>مهندس الموقع</option>
+          <option value="both" ${task.deliveryTo==="both"?"selected":""}>الاثنان</option>
+          <option value="internal" ${task.deliveryTo==="internal"?"selected":""}>داخلي</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">رابط مستند إثبات التسليم (Drive / أيميل)</label>
+        <input class="form-input" id="deliveryDocLink" placeholder="https://..." value="${task.deliveryLink||''}" style="direction:ltr;"></div>
+    </div>
+    <div style="margin-top:16px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">قرار العميل / مهندس الموقع:</div>
+      <div style="display:flex;gap:8px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:12px 16px;border:1.5px solid var(--gray-border);border-radius:8px;flex:1;">
+          <input type="radio" name="clientDec" value="approved" style="accent-color:var(--green);"> <span style="font-size:13px;font-weight:600;color:var(--green);">✅ اعتمد</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:12px 16px;border:1.5px solid var(--gray-border);border-radius:8px;flex:1;">
+          <input type="radio" name="clientDec" value="rejected" style="accent-color:var(--red);"> <span style="font-size:13px;font-weight:600;color:var(--red);">❌ أرجع بملاحظات</span>
+        </label>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:12px;"><label class="form-label">ملاحظات العميل</label>
+      <textarea class="form-textarea" id="clientNotes" rows="3">${task.clientNotes||''}</textarea></div>`;
+  document.getElementById("deliveryFooter").innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal('deliveryModal')">إلغاء</button>
+    <button class="btn btn-primary" onclick="saveDelivery('${projId}',${taskIdx})">💾 حفظ</button>`;
+  openModal("deliveryModal");
+}
+function saveDelivery(projId,taskIdx){
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  const dec=document.querySelector('input[name="clientDec"]:checked')?.value;
+  if(!dec){showToast("⚠️ يرجى تحديد قرار العميل");return;}
+  const link=document.getElementById("deliveryDocLink").value.trim();
+  const clientNotes=document.getElementById("clientNotes").value.trim();
+  const delivTo=document.getElementById("finalDeliveryTo").value;
+  task.deliveryTo=delivTo; task.deliveredAt=new Date().toISOString();
+  if(link) task.deliveryLink=link;
+  const name=getTaskDisplayName(task);
+  if(dec==="approved"){
+    task.wfStatus="done"; task.clientNotes="";
+    addNotif(task.assignee,"🎉","مهمتك مكتملة 100%!",`${name} في ${p.name} اعتُمدت من العميل!`,currentUser.id);
+    if(task.reviewer) addNotif(task.reviewer,"🎉","مهمة اكتملت",`${name} في ${p.name} اكتملت`,currentUser.id);
+    showToast("🎉 مكتملة 100%!");
+  } else {
+    if(!clientNotes){showToast("⚠️ يرجى كتابة ملاحظات العميل");return;}
+    task.wfStatus="client-rejected"; task.notes=clientNotes; task.clientNotes=clientNotes;
+    addNotif(task.assignee,"🔴","المخططات أُرجعت من المالك",`${name} في ${p.name} — أُرجعت بملاحظات`,currentUser.id);
+    showToast("📋 تم تسجيل الإرجاع");
+  }
+  closeModal("deliveryModal"); saveToStorage(); renderCurrentPage(); updateNotifBadge();
+}
+
+// ══════════════════════════════════════════════════════
+// ASSIGN TASK MODAL
+// ══════════════════════════════════════════════════════
+function switchTaskSource(mode){
+  taskSource=mode;
+  document.getElementById("taskSourceDrawing").style.display=mode==="drawing"?"":"none";
+  document.getElementById("taskSourceFree").style.display=mode==="free"?"":"none";
+  document.querySelectorAll("#taskSourceTabs .tab").forEach((t,i)=>{t.classList.toggle("active",(i===0&&mode==="drawing")||(i===1&&mode==="free"));});
+}
+function openNewTaskModal(projId){
+  if(!currentUser?.isAdmin){showToast("الأدمن فقط");return;}
+  currentAssignContext={mode:"new",projId,taskIdx:null};
+  document.getElementById("assignModalTitle").textContent="🎯 تعيين مهمة جديدة";
+  switchTaskSource("drawing");
+  const opts=projects.map(p=>`<option value="${p.id}" ${p.id===projId?"selected":""}>${p.name}</option>`).join("");
+  document.getElementById("assign_project").innerHTML=opts;
+  document.getElementById("assign_project_free").innerHTML=opts;
+  populateDrawingSelect();
+  populateMemberSelects();
+  document.getElementById("assignDuration").value="";
+  document.getElementById("assignStart").value=new Date().toISOString().split("T")[0];
+  document.getElementById("assignDeliveryTo").value="client";
+  document.getElementById("assignAdminNotes").value="";
+  document.getElementById("free_name_ar").value="";
+  document.getElementById("free_name_en").value="";
+  document.getElementById("free_desc").value="";
+  openModal("assignTaskModal");
+}
+function openEditTaskModal(projId,taskIdx){
+  if(!currentUser?.isAdmin){showToast("الأدمن فقط");return;}
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  const task=p.tasks[taskIdx];
+  currentAssignContext={mode:"edit",projId,taskIdx};
+  document.getElementById("assignModalTitle").textContent="✏️ تعديل المهمة";
+  switchTaskSource(task.type==="free"?"free":"drawing");
+  const opts=projects.map(p=>`<option value="${p.id}" ${p.id===projId?"selected":""}>${p.name}</option>`).join("");
+  document.getElementById("assign_project").innerHTML=opts;
+  document.getElementById("assign_project_free").innerHTML=opts;
+  populateDrawingSelect(task.drawingId);
+  populateMemberSelects(task.assignee,task.reviewer);
+  document.getElementById("assignDuration").value=task.duration||"";
+  document.getElementById("assignStart").value=task.taskStart||"";
+  document.getElementById("assignDeliveryTo").value=task.deliveryTo||"client";
+  document.getElementById("assignAdminNotes").value=task.adminNotes||"";
+  if(task.type==="free"){
+    document.getElementById("free_name_ar").value=task.freeNameAr||"";
+    document.getElementById("free_name_en").value=task.freeNameEn||"";
+    document.getElementById("free_type").value=task.freeType||"general";
+    document.getElementById("free_desc").value=task.freeDesc||"";
+  }
+  openModal("assignTaskModal");
+}
+function populateDrawingSelect(selectedId){
+  const grouped={};
+  DRAWINGS_DB.forEach(d=>{if(!grouped[d.cat])grouped[d.cat]=[];grouped[d.cat].push(d);});
+  let opts=`<option value="">اختر المخطط / المهمة</option>`;
+  DRAWING_CATEGORIES.forEach(cat=>{
+    const items=grouped[cat.id]||[];
+    if(!items.length) return;
+    opts+=`<optgroup label="${cat.icon} ${cat.ar}">`;
+    items.forEach(d=>{opts+=`<option value="${d.id}" ${d.id===selectedId?"selected":""}>${d.ar}</option>`;});
+    opts+=`</optgroup>`;
+  });
+  document.getElementById("assign_drawing").innerHTML=opts;
+}
+function populateMemberSelects(assignee,reviewer){
+  const teamOpts=TEAM.map(m=>`<option value="${m.id}" ${m.id===assignee?"selected":""}>${m.name} — ${m.role}</option>`).join("");
+  const adminOpts=USERS.filter(u=>u.isAdmin).map(u=>`<option value="${u.id}" ${u.id===reviewer?"selected":""}>${u.name} — ${u.role}</option>`).join("");
+  document.getElementById("assignMember").innerHTML=`<option value="">اختر المنفذ</option>`+teamOpts;
+  document.getElementById("assignReviewer").innerHTML=`<option value="">اختر المراجع (اختياري)</option>`+teamOpts+adminOpts;
+}
+function saveAssignment(){
+  const ctx=currentAssignContext||{};
+  const projId=taskSource==="drawing"?document.getElementById("assign_project").value:document.getElementById("assign_project_free").value;
+  if(!projId){showToast("⚠️ يرجى اختيار المشروع");return;}
+  const p=projects.find(x=>x.id===projId);
+  if(!p){showToast("⚠️ مشروع غير موجود");return;}
+  const memberId=document.getElementById("assignMember").value;
+  if(!memberId){showToast("⚠️ يرجى اختيار المنفذ");return;}
+  const reviewerId=document.getElementById("assignReviewer").value||null;
+  const dur=parseInt(document.getElementById("assignDuration").value)||null;
+  const start=document.getElementById("assignStart").value;
+  const deliveryTo=document.getElementById("assignDeliveryTo").value;
+  const adminNotes=document.getElementById("assignAdminNotes").value.trim();
+  if(ctx.mode==="edit"&&ctx.taskIdx!==null){
+    const task=p.tasks[ctx.taskIdx];
+    task.assignee=memberId||null; task.reviewer=reviewerId; task.deliveryTo=deliveryTo; task.adminNotes=adminNotes;
+    if(start) task.taskStart=start;
+    if(dur){task.duration=dur;task.durationLocked=true;}
+    if(memberId&&task.wfStatus==="not-started") task.wfStatus="pending-accept";
+    const name=getTaskDisplayName(task);
+    addNotif(memberId,"📋","تم تحديث مهمتك",`تم تحديث مهمة: ${name} في ${p.name} — يرجى المراجعة`,currentUser.id);
+  } else {
+    let newTask;
+    if(taskSource==="drawing"){
+      const drawingId=parseInt(document.getElementById("assign_drawing").value);
+      if(!drawingId){showToast("⚠️ يرجى اختيار المخطط");return;}
+      newTask=mkTask(null,drawingId,memberId,reviewerId,dur,start||p.start||new Date().toISOString().split("T")[0],"pending-accept",deliveryTo);
+    } else {
+      const arName=document.getElementById("free_name_ar").value.trim();
+      if(!arName){showToast("⚠️ يرجى إدخال اسم المهمة");return;}
+      const enName=document.getElementById("free_name_en").value.trim();
+      const fType=document.getElementById("free_type").value;
+      const desc=document.getElementById("free_desc").value.trim();
+      newTask=mkFreeTask(projId,arName,enName||arName,fType,desc,memberId,reviewerId,dur,start||p.start||new Date().toISOString().split("T")[0],"pending-accept",deliveryTo);
+    }
+    newTask.adminNotes=adminNotes;
+    p.tasks.push(newTask);
+    const name=getTaskDisplayName(newTask);
+    addNotif(memberId,"📋","مهمة جديدة معيّنة لك",
+      `مهمة: ${name} في ${p.name}${dur?" — المدة: "+dur+" أيام":''} — يرجى المراجعة والقبول`,currentUser.id);
+    if(reviewerId) addNotif(reviewerId,"👁️","ستُعيَّن لك مهمة للمراجعة",
+      `${getMember(memberId)?.name||"?"} سينهي: ${name} في ${p.name} وستصلك للمراجعة`,currentUser.id);
+  }
+  closeModal("assignTaskModal"); currentProjectId=projId;
+  saveToStorage(); showPage("projectDetail"); showToast("✅ تم الحفظ وإرسال الإشعار"); updateNotifBadge();
+}
+
+// ══════════════════════════════════════════════════════
+// CREATE PROJECT
+// ══════════════════════════════════════════════════════
+function createProject(){
+  const name=document.getElementById("np_name").value.trim();
+  const client=document.getElementById("np_client").value.trim();
+  const start=document.getElementById("np_start").value;
+  const end=document.getElementById("np_end").value;
+  if(!name||!client||!start||!end){showToast("⚠️ يرجى تعبئة جميع الحقول");return;}
+  const checked=[...document.querySelectorAll("#drawingsCheckboxes input:checked")].map(x=>parseInt(x.value)).filter(Boolean);
+  const tasks=checked.map(did=>mkTask(null,did,null,null,null,start,"not-started","client"));
+  const id="p"+Date.now();
+  projects.push({id,name,nameEn:name,client,clientEn:client,start,end,status:"active",tasks});
+  closeModal("newProjectModal");
+  document.getElementById("np_name").value="";
+  document.getElementById("np_client").value="";
+  document.getElementById("np_start").value="";
+  document.getElementById("np_end").value="";
+  currentProjectId=id;
+  saveToStorage(); showPage("projectDetail"); showToast("✅ تم إنشاء المشروع");
+}
+
+// ══════════════════════════════════════════════════════
+// PROJECT EDIT
+// ══════════════════════════════════════════════════════
+function openEditProjectModal(projId){
+  if(!currentUser?.isAdmin) return;
+  const p=projects.find(x=>x.id===projId); if(!p) return;
+  document.getElementById("ep_id").value=projId;
+  document.getElementById("ep_name").value=p.name;
+  document.getElementById("ep_client").value=p.client||"";
+  document.getElementById("ep_start").value=p.start||"";
+  document.getElementById("ep_end").value=p.end||"";
+  document.getElementById("ep_status").value=p.status||"active";
+  openModal("editProjectModal");
+}
+function saveProjectEdit(){
+  const id=document.getElementById("ep_id").value;
+  const p=projects.find(x=>x.id===id); if(!p) return;
+  p.name=document.getElementById("ep_name").value.trim()||p.name;
+  p.client=document.getElementById("ep_client").value.trim();
+  p.start=document.getElementById("ep_start").value;
+  p.end=document.getElementById("ep_end").value;
+  p.status=document.getElementById("ep_status").value;
+  p.nameEn=p.name; p.clientEn=p.client;
+  closeModal("editProjectModal"); saveToStorage(); renderCurrentPage(); showToast("✅ تم تحديث المشروع");
+}
+
+// ══════════════════════════════════════════════════════
+// TEAM MANAGEMENT
+// ══════════════════════════════════════════════════════
+const MEMBER_COLORS=["#7C3AED","#DB2777","#0891B2","#059669","#D97706","#DC2626","#2563EB","#0F766E","#9333EA","#C2410C","#B45309","#1D4ED8"];
+let colorIndex=5;
+function openAddMemberModal(){
+  if(!currentUser?.isAdmin){showToast("الأدمن فقط");return;}
+  document.getElementById("nm_name").value="";
+  document.getElementById("nm_nameEn").value="";
+  document.getElementById("nm_role").value="";
+  document.getElementById("nm_roleEn").value="";
+  document.getElementById("nm_otp").value="D_12345678";
+  openModal("addMemberModal");
+}
+function saveNewMember(){
+  const name=document.getElementById("nm_name").value.trim();
+  const nameEn=document.getElementById("nm_nameEn").value.trim();
+  const role=document.getElementById("nm_role").value.trim();
+  const roleEn=document.getElementById("nm_roleEn").value.trim();
+  const otp=document.getElementById("nm_otp").value.trim()||DEFAULT_OTP;
+  if(!name||!role){showToast("⚠️ الاسم والمنصب مطلوبان");return;}
+  const id=(name+Date.now()).replace(/\s+/g,"_").replace(/[^\w]/g,"").toLowerCase();
+  const color=MEMBER_COLORS[colorIndex%MEMBER_COLORS.length]; colorIndex++;
+  const member={id,name,nameEn:nameEn||name,role,roleEn:roleEn||role,color};
+  TEAM.push(member);
+  syncUsersFromTeam();
+  // Store OTP hash (first-login password)
+  // We don't set a hash — isFirstLogin returns true so DEFAULT_OTP is accepted
+  // But if admin set a custom OTP, store it
+  if(otp!==DEFAULT_OTP){ setPassHash(id, otp); }
+  // Actually keep as OTP (no stored hash = first login = DEFAULT_OTP or custom)
+  // For custom OTP we store it so it works
+  const obj=loadPasswords(); obj[id]="OTP:"+otp; savePasswords(obj);
+  closeModal("addMemberModal");
+  renderDrawingCheckboxes(); initLogin();
+  saveToStorage(); renderCurrentPage(); showToast(`✅ تم إضافة ${name} — كلمة المرور المؤقتة: ${otp}`);
+  updateNotifBadge();
+}
+// Override checkPassword to handle custom OTP
+const _origCheckPassword=checkPassword;
+function checkPassword(userId,plain){
+  const stored=getPassHash(userId);
+  if(!stored) return plain===DEFAULT_OTP;
+  if(stored.startsWith("OTP:")) return plain===stored.slice(4); // custom OTP
+  return stored===hashPass(plain);
+}
+function isFirstLogin(userId){
+  const stored=getPassHash(userId);
+  return !stored || stored.startsWith("OTP:");
+}
+// After first login with OTP, mark as needing change
+// (already handled by submitPassword → screenChangePass flow)
+
+function removeMember(id){
+  const m=TEAM.find(x=>x.id===id); if(!m) return;
+  const active=projects.flatMap(p=>p.tasks).filter(t=>t.assignee===id&&!["done","client-approved"].includes(t.wfStatus));
+  if(active.length>0){showToast(`⚠️ لا يمكن الحذف — لدى ${m.name} ${active.length} مهمة نشطة`);return;}
+  if(!confirm(`هل تريد حذف ${m.name} من الفريق؟`)) return;
+  TEAM.splice(TEAM.findIndex(x=>x.id===id),1);
+  syncUsersFromTeam(); initLogin();
+  saveToStorage(); renderCurrentPage(); showToast(`🗑️ تم حذف ${m.name}`);
+}
+function renderTeamPage(){
+  const isAdmin=currentUser?.isAdmin;
+  document.getElementById("teamPage").innerHTML=`
+  ${isAdmin?`<div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+    <button class="btn btn-primary" onclick="openAddMemberModal()">➕ إضافة موظف جديد</button>
+  </div>`:''}
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
+    ${TEAM.map(m=>{
+      const mt=memberTasks(m.id);
+      const md=mt.filter(t=>["done","client-approved"].includes(t.wfStatus)).length;
+      const mw=mt.filter(t=>["in-progress","submitted","approved","delivery"].includes(t.wfStatus)).length;
+      const pct=mt.length?Math.round(md/mt.length*100):0;
+      const projs=[...new Set(projects.filter(p=>p.tasks.some(t=>t.assignee===m.id)).map(p=>p.id))];
+      return`<div class="card" style="padding:20px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <div class="member-avatar" style="background:${m.color};width:44px;height:44px;font-size:16px;">${m.name[0]}</div>
+          <div style="flex:1;"><div style="font-size:15px;font-weight:700;">${m.name}</div><div style="font-size:12px;color:var(--gray);">${m.role}</div></div>
+          <div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--gold)">${pct}%</div><div style="font-size:10px;color:var(--gray);">إنجاز</div></div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px;"><div class="progress-fill" style="width:${pct}%;background:${m.color}"></div></div>
+        <div class="member-stats">
+          <div class="m-stat done"><div class="n">${md}</div><div class="l">مكتمل</div></div>
+          <div class="m-stat wip"><div class="n">${mw}</div><div class="l">جاري</div></div>
+          <div class="m-stat rem"><div class="n">${mt.length-md-mw}</div><div class="l">متبقي</div></div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--gray);display:flex;justify-content:space-between;align-items:center;">
+          <span>📁 ${projs.length} مشاريع | 📋 ${mt.length} مهمة</span>
+          ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="removeMember('${m.id}')">🗑️</button>`:''}
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// DRAWINGS DB & ADMIN
+// ══════════════════════════════════════════════════════
+function renderDrawingsDB(){
+  const grouped={};
+  DRAWINGS_DB.forEach(d=>{if(!grouped[d.cat])grouped[d.cat]=[];grouped[d.cat].push(d);});
+  let html='';
+  DRAWING_CATEGORIES.forEach(cat=>{
+    const items=grouped[cat.id]||[];
+    if(!items.length) return;
+    html+=`<div class="cat-section-header">${cat.icon} ${cat.ar} <span style="font-size:11px;opacity:0.6;">(${items.length})</span></div><div class="drawings-grid">`;
+    items.forEach(d=>{
+      const ti=typeIcon(d.type);
+      html+=`<div class="drawing-card">
+        <div style="width:34px;height:34px;border-radius:8px;background:${cat.color}18;border:1px solid ${cat.color}30;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${cat.color};font-family:var(--font-en);flex-shrink:0;">${d.id}</div>
+        <div><div style="font-size:13px;font-weight:600;">${d.ar}</div>
+          <div style="font-size:11px;color:var(--gray);">${d.en}</div>
+          <span style="font-size:10px;background:${cat.color}12;color:${cat.color};padding:1px 6px;border-radius:8px;margin-top:4px;display:inline-block;">${ti} ${d.type==="table"?"جدول":d.type==="letter"?"خطاب":d.type==="offer"?"عرض سعر":d.type==="report"?"تقرير":"مخطط"}</span>
+        </div></div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById("drawingsDBContent").innerHTML=html||`<div class="empty-state"><div class="icon">📐</div><div>لا توجد مخططات</div></div>`;
+}
+function renderDrawingCheckboxes(){
+  const grouped={};
+  DRAWINGS_DB.forEach(d=>{if(!grouped[d.cat])grouped[d.cat]=[];grouped[d.cat].push(d);});
+  let html='';
+  DRAWING_CATEGORIES.forEach(cat=>{
+    const items=grouped[cat.id]||[];
+    if(!items.length) return;
+    html+=`<div style="padding:5px 8px;background:${cat.color}12;border-radius:6px;font-size:11px;font-weight:700;color:${cat.color};margin-bottom:4px;margin-top:8px;">${cat.icon} ${cat.ar}</div>`;
+    items.forEach(d=>{html+=`<label class="checkbox-label" style="margin-bottom:3px;padding:3px 8px;"><input type="checkbox" value="${d.id}"><span style="font-size:12px;">${d.ar}</span></label>`;});
+  });
+  const el=document.getElementById("drawingsCheckboxes"); if(el) el.innerHTML=html;
+}
+function renderAdminDrawings(){
+  const grouped={};
+  DRAWINGS_DB.forEach(d=>{if(!grouped[d.cat])grouped[d.cat]=[];grouped[d.cat].push(d);});
+  let html='<div style="display:grid;gap:16px;">';
+  DRAWING_CATEGORIES.forEach(cat=>{
+    const items=grouped[cat.id]||[];
+    html+=`<div class="card"><div class="card-header" style="background:${cat.color}08;"><div class="card-title" style="color:${cat.color};">${cat.icon} ${cat.ar}</div><span style="font-size:12px;color:var(--gray);">${items.length} عنصر</span></div>
+      <div style="padding:12px 16px;">
+        ${items.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F3F4F6;">
+          <div><span style="font-size:11px;color:var(--gray);margin-left:8px;">#${d.id}</span><span style="font-size:13px;font-weight:500;">${d.ar}</span></div>
+          <button class="btn btn-danger btn-sm" onclick="removeDrawing(${d.id})">🗑️</button>
+        </div>`).join("")}
+        ${!items.length?`<div style="color:var(--gray);font-size:13px;text-align:center;padding:8px;">لا توجد عناصر</div>`:''}
+      </div></div>`;
+  });
+  html+='</div>';
+  document.getElementById("adminDrawingsContent").innerHTML=html;
+}
+function initAddDrawingCategorySelect(){
+  const el=document.getElementById("nd_category"); if(!el) return;
+  el.innerHTML=DRAWING_CATEGORIES.map(c=>`<option value="${c.id}">${c.icon} ${c.ar}</option>`).join("");
+}
+function addNewDrawing(){
+  const cat=document.getElementById("nd_category").value;
+  const ar=document.getElementById("nd_ar").value.trim();
+  const en=document.getElementById("nd_en").value.trim();
+  const type=document.getElementById("nd_type").value;
+  if(!ar||!en||!cat){showToast("⚠️ يرجى تعبئة جميع الحقول");return;}
+  DRAWINGS_DB.push({id:nextDrawingId++,cat,ar,en,type});
+  document.getElementById("nd_ar").value=""; document.getElementById("nd_en").value="";
+  closeModal("addDrawingModal"); renderCurrentPage(); renderDrawingCheckboxes();
+  saveToStorage(); showToast("✅ تم الإضافة");
+}
+function removeDrawing(id){
+  if(!confirm("هل تريد حذف هذا العنصر؟")) return;
+  DRAWINGS_DB=DRAWINGS_DB.filter(d=>d.id!==id);
+  renderCurrentPage(); renderDrawingCheckboxes(); saveToStorage(); showToast("🗑️ تم الحذف");
+}
+
+// ══════════════════════════════════════════════════════
+// DURATION
+// ══════════════════════════════════════════════════════
+function setDuration(projId,idx,val){
+  const p=projects.find(x=>x.id===projId);if(!p)return;
+  p.tasks[idx].duration=parseInt(val)||null;
+  if(!currentUser?.isAdmin&&p.tasks[idx].allowSelfDuration){p.tasks[idx].durationLocked=true;showToast("تم حفظ المدة");}
+  saveToStorage(); renderProjectDetail(projId);
+}
+function lockDuration(projId,idx){const p=projects.find(x=>x.id===projId);if(p){p.tasks[idx].durationLocked=true;saveToStorage();renderProjectDetail(projId);showToast("🔒 قُفل");}}
+function unlockDuration(projId,idx){const p=projects.find(x=>x.id===projId);if(p){p.tasks[idx].durationLocked=false;saveToStorage();renderProjectDetail(projId);showToast("🔓 فُك");}}
+
+// ══════════════════════════════════════════════════════
+// MODAL / TOAST
+// ══════════════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add("open");}
+function closeModal(id){document.getElementById(id).classList.remove("open");}
+function showToast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2800);}
+
+// ══════════════════════════════════════════════════════
+// EMAIL REGISTRATION & PASSWORD RESET
+// ══════════════════════════════════════════════════════
+
+// Admin emails — reset codes always go here too
+const ADMIN_EMAILS = {
+  radwan: "radwan@darc.sa",    // ← غيّر لإيميلك الحقيقي
+  jihad:  "jihad@darc.sa",     // ← إيميل م. جهاد
+};
+
+function getUserEmail(userId){
+  try{ return JSON.parse(localStorage.getItem("darc_emails")||"{}")[userId]||null; }
+  catch(e){ return null; }
+}
+function setUserEmail(userId, email){
+  const obj=JSON.parse(localStorage.getItem("darc_emails")||"{}");
+  obj[userId]=email;
+  localStorage.setItem("darc_emails", JSON.stringify(obj));
+}
+
+// Reset code storage
+let _activeResetCode = null;
+let _resetUserId = null;
+
+function generateCode(){
+  return Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+// Called after OTP verified — show email registration screen first
+function showEmailRegistration(){
+  document.getElementById("screenPassword").classList.add("hidden");
+  document.getElementById("screenChangePass").classList.add("hidden");
+  document.getElementById("screenRegEmail").classList.remove("hidden");
+  document.getElementById("regEmail").value = getUserEmail(_loginUser.id)||"";
+  document.getElementById("regEmailError").textContent="";
+}
+
+function saveRegEmail(){
+  const email = document.getElementById("regEmail").value.trim();
+  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    document.getElementById("regEmailError").textContent = t("يرجى إدخال إيميل صحيح","Please enter a valid email");
+    return;
+  }
+  if(email) setUserEmail(_loginUser.id, email);
+  document.getElementById("screenRegEmail").classList.add("hidden");
+  // Now go to change password
+  document.getElementById("screenChangePass").classList.remove("hidden");
+  document.getElementById("newPass1").value="";
+  document.getElementById("newPass2").value="";
+  document.getElementById("changePassError").textContent="";
+  checkPassRules();
+}
+function skipRegEmail(){
+  document.getElementById("screenRegEmail").classList.add("hidden");
+  document.getElementById("screenChangePass").classList.remove("hidden");
+  document.getElementById("newPass1").value="";
+  document.getElementById("newPass2").value="";
+  document.getElementById("changePassError").textContent="";
+  checkPassRules();
+}
+
+// Forgot password flow
+function openForgotPass(){
+  _resetUserId = _loginUser?.id;
+  if(!_resetUserId) return;
+  const email = getUserEmail(_resetUserId);
+  const user = USERS.find(u=>u.id===_resetUserId);
+  const infoEl = document.getElementById("forgotUserInfo");
+  if(email){
+    infoEl.innerHTML = `👤 <strong>${user?.name||_resetUserId}</strong><br>📧 ${email}`;
+  } else {
+    infoEl.innerHTML = `<span style="color:var(--red);">⚠️ ${t("لم تسجّل إيميلك بعد. سيُرسل الكود على إيميل المدير فقط","No email registered. Code will be sent to admin email only.")}</span>`;
+  }
+  document.getElementById("forgotStep1").style.display="";
+  document.getElementById("forgotStep2").style.display="none";
+  document.getElementById("forgotError").textContent="";
+  document.getElementById("screenPassword").classList.add("hidden");
+  document.getElementById("screenForgotPass").classList.remove("hidden");
+}
+function closeForgotPass(){
+  document.getElementById("screenForgotPass").classList.add("hidden");
+  document.getElementById("screenPassword").classList.remove("hidden");
+}
+
+function sendResetCode(){
+  _activeResetCode = generateCode();
+  const user = USERS.find(u=>u.id===_resetUserId);
+  const userEmail = getUserEmail(_resetUserId);
+  const adminEmails = Object.values(ADMIN_EMAILS).join(", ");
+
+  // Build mailto links (since this is offline — no real email server)
+  // We show the code prominently + give mailto links for admins to use
+  document.getElementById("forgotStep1").style.display="none";
+  document.getElementById("forgotStep2").style.display="";
+
+  const infoHtml = `
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px;">${t("كود الاستعادة الخاص بك:","Your recovery code:")}</div>
+    <div style="font-size:28px;font-weight:900;letter-spacing:8px;color:var(--dark);margin:8px 0;font-family:var(--font-en);">${_activeResetCode}</div>
+    <div style="font-size:11px;color:var(--gray);margin-top:6px;">${t("صالح لمدة 15 دقيقة فقط","Valid for 15 minutes only")}</div>
+    <hr style="border:none;border-top:1px solid #A7F3D0;margin:10px 0;">
+    <div style="font-size:11px;">
+      ${userEmail?`📧 ${t("سيصل على:","Sent to:")} ${userEmail}<br>`:''}
+      📧 ${t("وعلى إيميل المدير","And admin email")}
+    </div>
+    <div style="margin-top:10px;">
+      <a href="mailto:${userEmail||adminEmails}?subject=DARC Reset Code&body=كود الاستعادة: ${_activeResetCode} — ${user?.name||''}%0A%0AValidity: 15 minutes"
+         class="btn btn-ghost btn-sm" style="font-size:11px;" target="_blank">
+        📤 ${t("فتح تطبيق الإيميل","Open Email App")}
+      </a>
+    </div>`;
+  document.getElementById("resetCodeInfo").innerHTML = infoHtml;
+  document.getElementById("resetCodeInput").value="";
+  document.getElementById("resetNewPass1").value="";
+  document.getElementById("resetNewPass2").value="";
+  document.getElementById("resetError").textContent="";
+
+  // Set 15 min expiry
+  setTimeout(()=>{ _activeResetCode=null; }, 15*60*1000);
+}
+
+function checkResetPassRules(){
+  const v=document.getElementById("resetNewPass1").value;
+  [{id:"rrule-len",ok:v.length>=8},{id:"rrule-num",ok:/\d/.test(v)},{id:"rrule-upper",ok:/[A-Z]/.test(v)}]
+    .forEach(r=>{const el=document.getElementById(r.id);if(!el)return;el.classList.toggle("ok",r.ok);el.classList.toggle("bad",!r.ok&&v.length>0);});
+}
+
+function submitResetPassword(){
+  const code = document.getElementById("resetCodeInput").value.trim().toUpperCase();
+  const p1 = document.getElementById("resetNewPass1").value;
+  const p2 = document.getElementById("resetNewPass2").value;
+  const err = document.getElementById("resetError");
+  if(!_activeResetCode){ err.textContent=t("انتهت صلاحية الكود — أعد الطلب","Code expired — request again"); return; }
+  if(code!==_activeResetCode){ err.textContent=t("الكود غير صحيح ❌","Incorrect code ❌"); return; }
+  if(p1.length<8){ err.textContent=t("كلمة المرور قصيرة جداً","Password too short"); return; }
+  if(!/\d/.test(p1)){ err.textContent=t("يجب أن تحتوي على رقم","Must contain a number"); return; }
+  if(!/[A-Z]/.test(p1)){ err.textContent=t("يجب أن تحتوي على حرف كبير","Must contain uppercase"); return; }
+  if(p1!==p2){ err.textContent=t("كلمتا المرور غير متطابقتين","Passwords don't match"); return; }
+  setPassHash(_resetUserId, p1);
+  _activeResetCode=null;
+  document.getElementById("screenForgotPass").classList.add("hidden");
+  document.getElementById("screenPassword").classList.remove("hidden");
+  showToast(t("✅ تم تغيير كلمة المرور — ادخل الآن","✅ Password changed — login now"));
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+initSampleData();      // sets default projects if localStorage is empty
+loadFromStorage();     // loads saved data on top
+syncUsersFromTeam();
+initLogin();
+renderDrawingCheckboxes();
+initAddDrawingCategorySelect();
+
+document.querySelectorAll(".modal-overlay").forEach(m=>{
+  m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open");});
+});
+document.addEventListener("click",e=>{
+  const panel=document.getElementById("notifPanel");
+  const btn=document.getElementById("notifBtn");
+  if(panel.classList.contains("open")&&!panel.contains(e.target)&&!btn.contains(e.target))
+    panel.classList.remove("open");
+});
+</script>
+</body>
+</html>
