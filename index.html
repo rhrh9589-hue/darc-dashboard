@@ -314,94 +314,21 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
 <!-- ══ SCREEN 2: PASSWORD ══ -->
 <div class="screen hidden" id="screenPassword">
   <div class="auth-box">
-    <div class="pass-back" onclick="backToSelect()">← <span data-ar="العودة" data-en="Back">العودة</span></div>
+    <div class="pass-back" onclick="backToSelect()">← العودة</div>
     <div class="pass-avatar" id="passAvatar"></div>
     <div class="pass-name" id="passName"></div>
     <div class="pass-role" id="passRole"></div>
     <div class="otp-badge" id="otpBadge" style="display:none">
-      🔐 <span data-ar="هذه أول مرة تدخل — كلمة المرور المؤقتة هي" data-en="First login — your temporary password is">هذه أول مرة تدخل — كلمة المرور المؤقتة هي</span> <strong>D_12345678</strong><br>
-      <span data-ar="بعد الدخول ستُطلب منك تغييرها فوراً" data-en="You will be asked to change it immediately">بعد الدخول ستُطلب منك تغييرها فوراً</span>
+      🔐 هذه أول مرة تدخل — كلمة المرور المؤقتة هي <strong>D_12345678</strong><br>
+      بعد الدخول ستُطلب منك تغييرها فوراً
     </div>
     <div class="pass-input-wrap">
-      <input class="pass-input" type="password" id="passInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitPassword()">
+      <input class="pass-input" type="password" id="passInput" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')submitPassword()">
       <button class="pass-toggle" onclick="togglePassVis()" id="passToggleBtn">👁️</button>
     </div>
     <div class="pass-error" id="passError"></div>
     <br>
-    <button class="btn btn-primary btn-full" onclick="submitPassword()"><span data-ar="دخول ←" data-en="Login →">دخول ←</span></button>
-    <div style="margin-top:14px;">
-      <button onclick="openForgotPass()" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;">
-        <span data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SCREEN 3a: REGISTER EMAIL (after OTP login, before change password) ══ -->
-<div class="screen hidden" id="screenRegEmail">
-  <div class="auth-box">
-    <div class="auth-logo">📧</div>
-    <div class="auth-title" data-ar="تسجيل إيميلك" data-en="Register Your Email">تسجيل إيميلك</div>
-    <div class="auth-sub" data-ar="يُستخدم فقط لاستعادة كلمة المرور — لن يُشارك مع أي جهة" data-en="Used only for password recovery — never shared">يُستخدم فقط لاستعادة كلمة المرور — لن يُشارك مع أي جهة</div>
-    <div class="form-group" style="text-align:right;">
-      <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email Address">البريد الإلكتروني</label>
-      <input class="form-input" type="email" id="regEmail" placeholder="example@email.com" style="direction:ltr;text-align:left;">
-    </div>
-    <div style="background:var(--blue-bg);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px;text-align:right;">
-      💡 <span data-ar="إذا نسيت كلمة مرورك، سيُرسل كود استعادة على هذا الإيميل" data-en="If you forget your password, a recovery code will be sent to this email">إذا نسيت كلمة مرورك، سيُرسل كود استعادة على هذا الإيميل</span>
-    </div>
-    <div class="pass-error" id="regEmailError"></div>
-    <button class="btn btn-primary btn-full" onclick="saveRegEmail()"><span data-ar="متابعة ←" data-en="Continue →">متابعة ←</span></button>
-    <div style="margin-top:10px;">
-      <button onclick="skipRegEmail()" style="background:none;border:none;color:var(--gray);font-size:12px;cursor:pointer;font-family:inherit;">
-        <span data-ar="تخطي الآن (غير موصى به)" data-en="Skip for now (not recommended)">تخطي الآن (غير موصى به)</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SCREEN 4: FORGOT PASSWORD ══ -->
-<div class="screen hidden" id="screenForgotPass">
-  <div class="auth-box">
-    <div class="pass-back" onclick="closeForgotPass()">← <span data-ar="العودة" data-en="Back">العودة</span></div>
-    <div class="auth-logo">🔑</div>
-    <div class="auth-title" data-ar="استعادة كلمة المرور" data-en="Password Recovery">استعادة كلمة المرور</div>
-    <div id="forgotStep1">
-      <div class="auth-sub" data-ar="سيُرسل كود مؤقت على إيميلك المسجل وعلى إيميل المدير" data-en="A temporary code will be sent to your registered email and the admin email">سيُرسل كود مؤقت على إيميلك المسجل وعلى إيميل المدير</div>
-      <div id="forgotUserInfo" style="background:var(--gold-bg);border:1px solid var(--gold-pale);border-radius:8px;padding:12px;margin-bottom:16px;text-align:right;font-size:13px;"></div>
-      <button class="btn btn-primary btn-full" onclick="sendResetCode()"><span data-ar="إرسال كود الاستعادة" data-en="Send Recovery Code">إرسال كود الاستعادة</span></button>
-      <div class="pass-error" id="forgotError" style="margin-top:8px;"></div>
-    </div>
-    <div id="forgotStep2" style="display:none;">
-      <div class="auth-sub" data-ar="أدخل الكود المرسل على إيميلك" data-en="Enter the code sent to your email">أدخل الكود المرسل على إيميلك</div>
-      <div style="background:var(--green-bg);border:1px solid #A7F3D0;border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--green);text-align:right;" id="resetCodeInfo"></div>
-      <div class="form-group">
-        <input class="pass-input" type="text" id="resetCodeInput" placeholder="XXXXXX" style="letter-spacing:6px;text-align:center;font-size:20px;text-transform:uppercase;" maxlength="6">
-      </div>
-      <div class="form-group" style="text-align:right;">
-        <label class="form-label" data-ar="كلمة المرور الجديدة" data-en="New Password">كلمة المرور الجديدة</label>
-        <div class="pass-input-wrap">
-          <input class="pass-input" type="password" id="resetNewPass1" placeholder="••••••••" oninput="checkResetPassRules()">
-          <button class="pass-toggle" onclick="togglePassVis2('resetNewPass1')">👁️</button>
-        </div>
-      </div>
-      <div style="text-align:right;margin-bottom:12px;">
-        <div class="pwd-rule" id="rrule-len" data-ar="8 أحرف على الأقل" data-en="At least 8 characters">8 أحرف على الأقل</div>
-        <div class="pwd-rule" id="rrule-num" data-ar="تحتوي على رقم" data-en="Contains a number">تحتوي على رقم</div>
-        <div class="pwd-rule" id="rrule-upper" data-ar="تحتوي على حرف كبير" data-en="Contains uppercase letter">تحتوي على حرف كبير</div>
-      </div>
-      <div class="form-group" style="text-align:right;">
-        <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
-        <div class="pass-input-wrap">
-          <input class="pass-input" type="password" id="resetNewPass2" placeholder="••••••••">
-          <button class="pass-toggle" onclick="togglePassVis2('resetNewPass2')">👁️</button>
-        </div>
-      </div>
-      <div class="pass-error" id="resetError"></div>
-      <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="submitResetPassword()">
-        <span data-ar="✅ تعيين كلمة المرور الجديدة" data-en="✅ Set New Password">✅ تعيين كلمة المرور الجديدة</span>
-      </button>
-    </div>
+    <button class="btn btn-primary btn-full" onclick="submitPassword()">دخول ←</button>
   </div>
 </div>
 
@@ -409,8 +336,8 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
 <div class="screen hidden" id="screenChangePass">
   <div class="auth-box">
     <div class="auth-logo">🔐</div>
-    <div class="auth-title" data-ar="تعيين كلمة مرور جديدة" data-en="Set New Password">تعيين كلمة مرور جديدة</div>
-    <div class="auth-sub" data-ar="هذه خطوة إلزامية — ستُستخدم في كل دخول قادم" data-en="Mandatory step — will be used for all future logins">هذه خطوة إلزامية — ستُستخدم في كل دخول قادم</div>
+    <div class="auth-title">تعيين كلمة مرور جديدة</div>
+    <div class="auth-sub">هذه خطوة إلزامية — ستُستخدم في كل دخول قادم</div>
     <div class="form-group" style="text-align:right;">
       <label class="form-label">كلمة المرور الجديدة</label>
       <div class="pass-input-wrap">
@@ -436,6 +363,43 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
   </div>
 </div>
 
+<!-- QR SYNC MODAL -->
+<div class="modal-overlay" id="qrSyncModal">
+  <div class="modal" style="max-width:480px;text-align:center;">
+    <div class="modal-header">
+      <div class="modal-title">📲 مزامنة كلمة المرور عبر QR</div>
+      <button class="modal-close" onclick="closeModal('qrSyncModal')">✕</button>
+    </div>
+    <div style="padding:0 8px 8px;">
+      <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">اختر عضو الفريق لتوليد QR خاص به — يمسحه من الجوال لتطبيق كلمة مروره مباشرة</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;" id="qrUserBtns"></div>
+      <div id="qrCodeArea" style="display:none;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;" id="qrUserLabel"></div>
+        <div style="font-size:12px;color:var(--gray);margin-bottom:16px;">امسح هذا الـ QR من الجوال لتطبيق كلمة المرور</div>
+        <div style="display:flex;justify-content:center;margin-bottom:16px;">
+          <canvas id="qrCanvas" style="border-radius:12px;border:3px solid var(--gold-pale);padding:8px;background:#fff;"></canvas>
+        </div>
+        <div style="background:var(--orange-bg);border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--orange);">
+          ⚠️ هذا الـ QR يحتوي على كلمة المرور الحالية — لا تشاركه إلا مع صاحبه
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="downloadQR()">⬇️ تحميل QR</button>
+        </div>
+      </div>
+      <div id="qrEmptyMsg" style="color:var(--gray);font-size:13px;padding:20px 0;">اختر عضواً من الأعلى</div>
+    </div>
+  </div>
+</div>
+
+<!-- QR APPLY SCREEN -->
+<div class="screen hidden" id="screenQRImport">
+  <div class="auth-box" style="max-width:380px;">
+    <div class="auth-logo">📲</div>
+    <div class="auth-title">مزامنة كلمة المرور</div>
+    <div id="qrImportContent"></div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 <!-- SAVE INDICATOR -->
@@ -457,21 +421,22 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
     <div class="logo-text"><div class="brand">DARC</div><div class="sub">المتقدمة للإنشاءات</div></div>
   </div>
   <div class="sidebar-section">
-    <div class="sidebar-section-label" data-ar="الرئيسية" data-en="MAIN">الرئيسية</div>
-    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span><span data-ar="لوحة التحكم" data-en="Dashboard">لوحة التحكم</span></div>
-    <div class="nav-item" onclick="showPage('projects')"><span class="nav-icon">🏗️</span><span data-ar="المشاريع" data-en="Projects">المشاريع</span></div>
+    <div class="sidebar-section-label">الرئيسية</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span><span>لوحة التحكم</span></div>
+    <div class="nav-item" onclick="showPage('projects')"><span class="nav-icon">🏗️</span><span>المشاريع</span></div>
     <div class="nav-item" onclick="showPage('myTasks')">
-      <span class="nav-icon">📋</span><span data-ar="مهامي" data-en="My Tasks">مهامي</span>
+      <span class="nav-icon">📋</span><span>مهامي</span>
       <span class="nav-badge" id="myTasksBadge">0</span>
     </div>
-    <div class="nav-item" onclick="showPage('drawingsDB')"><span class="nav-icon">📐</span><span data-ar="قاعدة المخططات" data-en="Drawings DB">قاعدة المخططات</span></div>
+    <div class="nav-item" onclick="showPage('drawingsDB')"><span class="nav-icon">📐</span><span>قاعدة المخططات</span></div>
   </div>
   <div class="sidebar-section" id="adminNavSection" style="display:none">
-    <div class="sidebar-section-label" data-ar="إدارة" data-en="ADMIN">إدارة</div>
-    <div class="nav-item" onclick="showPage('team')"><span class="nav-icon">👥</span><span data-ar="الفريق" data-en="Team">الفريق</span></div>
-    <div class="nav-item" onclick="openNewTaskModal(null)"><span class="nav-icon">➕</span><span data-ar="مهمة جديدة" data-en="New Task">مهمة جديدة</span></div>
-    <div class="nav-item" onclick="openModal('newProjectModal')"><span class="nav-icon">🏗️</span><span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></div>
-    <div class="nav-item" onclick="showPage('adminDrawings')"><span class="nav-icon">🗂️</span><span data-ar="إدارة المخططات" data-en="Manage Drawings">إدارة المخططات</span></div>
+    <div class="sidebar-section-label">إدارة</div>
+    <div class="nav-item" onclick="showPage('team')"><span class="nav-icon">👥</span><span>الفريق</span></div>
+    <div class="nav-item" onclick="openNewTaskModal(null)"><span class="nav-icon">➕</span><span>مهمة جديدة</span></div>
+    <div class="nav-item" onclick="openModal('newProjectModal')"><span class="nav-icon">🏗️</span><span>مشروع جديد</span></div>
+    <div class="nav-item" onclick="showPage('adminDrawings')"><span class="nav-icon">🗂️</span><span>إدارة المخططات</span></div>
+    <div class="nav-item" onclick="openQRSyncModal()"><span class="nav-icon">📲</span><span>مزامنة QR</span></div>
   </div>
   <div class="sidebar-user">
     <div class="user-card">
@@ -479,8 +444,8 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
       <div class="user-info"><div class="uname" id="sidebarName"></div><div class="urole" id="sidebarRole"></div></div>
     </div>
     <div class="sidebar-footer-btns">
-      <button class="btn btn-ghost btn-sm btn-full" onclick="openChangePassModal()"><span data-ar="🔑 تغيير كلمة المرور" data-en="🔑 Change Password">🔑 تغيير كلمة المرور</span></button>
-      <button class="btn btn-ghost btn-sm btn-full" onclick="logout()"><span data-ar="تسجيل الخروج" data-en="Logout">تسجيل الخروج</span></button>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="openChangePassModal()">🔑 تغيير كلمة المرور</button>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="logout()">تسجيل الخروج</button>
     </div>
   </div>
 </div>
@@ -492,63 +457,45 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
     <div class="topbar-actions">
       <button class="notif-btn" onclick="toggleNotif()" id="notifBtn">🔔<span class="notif-count" id="notifCount">0</span></button>
       <button class="lang-btn" onclick="toggleLang()">EN / عر</button>
-      <button class="btn btn-primary btn-sm" id="adminActionBtn" style="display:none" onclick="openModal('newProjectModal')">➕ <span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></button>
+      <button class="btn btn-primary btn-sm" id="adminActionBtn" style="display:none" onclick="openModal('newProjectModal')">➕ مشروع جديد</button>
     </div>
   </div>
   <div class="content">
     <div class="page active" id="page-dashboard">
-      <div class="section-header"><div>
-        <div class="section-title" data-ar="لوحة التحكم الرئيسية" data-en="Main Dashboard">لوحة التحكم الرئيسية</div>
-        <div class="section-sub" data-ar="فريق التصميم — شركة دارك المتقدمة" data-en="Design Team — DARC Advanced Construction">فريق التصميم — شركة دارك المتقدمة</div>
-      </div></div>
+      <div class="section-header"><div><div class="section-title">لوحة التحكم الرئيسية</div><div class="section-sub">فريق التصميم — شركة دارك المتقدمة</div></div></div>
       <div class="kpi-grid" id="kpiGrid"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div class="card"><div class="card-header"><div class="card-title" data-ar="نسبة إنجاز المشاريع" data-en="Projects Progress">نسبة إنجاز المشاريع</div></div><div class="chart-container" id="projectsChart"></div></div>
-        <div class="card"><div class="card-header"><div class="card-title" data-ar="إنجاز أعضاء الفريق" data-en="Team Members Progress">إنجاز أعضاء الفريق</div></div><div class="chart-container" id="teamChart"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">نسبة إنجاز المشاريع</div></div><div class="chart-container" id="projectsChart"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">إنجاز أعضاء الفريق</div></div><div class="chart-container" id="teamChart"></div></div>
       </div>
     </div>
     <div class="page" id="page-projects">
       <div class="section-header">
-        <div>
-          <div class="section-title" data-ar="المشاريع" data-en="Projects">المشاريع</div>
-          <div class="section-sub" data-ar="جميع مشاريع فريق التصميم" data-en="All design team projects">جميع مشاريع فريق التصميم</div>
-        </div>
-        <div id="adminProjectBtn" style="display:none"><button class="btn btn-primary" onclick="openModal('newProjectModal')">➕ <span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></button></div>
+        <div><div class="section-title">المشاريع</div><div class="section-sub">جميع مشاريع فريق التصميم</div></div>
+        <div id="adminProjectBtn" style="display:none"><button class="btn btn-primary" onclick="openModal('newProjectModal')">➕ مشروع جديد</button></div>
       </div>
       <div class="projects-grid" id="projectsGrid"></div>
     </div>
     <div class="page" id="page-projectDetail">
-      <div class="back-btn" onclick="showPage('projects')">← <span data-ar="العودة للمشاريع" data-en="Back to Projects">العودة للمشاريع</span></div>
+      <div class="back-btn" onclick="showPage('projects')">← العودة للمشاريع</div>
       <div id="projectDetailContent"></div>
     </div>
     <div class="page" id="page-myTasks">
-      <div class="section-header"><div>
-        <div class="section-title" data-ar="📋 مهامي" data-en="📋 My Tasks">📋 مهامي</div>
-        <div class="section-sub" data-ar="جميع المهام المعينة لي" data-en="All tasks assigned to me">جميع المهام المعينة لي</div>
-      </div></div>
+      <div class="section-header"><div><div class="section-title">📋 مهامي</div><div class="section-sub">جميع المهام المعينة لي</div></div></div>
       <div id="myTasksContent"></div>
     </div>
     <div class="page" id="page-drawingsDB">
-      <div class="section-header"><div>
-        <div class="section-title" data-ar="قاعدة بيانات المخططات" data-en="Drawings Database">قاعدة بيانات المخططات</div>
-        <div class="section-sub" data-ar="جميع أنواع المخططات والمهام المعتمدة" data-en="All approved drawing & task types">جميع أنواع المخططات والمهام المعتمدة</div>
-      </div></div>
+      <div class="section-header"><div><div class="section-title">قاعدة بيانات المخططات</div><div class="section-sub">جميع أنواع المخططات والمهام المعتمدة</div></div></div>
       <div id="drawingsDBContent"></div>
     </div>
     <div class="page" id="page-team">
-      <div class="section-header"><div>
-        <div class="section-title" data-ar="فريق التصميم" data-en="Design Team">فريق التصميم</div>
-        <div class="section-sub" data-ar="أداء الأعضاء عبر جميع المشاريع" data-en="Member performance across all projects">أداء الأعضاء عبر جميع المشاريع</div>
-      </div></div>
+      <div class="section-header"><div><div class="section-title">فريق التصميم</div><div class="section-sub">أداء الأعضاء عبر جميع المشاريع</div></div></div>
       <div id="teamPage"></div>
     </div>
     <div class="page" id="page-adminDrawings">
       <div class="section-header">
-        <div>
-          <div class="section-title" data-ar="🗂️ إدارة قاعدة المخططات" data-en="🗂️ Manage Drawings DB">🗂️ إدارة قاعدة المخططات</div>
-          <div class="section-sub" data-ar="إضافة وحذف المخططات والمهام" data-en="Add and remove drawing & task types">إضافة وحذف المخططات والمهام</div>
-        </div>
-        <button class="btn btn-primary" onclick="openModal('addDrawingModal')">➕ <span data-ar="إضافة نوع جديد" data-en="Add New Type">إضافة نوع جديد</span></button>
+        <div><div class="section-title">🗂️ إدارة قاعدة المخططات</div><div class="section-sub">إضافة وحذف المخططات والمهام</div></div>
+        <button class="btn btn-primary" onclick="openModal('addDrawingModal')">➕ إضافة نوع جديد</button>
       </div>
       <div id="adminDrawingsContent"></div>
     </div>
@@ -847,8 +794,13 @@ function submitPassword(){
   }
   // Check if first login (OTP)
   if(isFirstLogin(_loginUser.id)){
-    // Show email registration first, then change password
-    showEmailRegistration();
+    // Force change password
+    document.getElementById("screenPassword").classList.add("hidden");
+    document.getElementById("screenChangePass").classList.remove("hidden");
+    document.getElementById("newPass1").value="";
+    document.getElementById("newPass2").value="";
+    document.getElementById("changePassError").textContent="";
+    checkPassRules();
     return;
   }
   finishLogin(_loginUser);
@@ -892,9 +844,8 @@ function submitChangePassword(){
   if(p1!==p2){err.textContent="كلمتا المرور غير متطابقتين"; return;}
   setPassHash(_loginUser.id, p1);
   document.getElementById("screenChangePass").classList.add("hidden");
-  document.getElementById("screenRegEmail").classList.add("hidden");
   finishLogin(_loginUser);
-  showToast(t("✅ تم تعيين كلمة المرور بنجاح — مرحباً!","✅ Password set successfully — Welcome!"));
+  showToast("✅ تم تعيين كلمة المرور بنجاح — مرحباً!");
 }
 
 function openChangePassModal(){
@@ -1205,34 +1156,11 @@ function toggleLang(){
   currentLang=currentLang==="ar"?"en":"ar";
   document.documentElement.lang=currentLang;
   document.documentElement.dir=currentLang==="ar"?"rtl":"ltr";
-  document.body.style.fontFamily=currentLang==="ar"?"'Cairo',sans-serif":"'Montserrat',sans-serif";
-  // Update all static elements with data-ar / data-en
-  document.querySelectorAll("[data-ar]").forEach(el=>{
-    el.textContent=currentLang==="ar"?el.dataset.ar:el.dataset.en;
-  });
-  // Re-render current page so all JS-generated content is also translated
+  document.querySelectorAll("[data-ar]").forEach(el=>{el.textContent=currentLang==="ar"?el.dataset.ar:el.dataset.en;});
   renderCurrentPage();
-  // Update topbar title
-  const active=document.querySelector(".page.active");
-  if(active){
-    const id=active.id.replace("page-","");
-    const titles={
-      dashboard:t("لوحة التحكم","Dashboard"),
-      projects:t("المشاريع","Projects"),
-      projectDetail:t("تفاصيل المشروع","Project Detail"),
-      drawingsDB:t("قاعدة المخططات","Drawings DB"),
-      team:t("الفريق","Team"),
-      myTasks:t("مهامي","My Tasks"),
-      adminDrawings:t("إدارة المخططات","Manage Drawings"),
-    };
-    document.getElementById("topbarTitle").textContent=titles[id]||"";
-  }
-  // Refresh login screen if visible
-  if(!document.getElementById("screenSelect").classList.contains("hidden")) initLogin();
 }
 function t(ar,en){return currentLang==="ar"?ar:en;}
-function teamName(m){return currentLang==="ar"?m.name:(m.nameEn||m.name);}
-function roleName(m){return currentLang==="ar"?m.role:(m.roleEn||m.role);}
+function teamName(m){return currentLang==="ar"?m.name:m.nameEn;}
 
 // ══════════════════════════════════════════════════════
 // LOGIN INIT
@@ -1256,15 +1184,8 @@ function showPage(name){
   document.getElementById("page-"+name).classList.add("active");
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   document.getElementById("notifPanel").classList.remove("open");
-  const titles={
-    dashboard:t("لوحة التحكم","Dashboard"),
-    projects:t("المشاريع","Projects"),
-    projectDetail:t("تفاصيل المشروع","Project Detail"),
-    drawingsDB:t("قاعدة المخططات","Drawings DB"),
-    team:t("الفريق","Team"),
-    myTasks:t("مهامي","My Tasks"),
-    adminDrawings:t("إدارة المخططات","Manage Drawings"),
-  };
+  const titles={dashboard:"لوحة التحكم",projects:"المشاريع",projectDetail:"تفاصيل المشروع",
+    drawingsDB:"قاعدة المخططات",team:"الفريق",myTasks:"مهامي",adminDrawings:"إدارة المخططات"};
   document.getElementById("topbarTitle").textContent=titles[name]||"";
   renderCurrentPage();
 }
@@ -2148,147 +2069,166 @@ function closeModal(id){document.getElementById(id).classList.remove("open");}
 function showToast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2800);}
 
 // ══════════════════════════════════════════════════════
-// EMAIL REGISTRATION & PASSWORD RESET
+// QR SYNC SYSTEM
 // ══════════════════════════════════════════════════════
 
-// Admin emails — reset codes always go here too
-const ADMIN_EMAILS = {
-  radwan: "radwan@darc.sa",    // ← غيّر لإيميلك الحقيقي
-  jihad:  "jihad@darc.sa",     // ← إيميل م. جهاد
-};
-
-function getUserEmail(userId){
-  try{ return JSON.parse(localStorage.getItem("darc_emails")||"{}")[userId]||null; }
-  catch(e){ return null; }
-}
-function setUserEmail(userId, email){
-  const obj=JSON.parse(localStorage.getItem("darc_emails")||"{}");
-  obj[userId]=email;
-  localStorage.setItem("darc_emails", JSON.stringify(obj));
-}
-
-// Reset code storage
-let _activeResetCode = null;
-let _resetUserId = null;
-
-function generateCode(){
-  return Math.random().toString(36).substring(2,8).toUpperCase();
+// Tiny QR generator (pure JS, no external lib needed for simple URLs)
+// We'll use a data URL approach with qrcode-generator style encoding
+// Load qrcode lib dynamically
+function loadQRLib(cb){
+  if(window.QRCode){cb();return;}
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload=cb;
+  s.onerror=()=>{
+    // Fallback: use canvas-based QR via qr-creator
+    const s2=document.createElement('script');
+    s2.src='https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js';
+    s2.onload=cb;
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s);
 }
 
-// Called after OTP verified — show email registration screen first
-function showEmailRegistration(){
-  document.getElementById("screenPassword").classList.add("hidden");
-  document.getElementById("screenChangePass").classList.add("hidden");
-  document.getElementById("screenRegEmail").classList.remove("hidden");
-  document.getElementById("regEmail").value = getUserEmail(_loginUser.id)||"";
-  document.getElementById("regEmailError").textContent="";
+let _qrSelectedUser=null;
+let _qrInstance=null;
+
+function openQRSyncModal(){
+  if(!currentUser?.isAdmin){showToast("⛔ للمدير فقط");return;}
+  // Render user buttons
+  const btns=document.getElementById("qrUserBtns");
+  btns.innerHTML=TEAM.map(m=>`
+    <button onclick="selectQRUser('${m.id}')" id="qrBtn_${m.id}"
+      style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--gray-border);border-radius:20px;background:var(--white);cursor:pointer;font-size:12px;font-family:inherit;transition:all 0.2s;">
+      <span style="width:24px;height:24px;border-radius:50%;background:${m.color};display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:10px;">${m.name[0]}</span>
+      ${m.name}
+    </button>
+  `).join("");
+  document.getElementById("qrCodeArea").style.display="none";
+  document.getElementById("qrEmptyMsg").style.display="";
+  _qrSelectedUser=null;
+  openModal("qrSyncModal");
 }
 
-function saveRegEmail(){
-  const email = document.getElementById("regEmail").value.trim();
-  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    document.getElementById("regEmailError").textContent = t("يرجى إدخال إيميل صحيح","Please enter a valid email");
-    return;
-  }
-  if(email) setUserEmail(_loginUser.id, email);
-  document.getElementById("screenRegEmail").classList.add("hidden");
-  // Now go to change password
-  document.getElementById("screenChangePass").classList.remove("hidden");
-  document.getElementById("newPass1").value="";
-  document.getElementById("newPass2").value="";
-  document.getElementById("changePassError").textContent="";
-  checkPassRules();
-}
-function skipRegEmail(){
-  document.getElementById("screenRegEmail").classList.add("hidden");
-  document.getElementById("screenChangePass").classList.remove("hidden");
-  document.getElementById("newPass1").value="";
-  document.getElementById("newPass2").value="";
-  document.getElementById("changePassError").textContent="";
-  checkPassRules();
-}
+function selectQRUser(uid){
+  const u=TEAM.find(x=>x.id===uid); if(!u) return;
+  _qrSelectedUser=u;
+  // Highlight selected
+  document.querySelectorAll("[id^='qrBtn_']").forEach(b=>{
+    b.style.borderColor="var(--gray-border)";b.style.background="var(--white)";
+  });
+  const btn=document.getElementById("qrBtn_"+uid);
+  if(btn){btn.style.borderColor="var(--gold-light)";btn.style.background="var(--gold-bg)";}
 
-// Forgot password flow
-function openForgotPass(){
-  _resetUserId = _loginUser?.id;
-  if(!_resetUserId) return;
-  const email = getUserEmail(_resetUserId);
-  const user = USERS.find(u=>u.id===_resetUserId);
-  const infoEl = document.getElementById("forgotUserInfo");
-  if(email){
-    infoEl.innerHTML = `👤 <strong>${user?.name||_resetUserId}</strong><br>📧 ${email}`;
+  // Get stored password hash for this user
+  const passwords=loadPasswords();
+  const stored=passwords[uid];
+  
+  if(!stored){
+    // First login — no custom password set yet, use OTP
+    showQRForData(u, "OTP:"+DEFAULT_OTP);
   } else {
-    infoEl.innerHTML = `<span style="color:var(--red);">⚠️ ${t("لم تسجّل إيميلك بعد. سيُرسل الكود على إيميل المدير فقط","No email registered. Code will be sent to admin email only.")}</span>`;
+    showQRForData(u, stored);
   }
-  document.getElementById("forgotStep1").style.display="";
-  document.getElementById("forgotStep2").style.display="none";
-  document.getElementById("forgotError").textContent="";
-  document.getElementById("screenPassword").classList.add("hidden");
-  document.getElementById("screenForgotPass").classList.remove("hidden");
-}
-function closeForgotPass(){
-  document.getElementById("screenForgotPass").classList.add("hidden");
-  document.getElementById("screenPassword").classList.remove("hidden");
 }
 
-function sendResetCode(){
-  _activeResetCode = generateCode();
-  const user = USERS.find(u=>u.id===_resetUserId);
-  const userEmail = getUserEmail(_resetUserId);
-  const adminEmails = Object.values(ADMIN_EMAILS).join(", ");
+function showQRForData(u, passData){
+  document.getElementById("qrEmptyMsg").style.display="none";
+  document.getElementById("qrCodeArea").style.display="";
+  document.getElementById("qrUserLabel").textContent="🔐 " + u.name + " — " + u.role;
 
-  // Build mailto links (since this is offline — no real email server)
-  // We show the code prominently + give mailto links for admins to use
-  document.getElementById("forgotStep1").style.display="none";
-  document.getElementById("forgotStep2").style.display="";
+  // Build payload: userId + passHash (hash only, never plain text)
+  const payload = JSON.stringify({uid: u.id, ph: passData, n: u.name});
+  // Encode as base64 for URL safety
+  const encoded = btoa(unescape(encodeURIComponent(payload)));
+  // Build a URL that triggers QR import when opened
+  const currentURL = window.location.href.split('?')[0].split('#')[0];
+  const qrURL = currentURL + "?darc_sync=" + encoded;
 
-  const infoHtml = `
-    <div style="font-size:13px;font-weight:700;margin-bottom:6px;">${t("كود الاستعادة الخاص بك:","Your recovery code:")}</div>
-    <div style="font-size:28px;font-weight:900;letter-spacing:8px;color:var(--dark);margin:8px 0;font-family:var(--font-en);">${_activeResetCode}</div>
-    <div style="font-size:11px;color:var(--gray);margin-top:6px;">${t("صالح لمدة 15 دقيقة فقط","Valid for 15 minutes only")}</div>
-    <hr style="border:none;border-top:1px solid #A7F3D0;margin:10px 0;">
-    <div style="font-size:11px;">
-      ${userEmail?`📧 ${t("سيصل على:","Sent to:")} ${userEmail}<br>`:''}
-      📧 ${t("وعلى إيميل المدير","And admin email")}
-    </div>
-    <div style="margin-top:10px;">
-      <a href="mailto:${userEmail||adminEmails}?subject=DARC Reset Code&body=كود الاستعادة: ${_activeResetCode} — ${user?.name||''}%0A%0AValidity: 15 minutes"
-         class="btn btn-ghost btn-sm" style="font-size:11px;" target="_blank">
-        📤 ${t("فتح تطبيق الإيميل","Open Email App")}
-      </a>
-    </div>`;
-  document.getElementById("resetCodeInfo").innerHTML = infoHtml;
-  document.getElementById("resetCodeInput").value="";
-  document.getElementById("resetNewPass1").value="";
-  document.getElementById("resetNewPass2").value="";
-  document.getElementById("resetError").textContent="";
+  // Generate QR
+  const canvas=document.getElementById("qrCanvas");
+  // Clear previous
+  const ctx=canvas.getContext("2d");
+  canvas.width=220; canvas.height=220;
+  ctx.fillStyle="#fff"; ctx.fillRect(0,0,220,220);
+  ctx.fillStyle="#888"; ctx.font="13px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("جاري التوليد...",110,110);
 
-  // Set 15 min expiry
-  setTimeout(()=>{ _activeResetCode=null; }, 15*60*1000);
+  loadQRLib(()=>{
+    try{
+      if(window.QRCode){
+        // Clear canvas div approach
+        const div=document.createElement('div');
+        new QRCode(div,{text:qrURL,width:220,height:220,colorDark:"#1A1A1A",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+        setTimeout(()=>{
+          const img=div.querySelector('img')||div.querySelector('canvas');
+          if(img){
+            canvas.width=220;canvas.height=220;
+            const ctx2=canvas.getContext('2d');
+            ctx2.drawImage(img,0,0,220,220);
+          }
+        },200);
+      }
+    }catch(e){
+      // Fallback text
+      const ctx3=canvas.getContext("2d");
+      ctx3.fillStyle="#fff";ctx3.fillRect(0,0,220,220);
+      ctx3.fillStyle="#333";ctx3.font="11px monospace";ctx3.textAlign="center";
+      ctx3.fillText("يتطلب اتصال بالإنترنت",110,110);
+    }
+  });
 }
 
-function checkResetPassRules(){
-  const v=document.getElementById("resetNewPass1").value;
-  [{id:"rrule-len",ok:v.length>=8},{id:"rrule-num",ok:/\d/.test(v)},{id:"rrule-upper",ok:/[A-Z]/.test(v)}]
-    .forEach(r=>{const el=document.getElementById(r.id);if(!el)return;el.classList.toggle("ok",r.ok);el.classList.toggle("bad",!r.ok&&v.length>0);});
+function downloadQR(){
+  const canvas=document.getElementById("qrCanvas");
+  const link=document.createElement("a");
+  link.download=`darc-qr-${_qrSelectedUser?.name||'user'}.png`;
+  link.href=canvas.toDataURL("image/png");
+  link.click();
 }
 
-function submitResetPassword(){
-  const code = document.getElementById("resetCodeInput").value.trim().toUpperCase();
-  const p1 = document.getElementById("resetNewPass1").value;
-  const p2 = document.getElementById("resetNewPass2").value;
-  const err = document.getElementById("resetError");
-  if(!_activeResetCode){ err.textContent=t("انتهت صلاحية الكود — أعد الطلب","Code expired — request again"); return; }
-  if(code!==_activeResetCode){ err.textContent=t("الكود غير صحيح ❌","Incorrect code ❌"); return; }
-  if(p1.length<8){ err.textContent=t("كلمة المرور قصيرة جداً","Password too short"); return; }
-  if(!/\d/.test(p1)){ err.textContent=t("يجب أن تحتوي على رقم","Must contain a number"); return; }
-  if(!/[A-Z]/.test(p1)){ err.textContent=t("يجب أن تحتوي على حرف كبير","Must contain uppercase"); return; }
-  if(p1!==p2){ err.textContent=t("كلمتا المرور غير متطابقتين","Passwords don't match"); return; }
-  setPassHash(_resetUserId, p1);
-  _activeResetCode=null;
-  document.getElementById("screenForgotPass").classList.add("hidden");
-  document.getElementById("screenPassword").classList.remove("hidden");
-  showToast(t("✅ تم تغيير كلمة المرور — ادخل الآن","✅ Password changed — login now"));
+// ── Check on page load if URL has QR sync param ──
+function checkQRSyncParam(){
+  const params=new URLSearchParams(window.location.search);
+  const syncData=params.get("darc_sync");
+  if(!syncData) return false;
+  
+  try{
+    const decoded=decodeURIComponent(escape(atob(syncData)));
+    const obj=JSON.parse(decoded);
+    const{uid,ph,n}=obj;
+    if(!uid||!ph) return false;
+
+    // Apply the password hash directly to localStorage
+    const passwords=loadPasswords();
+    passwords[uid]=ph;
+    savePasswords(passwords);
+
+    // Show success screen
+    document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
+    const screen=document.getElementById("screenQRImport");
+    screen.classList.remove("hidden");
+    document.getElementById("qrImportContent").innerHTML=`
+      <div style="padding:20px 0;">
+        <div style="font-size:48px;margin-bottom:12px;">✅</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">تم تطبيق كلمة المرور</div>
+        <div style="font-size:13px;color:var(--gray);margin-bottom:24px;">مرحباً <strong>${n}</strong>! كلمة مرورك جاهزة على هذا الجهاز</div>
+        <button class="btn btn-primary btn-full" onclick="finishQRImport()">🚀 ابدأ الدخول</button>
+      </div>
+    `;
+
+    // Clean URL
+    window.history.replaceState({},"",window.location.pathname);
+    return true;
+  }catch(e){
+    console.warn("QR sync error:",e);
+    return false;
+  }
+}
+
+function finishQRImport(){
+  document.getElementById("screenQRImport").classList.add("hidden");
+  document.getElementById("screenSelect").classList.remove("hidden");
 }
 
 // ══════════════════════════════════════════════════════
@@ -2297,7 +2237,8 @@ function submitResetPassword(){
 initSampleData();      // sets default projects if localStorage is empty
 loadFromStorage();     // loads saved data on top
 syncUsersFromTeam();
-initLogin();
+const _hadQR = checkQRSyncParam(); // check for QR sync in URL
+if(!_hadQR) initLogin();
 renderDrawingCheckboxes();
 initAddDrawingCategorySelect();
 
