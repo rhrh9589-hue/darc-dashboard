@@ -925,35 +925,34 @@ function saveChangedPassword(){
 }
 
 function finishLogin(u){
-  currentUser = u;
-
-  // Hide all auth screens
+  // 1. Hide all auth screens
   ["screenSelect","screenPassword","screenChangePass","screenRegEmail","screenForgotPass"]
-    .forEach(id=>document.getElementById(id).classList.add("hidden"));
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add("hidden"); });
 
-  // Load saved data (projects, team, etc.)
+  // 2. Load saved data (may override defaults)
   loadFromStorage();
 
-  // Re-find user after team may have been updated from storage
-  const freshUser = USERS.find(x=>x.id===u.id) || u;
-  currentUser = freshUser;
+  // 3. Find fresh user object (TEAM may have been updated from storage)
+  currentUser = USERS.find(x=>x.id===u.id) || u;
 
-  // Set sidebar
+  // 4. Setup sidebar
   const av=document.getElementById("sidebarAvatar");
-  av.textContent=freshUser.name[0]; av.style.background=freshUser.color;
-  document.getElementById("sidebarName").textContent=freshUser.name;
-  document.getElementById("sidebarRole").textContent=freshUser.isAdmin?"Admin":freshUser.role;
+  av.textContent = currentUser.name[0];
+  av.style.background = currentUser.color;
+  document.getElementById("sidebarName").textContent = currentUser.name;
+  document.getElementById("sidebarRole").textContent = currentUser.isAdmin ? "Admin" : currentUser.role;
 
-  // Admin UI
-  const isAdm=freshUser.isAdmin;
-  document.getElementById("adminNavSection").style.display=isAdm?"":"none";
-  document.getElementById("adminActionBtn").style.display=isAdm?"":"none";
-  document.getElementById("adminProjectBtn").style.display=isAdm?"":"none";
+  // 5. Show/hide admin-only UI
+  const isAdm = currentUser.isAdmin;
+  document.getElementById("adminNavSection").style.display = isAdm ? "" : "none";
+  document.getElementById("adminActionBtn").style.display  = isAdm ? "" : "none";
+  document.getElementById("adminProjectBtn").style.display = isAdm ? "" : "none";
 
-  // Rebuild login list with fresh team
+  // 6. Rebuild login screen with fresh team data
   initLogin();
   renderDrawingCheckboxes();
 
+  // 7. Go to dashboard
   updateNotifBadge();
   checkDelays();
   showPage("dashboard");
@@ -974,26 +973,53 @@ function logout(){
 // ══════════════════════════════════════════════════════
 function saveToStorage(){
   try{
-    localStorage.setItem("darc_projects", JSON.stringify(projects));
-    localStorage.setItem("darc_team", JSON.stringify(TEAM));
-    localStorage.setItem("darc_drawings", JSON.stringify(DRAWINGS_DB));
-    localStorage.setItem("darc_notifications", JSON.stringify(notifications.slice(0,200)));
-    localStorage.setItem("darc_nextDrawingId", String(nextDrawingId));
+    localStorage.setItem("darc_projects",   JSON.stringify(projects));
+    localStorage.setItem("darc_team",       JSON.stringify(TEAM));
+    localStorage.setItem("darc_drawings",   JSON.stringify(DRAWINGS_DB));
+    localStorage.setItem("darc_notifs",     JSON.stringify(notifications.slice(0,200)));
+    localStorage.setItem("darc_notifId",    String(notifId));
+    localStorage.setItem("darc_drawingId",  String(nextDrawingId));
     flashSave();
-  }catch(e){ console.warn("Storage error",e); }
+  }catch(e){ console.warn("Save error",e); }
 }
+
 function loadFromStorage(){
   try{
-    const p=localStorage.getItem("darc_projects");
-    if(p){ const parsed=JSON.parse(p); if(Array.isArray(parsed)&&parsed.length>0) projects=parsed; }
-    const tm=localStorage.getItem("darc_team");
-    if(tm){ const parsed=JSON.parse(tm); if(Array.isArray(parsed)&&parsed.length>0){ TEAM.length=0; parsed.forEach(m=>TEAM.push(m)); syncUsersFromTeam(); } }
-    const dr=localStorage.getItem("darc_drawings");
-    if(dr){ const parsed=JSON.parse(dr); if(Array.isArray(parsed)&&parsed.length>0) DRAWINGS_DB=parsed; }
-    const no=localStorage.getItem("darc_notifications");
-    if(no){ const parsed=JSON.parse(no); if(Array.isArray(parsed)) notifications=parsed; }
-    const ndi=localStorage.getItem("darc_nextDrawingId");
-    if(ndi){ const n=parseInt(ndi); if(n>nextDrawingId) nextDrawingId=n; }
+    // Projects
+    const rawP = localStorage.getItem("darc_projects");
+    if(rawP){
+      const arr = JSON.parse(rawP);
+      if(Array.isArray(arr) && arr.length > 0) projects = arr;
+    }
+    // Team (includes admins now)
+    const rawT = localStorage.getItem("darc_team");
+    if(rawT){
+      const arr = JSON.parse(rawT);
+      if(Array.isArray(arr) && arr.length >= 2){
+        // Validate has at least admins
+        const hasAdmin = arr.some(m=>m.isAdmin);
+        if(hasAdmin){ TEAM.length=0; arr.forEach(m=>TEAM.push(m)); }
+      }
+    }
+    // Drawings
+    const rawD = localStorage.getItem("darc_drawings");
+    if(rawD){
+      const arr = JSON.parse(rawD);
+      if(Array.isArray(arr) && arr.length > 0) DRAWINGS_DB = arr;
+    }
+    // Notifications
+    const rawN = localStorage.getItem("darc_notifs");
+    if(rawN){
+      const arr = JSON.parse(rawN);
+      if(Array.isArray(arr)) notifications = arr;
+    }
+    const rawNid = localStorage.getItem("darc_notifId");
+    if(rawNid){ const n=parseInt(rawNid); if(n>notifId) notifId=n; }
+    const rawDid = localStorage.getItem("darc_drawingId");
+    if(rawDid){ const n=parseInt(rawDid); if(n>nextDrawingId) nextDrawingId=n; }
+
+    // Always sync USERS from TEAM after loading
+    syncUsersFromTeam();
     renderDrawingCheckboxes();
     initAddDrawingCategorySelect();
   }catch(e){ console.warn("Load error",e); }
@@ -1062,22 +1088,24 @@ let DRAWINGS_DB = [
 let nextDrawingId = 33;
 
 // ══════════════════════════════════════════════════════
-// TEAM — starts with your 5 employees
+// TEAM — ALL members including admins
 // ══════════════════════════════════════════════════════
 let TEAM = [
-  {id:"tariq",     name:"طارق",              nameEn:"Tariq",          role:"منفذ تصاميم 3D",      roleEn:"3D Designer",           color:"#7C3AED"},
-  {id:"hanan",     name:"حنان",              nameEn:"Hanan",          role:"مهندسة معمارية",       roleEn:"Arch. Engineer",        color:"#DB2777"},
-  {id:"mohanad",   name:"مهند",              nameEn:"Mohanad",        role:"مهندس معماري",         roleEn:"Arch. Engineer",        color:"#2563EB"},
-  {id:"hakeem",    name:"عبد الحكيم",        nameEn:"Abd Al-Hakeem",  role:"رسام",                 roleEn:"Draftsman",             color:"#059669"},
-  {id:"abdrahman", name:"عبدالرحمن شيط",     nameEn:"Abd Al-Rahman",  role:"مهندس إلكتروميكانيك", roleEn:"Electromechanical Eng.", color:"#D97706"},
+  // Admins (can also be assigned tasks)
+  {id:"radwan",    name:"رضوان",           nameEn:"Radwan",         role:"مدير",                roleEn:"Admin",                 color:"#B8960C", isAdmin:true},
+  {id:"jihad",     name:"م. جهاد مسلاتي", nameEn:"Eng. Jihad",    role:"مدير عام",             roleEn:"General Manager",       color:"#1A1A1A", isAdmin:true},
+  // Team members
+  {id:"tariq",     name:"طارق",            nameEn:"Tariq",          role:"منفذ تصاميم 3D",      roleEn:"3D Designer",           color:"#7C3AED", isAdmin:false},
+  {id:"hanan",     name:"حنان",            nameEn:"Hanan",          role:"مهندسة معمارية",       roleEn:"Arch. Engineer",        color:"#DB2777", isAdmin:false},
+  {id:"mohanad",   name:"مهند",            nameEn:"Mohanad",        role:"مهندس معماري",         roleEn:"Arch. Engineer",        color:"#2563EB", isAdmin:false},
+  {id:"hakeem",    name:"عبد الحكيم",      nameEn:"Abd Al-Hakeem",  role:"رسام",                 roleEn:"Draftsman",             color:"#059669", isAdmin:false},
+  {id:"abdrahman", name:"عبدالرحمن شيط",   nameEn:"Abd Al-Rahman",  role:"مهندس إلكتروميكانيك", roleEn:"Electromechanical Eng.", color:"#D97706", isAdmin:false},
 ];
 let USERS = [];
+
 function syncUsersFromTeam(){
-  USERS = [
-    {id:"radwan",name:"رضوان",           nameEn:"Radwan",       role:"مدير",    roleEn:"Admin",           isAdmin:true, color:"#B8960C"},
-    {id:"jihad", name:"م. جهاد مسلاتي", nameEn:"Eng. Jihad",  role:"مدير عام",roleEn:"General Manager", isAdmin:true, color:"#1A1A1A"},
-    ...TEAM.map(m=>({...m,isAdmin:false}))
-  ];
+  // USERS = all TEAM members (admins + employees)
+  USERS = TEAM.map(m=>({...m}));
 }
 syncUsersFromTeam();
 
@@ -1115,7 +1143,7 @@ let taskSource = "drawing";
 // INIT PROJECTS — your 8 real projects, empty tasks
 // ══════════════════════════════════════════════════════
 function initSampleData(){
-  // Always set default projects (will be overridden by loadFromStorage if saved data exists)
+  // Set default projects in memory
   projects = [
     {id:"p1",name:"صالون لمسات الخالدية",        nameEn:"Lamasat Salon Al-Khalidiya",      client:"",start:"",end:"",status:"active",tasks:[]},
     {id:"p2",name:"صالون لي لي الرياض",           nameEn:"Li Li Salon Riyadh",              client:"",start:"",end:"",status:"active",tasks:[]},
@@ -1126,10 +1154,7 @@ function initSampleData(){
     {id:"p7",name:"مشروع فيلا الزعيم بالرياض",   nameEn:"Al-Za'eem Villa Riyadh",          client:"",start:"",end:"",status:"active",tasks:[]},
     {id:"p8",name:"مخططات تفصيلية مرسيدس أتومول",nameEn:"Mercedes Automall Detailed Plans", client:"مرسيدس أتومول",start:"",end:"",status:"active",tasks:[]},
   ];
-  // Save to localStorage so they persist (only if no saved data)
-  if(!localStorage.getItem("darc_projects")){
-    localStorage.setItem("darc_projects", JSON.stringify(projects));
-  }
+  // loadFromStorage will override these if saved data exists
 }
 
 function mkTask(id,drawingId,assignee,reviewer,duration,taskStart,wfStatus,deliveryTo,notes=""){
@@ -1964,11 +1989,12 @@ function populateDrawingSelect(selectedId){
   });
   document.getElementById("assign_drawing").innerHTML=opts;
 }
-function populateMemberSelects(assignee,reviewer){
-  const teamOpts=TEAM.map(m=>`<option value="${m.id}" ${m.id===assignee?"selected":""}>${m.name} — ${m.role}</option>`).join("");
-  const adminOpts=USERS.filter(u=>u.isAdmin).map(u=>`<option value="${u.id}" ${u.id===reviewer?"selected":""}>${u.name} — ${u.role}</option>`).join("");
-  document.getElementById("assignMember").innerHTML=`<option value="">اختر المنفذ</option>`+teamOpts;
-  document.getElementById("assignReviewer").innerHTML=`<option value="">اختر المراجع (اختياري)</option>`+teamOpts+adminOpts;
+function populateMemberSelects(assignee, reviewer){
+  // All team members (admins + employees) can be assigned tasks
+  const allOpts = TEAM.map(m=>`<option value="${m.id}" ${m.id===assignee?"selected":""}>${m.name} — ${m.role}</option>`).join("");
+  const reviewerOpts = TEAM.map(m=>`<option value="${m.id}" ${m.id===reviewer?"selected":""}>${m.name} — ${m.role}</option>`).join("");
+  document.getElementById("assignMember").innerHTML   = `<option value="">${t("اختر المنفذ","Select Assignee")}</option>`+allOpts;
+  document.getElementById("assignReviewer").innerHTML = `<option value="">${t("اختر المراجع (اختياري)","Select Reviewer (optional)")}</option>`+reviewerOpts;
 }
 function saveAssignment(){
   const ctx=currentAssignContext||{};
@@ -2080,27 +2106,26 @@ function openAddMemberModal(){
   openModal("addMemberModal");
 }
 function saveNewMember(){
-  const name=document.getElementById("nm_name").value.trim();
-  const nameEn=document.getElementById("nm_nameEn").value.trim();
-  const role=document.getElementById("nm_role").value.trim();
-  const roleEn=document.getElementById("nm_roleEn").value.trim();
-  const otp=document.getElementById("nm_otp").value.trim()||DEFAULT_OTP;
-  if(!name||!role){showToast("⚠️ الاسم والمنصب مطلوبان");return;}
-  const id=(name+Date.now()).replace(/\s+/g,"_").replace(/[^\w]/g,"").toLowerCase();
-  const color=MEMBER_COLORS[colorIndex%MEMBER_COLORS.length]; colorIndex++;
-  const member={id,name,nameEn:nameEn||name,role,roleEn:roleEn||role,color};
+  const name   = document.getElementById("nm_name").value.trim();
+  const nameEn = document.getElementById("nm_nameEn").value.trim();
+  const role   = document.getElementById("nm_role").value.trim();
+  const roleEn = document.getElementById("nm_roleEn").value.trim();
+  const otp    = document.getElementById("nm_otp").value.trim() || DEFAULT_OTP;
+  if(!name||!role){ showToast("⚠️ الاسم والمنصب مطلوبان"); return; }
+  const id = (name+Date.now()).replace(/\s+/g,"_").replace(/[^\w]/g,"").toLowerCase();
+  if(TEAM.find(m=>m.id===id)){ showToast("⚠️ يوجد تعارض في المعرّف، حاول مرة أخرى"); return; }
+  const color = MEMBER_COLORS[colorIndex%MEMBER_COLORS.length]; colorIndex++;
+  const member = {id, name, nameEn:nameEn||name, role, roleEn:roleEn||role, color, isAdmin:false};
   TEAM.push(member);
   syncUsersFromTeam();
-  // Store OTP hash (first-login password)
-  // We don't set a hash — isFirstLogin returns true so DEFAULT_OTP is accepted
-  // But if admin set a custom OTP, store it
-  if(otp!==DEFAULT_OTP){ setPassHash(id, otp); }
-  // Actually keep as OTP (no stored hash = first login = DEFAULT_OTP or custom)
-  // For custom OTP we store it so it works
+  // Store OTP
   const obj=loadPasswords(); obj[id]="OTP:"+otp; savePasswords(obj);
   closeModal("addMemberModal");
-  renderDrawingCheckboxes(); initLogin();
-  saveToStorage(); renderCurrentPage(); showToast(`✅ تم إضافة ${name} — كلمة المرور المؤقتة: ${otp}`);
+  initLogin();
+  renderDrawingCheckboxes();
+  saveToStorage();
+  renderCurrentPage();
+  showToast(`✅ ${t("تم إضافة","Added")} ${name} — ${t("كلمة المرور المؤقتة","Temp password")}: ${otp}`);
   updateNotifBadge();
 }
 // Override checkPassword to handle custom OTP
@@ -2120,41 +2145,51 @@ function isFirstLogin(userId){
 
 function removeMember(id){
   const m=TEAM.find(x=>x.id===id); if(!m) return;
-  const active=projects.flatMap(p=>p.tasks).filter(t=>t.assignee===id&&!["done","client-approved"].includes(t.wfStatus));
-  if(active.length>0){showToast(`⚠️ لا يمكن الحذف — لدى ${m.name} ${active.length} مهمة نشطة`);return;}
-  if(!confirm(`هل تريد حذف ${m.name} من الفريق؟`)) return;
+  if(m.isAdmin){ showToast(t("⚠️ لا يمكن حذف الأدمن","⚠️ Cannot delete admin")); return; }
+  const active=projects.flatMap(p=>p.tasks).filter(t2=>t2.assignee===id&&!["done","client-approved"].includes(t2.wfStatus));
+  if(active.length>0){ showToast(`⚠️ ${m.name} ${t("لديه مهام نشطة","has active tasks")}: ${active.length}`); return; }
+  if(!confirm(`${t("هل تريد حذف","Delete")} ${m.name}?`)) return;
   TEAM.splice(TEAM.findIndex(x=>x.id===id),1);
   syncUsersFromTeam(); initLogin();
-  saveToStorage(); renderCurrentPage(); showToast(`🗑️ تم حذف ${m.name}`);
+  saveToStorage(); renderCurrentPage();
+  showToast(`🗑️ ${t("تم حذف","Deleted")} ${m.name}`);
 }
 function renderTeamPage(){
   const isAdmin=currentUser?.isAdmin;
   document.getElementById("teamPage").innerHTML=`
   ${isAdmin?`<div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-    <button class="btn btn-primary" onclick="openAddMemberModal()">➕ إضافة موظف جديد</button>
+    <button class="btn btn-primary" onclick="openAddMemberModal()">➕ ${t("إضافة موظف جديد","Add New Member")}</button>
   </div>`:''}
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
     ${TEAM.map(m=>{
       const mt=memberTasks(m.id);
-      const md=mt.filter(t=>["done","client-approved"].includes(t.wfStatus)).length;
-      const mw=mt.filter(t=>["in-progress","submitted","approved","delivery"].includes(t.wfStatus)).length;
+      const md=mt.filter(t2=>["done","client-approved"].includes(t2.wfStatus)).length;
+      const mw=mt.filter(t2=>["in-progress","submitted","approved","delivery"].includes(t2.wfStatus)).length;
       const pct=mt.length?Math.round(md/mt.length*100):0;
-      const projs=[...new Set(projects.filter(p=>p.tasks.some(t=>t.assignee===m.id)).map(p=>p.id))];
+      const projs=[...new Set(projects.filter(p=>p.tasks.some(t2=>t2.assignee===m.id)).map(p=>p.id))];
+      const canDelete=isAdmin && !m.isAdmin; // Can't delete admins
       return`<div class="card" style="padding:20px;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
           <div class="member-avatar" style="background:${m.color};width:44px;height:44px;font-size:16px;">${m.name[0]}</div>
-          <div style="flex:1;"><div style="font-size:15px;font-weight:700;">${m.name}</div><div style="font-size:12px;color:var(--gray);">${m.role}</div></div>
-          <div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--gold)">${pct}%</div><div style="font-size:10px;color:var(--gray);">إنجاز</div></div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;">${teamName(m)}</div>
+            <div style="font-size:12px;color:var(--gray);">${roleName(m)}</div>
+            ${m.isAdmin?`<span style="font-size:10px;background:var(--gold-bg);color:var(--gold);padding:1px 7px;border-radius:8px;border:1px solid var(--gold-pale);">Admin</span>`:''}
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:22px;font-weight:700;color:var(--gold)">${pct}%</div>
+            <div style="font-size:10px;color:var(--gray);">${t("إنجاز","Progress")}</div>
+          </div>
         </div>
         <div class="progress-bar" style="margin-bottom:12px;"><div class="progress-fill" style="width:${pct}%;background:${m.color}"></div></div>
         <div class="member-stats">
-          <div class="m-stat done"><div class="n">${md}</div><div class="l">مكتمل</div></div>
-          <div class="m-stat wip"><div class="n">${mw}</div><div class="l">جاري</div></div>
-          <div class="m-stat rem"><div class="n">${mt.length-md-mw}</div><div class="l">متبقي</div></div>
+          <div class="m-stat done"><div class="n">${md}</div><div class="l">${t("مكتمل","Done")}</div></div>
+          <div class="m-stat wip"><div class="n">${mw}</div><div class="l">${t("جاري","Active")}</div></div>
+          <div class="m-stat rem"><div class="n">${mt.length-md-mw}</div><div class="l">${t("متبقي","Left")}</div></div>
         </div>
         <div style="margin-top:10px;font-size:11px;color:var(--gray);display:flex;justify-content:space-between;align-items:center;">
-          <span>📁 ${projs.length} مشاريع | 📋 ${mt.length} مهمة</span>
-          ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="removeMember('${m.id}')">🗑️</button>`:''}
+          <span>📁 ${projs.length} ${t("مشاريع","projects")} | 📋 ${mt.length} ${t("مهمة","tasks")}</span>
+          ${canDelete?`<button class="btn btn-danger btn-sm" onclick="removeMember('${m.id}')">🗑️</button>`:''}
         </div>
       </div>`;
     }).join("")}
@@ -2406,14 +2441,14 @@ function submitResetPassword(){
 }
 
 // ══════════════════════════════════════════════════════
-// INIT
+// INIT — Correct sequence
 // ══════════════════════════════════════════════════════
-initSampleData();      // sets default projects if localStorage is empty
-loadFromStorage();     // loads saved data on top
-syncUsersFromTeam();
-initLogin();
-renderDrawingCheckboxes();
-initAddDrawingCategorySelect();
+initSampleData();          // 1. Set default projects in memory
+loadFromStorage();         // 2. Override with saved data if exists (storage wins)
+syncUsersFromTeam();       // 3. Sync USERS from TEAM
+initLogin();               // 4. Build login screen
+renderDrawingCheckboxes(); // 5. Build drawing checkboxes
+initAddDrawingCategorySelect(); // 6. Init drawing category select
 
 document.querySelectorAll(".modal-overlay").forEach(m=>{
   m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open");});
