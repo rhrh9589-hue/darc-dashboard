@@ -620,7 +620,11 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
         <option value="internal">داخلي</option><option value="both">الاثنان</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">ملاحظات للمنفذ</label><textarea class="form-textarea" id="assignAdminNotes" rows="2"></textarea></div>
+    <div class="form-group">
+      <label class="form-label">📝 ${t("تعليمات / إرشادات للمنفذ","Instructions / Guidance for Assignee")}</label>
+      <textarea class="form-textarea" id="assignAdminNotes" rows="3" placeholder="${t("اكتب أي توضيحات أو متطلبات خاصة بالمهمة — ستظهر للمنفذ عند مراجعة المهمة...","Write any special requirements or notes — will appear to the assignee when reviewing the task...")}"></textarea>
+      <div class="form-hint">💡 ${t("سيراها الموظف عند قبوله للمهمة","The employee will see this when reviewing the task")}</div>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('assignTaskModal')">إلغاء</button>
       <button class="btn btn-primary" onclick="saveAssignment()">💾 حفظ وإرسال الإشعار</button>
@@ -921,31 +925,34 @@ function saveChangedPassword(){
 }
 
 function finishLogin(u){
-  currentUser=u;
-  // First load storage so TEAM and USERS are synced
+  currentUser = u;
+
+  // Hide all auth screens
+  ["screenSelect","screenPassword","screenChangePass","screenRegEmail","screenForgotPass"]
+    .forEach(id=>document.getElementById(id).classList.add("hidden"));
+
+  // Load saved data (projects, team, etc.)
   loadFromStorage();
-  // Re-find the user after load (team might have been updated)
-  const freshUser = USERS.find(x=>x.id===u.id)||u;
+
+  // Re-find user after team may have been updated from storage
+  const freshUser = USERS.find(x=>x.id===u.id) || u;
   currentUser = freshUser;
 
-  // Hide all login screens
-  document.getElementById("screenSelect").classList.add("hidden");
-  document.getElementById("screenPassword").classList.add("hidden");
-  document.getElementById("screenChangePass").classList.add("hidden");
-  document.getElementById("screenRegEmail").classList.add("hidden");
-  document.getElementById("screenForgotPass").classList.add("hidden");
-
-  // Set sidebar user info
+  // Set sidebar
   const av=document.getElementById("sidebarAvatar");
   av.textContent=freshUser.name[0]; av.style.background=freshUser.color;
   document.getElementById("sidebarName").textContent=freshUser.name;
   document.getElementById("sidebarRole").textContent=freshUser.isAdmin?"Admin":freshUser.role;
 
-  // Show/hide admin sections
-  const showAdmin = freshUser.isAdmin;
-  document.getElementById("adminNavSection").style.display = showAdmin?"":"none";
-  document.getElementById("adminActionBtn").style.display  = showAdmin?"":"none";
-  document.getElementById("adminProjectBtn").style.display = showAdmin?"":"none";
+  // Admin UI
+  const isAdm=freshUser.isAdmin;
+  document.getElementById("adminNavSection").style.display=isAdm?"":"none";
+  document.getElementById("adminActionBtn").style.display=isAdm?"":"none";
+  document.getElementById("adminProjectBtn").style.display=isAdm?"":"none";
+
+  // Rebuild login list with fresh team
+  initLogin();
+  renderDrawingCheckboxes();
 
   updateNotifBadge();
   checkDelays();
@@ -978,15 +985,15 @@ function saveToStorage(){
 function loadFromStorage(){
   try{
     const p=localStorage.getItem("darc_projects");
-    if(p) projects=JSON.parse(p);
+    if(p){ const parsed=JSON.parse(p); if(Array.isArray(parsed)&&parsed.length>0) projects=parsed; }
     const tm=localStorage.getItem("darc_team");
-    if(tm){ TEAM.length=0; JSON.parse(tm).forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
+    if(tm){ const parsed=JSON.parse(tm); if(Array.isArray(parsed)&&parsed.length>0){ TEAM.length=0; parsed.forEach(m=>TEAM.push(m)); syncUsersFromTeam(); } }
     const dr=localStorage.getItem("darc_drawings");
-    if(dr) DRAWINGS_DB=JSON.parse(dr);
+    if(dr){ const parsed=JSON.parse(dr); if(Array.isArray(parsed)&&parsed.length>0) DRAWINGS_DB=parsed; }
     const no=localStorage.getItem("darc_notifications");
-    if(no) notifications=JSON.parse(no);
+    if(no){ const parsed=JSON.parse(no); if(Array.isArray(parsed)) notifications=parsed; }
     const ndi=localStorage.getItem("darc_nextDrawingId");
-    if(ndi) nextDrawingId=parseInt(ndi)||nextDrawingId;
+    if(ndi){ const n=parseInt(ndi); if(n>nextDrawingId) nextDrawingId=n; }
     renderDrawingCheckboxes();
     initAddDrawingCategorySelect();
   }catch(e){ console.warn("Load error",e); }
@@ -1108,18 +1115,21 @@ let taskSource = "drawing";
 // INIT PROJECTS — your 8 real projects, empty tasks
 // ══════════════════════════════════════════════════════
 function initSampleData(){
-  // Only set if localStorage is empty
-  if(localStorage.getItem("darc_projects")) return;
+  // Always set default projects (will be overridden by loadFromStorage if saved data exists)
   projects = [
-    {id:"p1",name:"صالون لمسات الخالدية",        nameEn:"Lamasat Salon Al-Khalidiya",     client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p2",name:"صالون لي لي الرياض",           nameEn:"Li Li Salon Riyadh",             client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p3",name:"صالون لي لي جدة",              nameEn:"Li Li Salon Jeddah",             client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p4",name:"برج صاري",                      nameEn:"Sari Tower",                     client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p5",name:"لمسات المدينة المنورة",         nameEn:"Lamasat Al-Madinah",             client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p6",name:"مشروع شقة د. ماجدة أبو راس",  nameEn:"Dr. Majda Apartment",            client:"د. ماجدة أبو راس",start:"",end:"",status:"active",tasks:[]},
-    {id:"p7",name:"مشروع فيلا الزعيم بالرياض",   nameEn:"Al-Za'eem Villa Riyadh",         client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p8",name:"مخططات تفصيلية مرسيدس أتومول",nameEn:"Mercedes Automall Detailed Plans",client:"مرسيدس أتومول",start:"",end:"",status:"active",tasks:[]},
+    {id:"p1",name:"صالون لمسات الخالدية",        nameEn:"Lamasat Salon Al-Khalidiya",      client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p2",name:"صالون لي لي الرياض",           nameEn:"Li Li Salon Riyadh",              client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p3",name:"صالون لي لي جدة",              nameEn:"Li Li Salon Jeddah",              client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p4",name:"برج صاري",                      nameEn:"Sari Tower",                      client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p5",name:"لمسات المدينة المنورة",         nameEn:"Lamasat Al-Madinah",              client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p6",name:"مشروع شقة د. ماجدة أبو راس",  nameEn:"Dr. Majda Apartment",             client:"د. ماجدة أبو راس",start:"",end:"",status:"active",tasks:[]},
+    {id:"p7",name:"مشروع فيلا الزعيم بالرياض",   nameEn:"Al-Za'eem Villa Riyadh",          client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p8",name:"مخططات تفصيلية مرسيدس أتومول",nameEn:"Mercedes Automall Detailed Plans", client:"مرسيدس أتومول",start:"",end:"",status:"active",tasks:[]},
   ];
+  // Save to localStorage so they persist (only if no saved data)
+  if(!localStorage.getItem("darc_projects")){
+    localStorage.setItem("darc_projects", JSON.stringify(projects));
+  }
 }
 
 function mkTask(id,drawingId,assignee,reviewer,duration,taskStart,wfStatus,deliveryTo,notes=""){
@@ -1408,8 +1418,9 @@ function renderProjectDetail(id){
         <div class="task-name">${name}</div>
         ${task.type==="free"?`<span class="task-type-badge" style="background:${catColor}18;color:${catColor};">${typeIcon(task.freeType)} ${task.freeType||"عام"}</span>`:''}
         ${task.type==="drawing"?(()=>{const d=getDrawing(task.drawingId);const cat=d?getCategory(d.cat):null;return cat?`<span class="task-type-badge" style="background:${cat.color}18;color:${cat.color};">${cat.icon} ${cat.ar}</span>`:''})():''}
-        ${task.notes?`<div style="color:var(--red);font-size:10px;margin-top:3px;">💬 ملاحظات إرجاع</div>`:''}
-        ${isDelayedTask?`<div style="color:var(--red);font-size:10px;">⚠️ تجاوزت المدة</div>`:''}
+        ${task.notes?`<div style="color:var(--red);font-size:10px;margin-top:3px;">💬 ${t("ملاحظات إرجاع","Return notes")}</div>`:''}
+        ${task.employeeComment?`<div style="color:var(--blue);font-size:10px;margin-top:3px;" title="${task.employeeComment}">💬 ${t("تعليق الموظف","Employee comment")}: ${task.employeeComment.substring(0,30)}${task.employeeComment.length>30?'…':''}</div>`:''}
+        ${isDelayedTask?`<div style="color:var(--red);font-size:10px;">⚠️ ${t("تجاوزت المدة","Overdue")}</div>`:''}
       </td>
       <td>${member?`<div style="display:flex;align-items:center;gap:6px;">
         <div style="width:22px;height:22px;border-radius:50%;background:${member.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;">${member.name[0]}</div>
@@ -1596,55 +1607,102 @@ function openTaskAccept(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
   const task=p.tasks[taskIdx];
   const name=getTaskDisplayName(task);
+  const isNeg=task.wfStatus==="negotiating";
+
   document.getElementById("taskAcceptContent").innerHTML=`
     <div style="background:var(--gold-bg);border:1px solid var(--gold-pale);border-radius:8px;padding:16px;margin-bottom:16px;">
       <div style="font-size:15px;font-weight:700;margin-bottom:6px;">📋 ${name}</div>
-      <div style="font-size:12px;color:var(--gray);">📁 ${p.name} ${p.client?'| 👤 '+p.client:''}</div>
-      ${task.duration?`<div style="font-size:13px;margin-top:8px;font-weight:600;">⏱️ المدة المطلوبة: <span style="color:var(--gold);font-family:var(--font-en);">${task.duration}</span> أيام</div>`:'<div style="font-size:13px;margin-top:8px;color:var(--orange);">⏱️ لم تحدد المدة</div>'}
-      ${task.adminNotes?`<div style="font-size:12px;margin-top:8px;padding:8px 12px;background:var(--white);border-radius:6px;">📌 ${task.adminNotes}</div>`:''}
+      <div style="font-size:12px;color:var(--gray);">📁 ${p.name}${p.client?' | 👤 '+p.client:''}</div>
+      ${task.duration?`<div style="font-size:13px;margin-top:10px;font-weight:600;">⏱️ ${t("المدة المطلوبة","Required Duration")}: <span style="color:var(--gold);font-family:var(--font-en);">${task.duration}</span> ${t("أيام","days")}</div>`:`<div style="font-size:13px;margin-top:8px;color:var(--orange);">⏱️ ${t("لم تحدد مدة","No duration set")}</div>`}
+      ${task.adminNotes?`<div style="font-size:12px;margin-top:10px;padding:10px 12px;background:var(--white);border-radius:6px;border-right:3px solid var(--gold);"><strong>📌 ${t("تعليمات","Instructions")}:</strong><br>${task.adminNotes}</div>`:''}
     </div>
-    <div class="form-group"><label class="form-label">مدة الإنجاز المقترحة منك (أيام)</label>
-      <input class="form-input" type="number" id="acceptDuration" value="${task.proposedDuration||task.duration||''}" min="1">
+
+    ${isNeg?`<div class="notes-box" style="margin-bottom:14px;"><div class="notes-label">🔄 ${t("جارٍ التفاوض","Under Negotiation")}</div>${t("طلبت تعديل المدة. يمكنك القبول بالمدة الحالية أو تعديل طلبك.","You requested duration change. You can accept current or modify your request.")}</div>`:''}
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">⏱️ ${t("مدة الإنجاز المقترحة (أيام)","Proposed Duration (days)")}</label>
+        <input class="form-input" type="number" id="acceptDuration" value="${task.proposedDuration||task.duration||''}" min="1" placeholder="${t("عدد الأيام","Number of days")}">
+      </div>
     </div>
-    <div class="form-group"><label class="form-label">ملاحظة (اختياري)</label>
-      <textarea class="form-textarea" id="acceptNote" rows="2" placeholder="أي ملاحظة على القبول أو طلب تعديل المدة..."></textarea>
+
+    <div class="form-group">
+      <label class="form-label">💬 ${t("تعليقك / استفسارك (اختياري)","Your Comment / Inquiry (optional)")}</label>
+      <textarea class="form-textarea" id="acceptNote" rows="3" placeholder="${t("اكتب أي استفسار، أو سبب رفض المدة، أو أي ملاحظة للمسؤول...","Write any inquiry, reason for rejecting the duration, or notes for the manager...")}"></textarea>
+      <div class="form-hint">${t("سيظهر تعليقك للمسؤول فور إرساله","Your comment will be visible to the manager immediately")}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;">
+      <button class="btn btn-danger" style="font-size:12px;" onclick="rejectTaskByWorker('${projId}',${taskIdx})">❌ ${t("رفض المهمة","Reject Task")}</button>
+      <button class="btn btn-orange" style="font-size:12px;" onclick="requestDurationChange('${projId}',${taskIdx})">⏱️ ${t("طلب تعديل المدة","Request Duration Change")}</button>
+      <button class="btn btn-success" style="font-size:12px;" onclick="acceptTask('${projId}',${taskIdx})">✅ ${t("قبول المهمة","Accept Task")}</button>
     </div>`;
+
+  // Clear footer since buttons are inline
   document.getElementById("taskAcceptFooter").innerHTML=`
-    <button class="btn btn-ghost" onclick="closeModal('taskAcceptModal')">إلغاء</button>
-    <button class="btn btn-danger" onclick="rejectTaskByWorker('${projId}',${taskIdx})">❌ رفض المهمة</button>
-    <button class="btn btn-orange" onclick="requestDurationChange('${projId}',${taskIdx})">⏱️ طلب تعديل المدة</button>
-    <button class="btn btn-success" onclick="acceptTask('${projId}',${taskIdx})">✅ قبول المهمة</button>`;
+    <button class="btn btn-ghost" onclick="closeModal('taskAcceptModal')">✕ ${t("إغلاق","Close")}</button>`;
   openModal("taskAcceptModal");
 }
 function acceptTask(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
   const task=p.tasks[taskIdx];
   const dur=parseInt(document.getElementById("acceptDuration").value)||task.duration;
-  task.wfStatus="accepted"; task.duration=dur; task.durationLocked=true; task.proposedDuration=null;
+  const comment=document.getElementById("acceptNote").value.trim();
+  task.wfStatus="accepted";
+  task.duration=dur; task.durationLocked=true; task.proposedDuration=null;
+  task.employeeComment=comment||"";
   const name=getTaskDisplayName(task);
-  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"✅","قبِل الموظف المهمة",`${currentUser.name} قبِل: ${name} في ${p.name} — المدة: ${dur} أيام`,currentUser.id));
-  closeModal("taskAcceptModal"); saveToStorage(); showToast("✅ تم قبول المهمة"); renderCurrentPage(); updateNotifBadge();
+  const commentPart=comment?` — تعليق: "${comment}"`:"";
+  USERS.filter(u=>u.isAdmin).forEach(a=>
+    addNotif(a.id,"✅","قبِل الموظف المهمة",
+      `${currentUser.name} قبِل: ${name} في ${p.name} — المدة: ${dur} ${t("أيام","days")}${commentPart}`,
+      currentUser.id)
+  );
+  closeModal("taskAcceptModal"); saveToStorage();
+  showToast(t("✅ تم قبول المهمة — تم الإشعار","✅ Task accepted — admin notified"));
+  renderCurrentPage(); updateNotifBadge();
 }
 function requestDurationChange(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
   const task=p.tasks[taskIdx];
   const newDur=parseInt(document.getElementById("acceptDuration").value);
-  const note=document.getElementById("acceptNote").value.trim();
-  if(!newDur||newDur===(task.duration||0)){showToast("⚠️ يرجى إدخال مدة مختلفة");return;}
+  const comment=document.getElementById("acceptNote").value.trim();
+  if(!newDur||newDur===(task.duration||0)){
+    showToast(t("⚠️ يرجى إدخال مدة مختلفة","⚠️ Please enter a different duration")); return;
+  }
   task.wfStatus="negotiating"; task.proposedDuration=newDur;
+  task.employeeComment=comment||"";
   const name=getTaskDisplayName(task);
-  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"⏱️","طلب تعديل مدة",`${currentUser.name} يطلب ${newDur} يوم لـ: ${name} في ${p.name}${note?" — "+note:""}`,currentUser.id));
-  closeModal("taskAcceptModal"); saveToStorage(); showToast("⏱️ تم إرسال طلب تعديل المدة"); renderCurrentPage(); updateNotifBadge();
+  const commentPart=comment?` — السبب: "${comment}"`:"";
+  USERS.filter(u=>u.isAdmin).forEach(a=>
+    addNotif(a.id,"⏱️","طلب تعديل مدة",
+      `${currentUser.name} يطلب ${newDur} ${t("يوم","days")} بدلاً من ${task.duration||t("غير محدد","unset")} لـ: ${name} في ${p.name}${commentPart}`,
+      currentUser.id)
+  );
+  closeModal("taskAcceptModal"); saveToStorage();
+  showToast(t("⏱️ تم إرسال طلب تعديل المدة","⏱️ Duration change request sent"));
+  renderCurrentPage(); updateNotifBadge();
 }
 function rejectTaskByWorker(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
   const task=p.tasks[taskIdx];
-  const note=document.getElementById("acceptNote").value.trim();
-  const prevAssignee=task.assignee;
+  const comment=document.getElementById("acceptNote").value.trim();
+  if(!comment){
+    showToast(t("⚠️ يرجى كتابة سبب الرفض في خانة التعليق","⚠️ Please write rejection reason in the comment field"));
+    document.getElementById("acceptNote").focus();
+    return;
+  }
   task.wfStatus="not-started"; task.assignee=null; task.proposedDuration=null;
+  task.employeeComment=comment;
   const name=getTaskDisplayName(task);
-  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"❌","رفض موظف مهمة",`${currentUser.name} رفض: ${name} في ${p.name}${note?" — "+note:""}`,currentUser.id));
-  closeModal("taskAcceptModal"); saveToStorage(); showToast("❌ تم رفض المهمة — تم إشعار المدير"); renderCurrentPage(); updateNotifBadge();
+  USERS.filter(u=>u.isAdmin).forEach(a=>
+    addNotif(a.id,"❌","رفض موظف مهمة",
+      `${currentUser.name} رفض: ${name} في ${p.name} — السبب: "${comment}"`,
+      currentUser.id)
+  );
+  closeModal("taskAcceptModal"); saveToStorage();
+  showToast(t("❌ تم رفض المهمة — تم إشعار المدير","❌ Task rejected — manager notified"));
+  renderCurrentPage(); updateNotifBadge();
 }
 function openNegResponse(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
@@ -1655,24 +1713,25 @@ function openNegResponse(projId,taskIdx){
     <div style="font-size:14px;font-weight:700;margin-bottom:12px;">${name} — ${p.name}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
       <div style="background:var(--blue-bg);border-radius:8px;padding:12px;text-align:center;">
-        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">مدتك الأصلية</div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${t("مدتك الأصلية","Your original duration")}</div>
         <div style="font-size:22px;font-weight:700;color:var(--blue);">${task.duration||"—"}</div>
-        <div style="font-size:11px;color:var(--gray);">يوم</div>
+        <div style="font-size:11px;color:var(--gray);">${t("يوم","days")}</div>
       </div>
       <div style="background:var(--orange-bg);border-radius:8px;padding:12px;text-align:center;">
-        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">طلب ${assignee?.name.split(" ")[0]||"الموظف"}</div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${t("طلب","Request of")} ${assignee?.name.split(" ")[0]||t("الموظف","employee")}</div>
         <div style="font-size:22px;font-weight:700;color:var(--orange);">${task.proposedDuration}</div>
-        <div style="font-size:11px;color:var(--gray);">يوم</div>
+        <div style="font-size:11px;color:var(--gray);">${t("يوم","days")}</div>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">المدة المعتمدة النهائية</label>
+    ${task.employeeComment?`<div class="notes-box" style="margin-bottom:14px;"><div class="notes-label">💬 ${t("تعليق الموظف","Employee Comment")}:</div>${task.employeeComment}</div>`:''}
+    <div class="form-group"><label class="form-label">${t("المدة المعتمدة النهائية","Final approved duration")}</label>
       <input class="form-input" type="number" id="negFinalDur" value="${task.proposedDuration}" min="1"></div>
-    <div class="form-group"><label class="form-label">رسالة للموظف</label>
-      <textarea class="form-textarea" id="negAdminNote" rows="2"></textarea></div>`;
+    <div class="form-group"><label class="form-label">${t("ردّك على الموظف","Your reply to employee")}</label>
+      <textarea class="form-textarea" id="negAdminNote" rows="2" placeholder="${t("اكتب ردك هنا...","Write your reply here...")}"></textarea></div>`;
   document.getElementById("negResponseFooter").innerHTML=`
-    <button class="btn btn-ghost" onclick="closeModal('negResponseModal')">إلغاء</button>
-    <button class="btn btn-danger" onclick="adminRejectNeg('${projId}',${taskIdx})">❌ رفض — إبقاء المدة الأصلية</button>
-    <button class="btn btn-success" onclick="adminAcceptNeg('${projId}',${taskIdx})">✅ قبول المدة الجديدة</button>`;
+    <button class="btn btn-ghost" onclick="closeModal('negResponseModal')">${t("إلغاء","Cancel")}</button>
+    <button class="btn btn-danger" onclick="adminRejectNeg('${projId}',${taskIdx})">❌ ${t("رفض — إبقاء المدة الأصلية","Reject — Keep Original")}</button>
+    <button class="btn btn-success" onclick="adminAcceptNeg('${projId}',${taskIdx})">✅ ${t("قبول المدة الجديدة","Accept New Duration")}</button>`;
   openModal("negResponseModal");
 }
 function adminAcceptNeg(projId,taskIdx){
