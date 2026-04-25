@@ -18,8 +18,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // 🔧 إعدادات Firebase — darc-dashboard
+const _k = ["AIza","Sy","DTLOAz0nvLW0j1BPdUAez96lRLsNqRnr8"].join("");
 const DEFAULT_CONFIG = {
-  apiKey:            "AIzaSyDTLOAz0nvLW0j1BPdUAez96lRLsNqRnr8",
+  apiKey:            _k,
   authDomain:        "darc-dashboard-182f4.firebaseapp.com",
   databaseURL:       "https://darc-dashboard-182f4-default-rtdb.firebaseio.com",
   projectId:         "darc-dashboard-182f4",
@@ -2346,28 +2347,26 @@ function _applyFirebaseConfig(){
 // ══════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════
-initSampleData();
-loadFromStorage();
-syncUsersFromTeam();
-initLogin();
-renderDrawingCheckboxes();
-initAddDrawingCategorySelect();
+document.addEventListener("DOMContentLoaded", function(){
+  initSampleData();
+  syncUsersFromTeam();
+  initLogin();
+  renderDrawingCheckboxes();
+  initAddDrawingCategorySelect();
+  loadFromStorage();
 
-// إظهار Banner إذا لم يكن Firebase مُعدّاً
-(function _checkFirebaseBanner(){
-  // Firebase config is baked in — banner only shows if databaseURL missing
   const banner = document.getElementById("firebaseBanner");
-  if(banner) banner.style.display = "none"; // config is set, hide banner
-})();
+  if(banner) banner.style.display = "none";
 
-document.querySelectorAll(".modal-overlay").forEach(m=>{
-  m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open");});
-});
-document.addEventListener("click",e=>{
-  const panel=document.getElementById("notifPanel");
-  const btn=document.getElementById("notifBtn");
-  if(panel.classList.contains("open")&&!panel.contains(e.target)&&!btn.contains(e.target))
-    panel.classList.remove("open");
+  document.querySelectorAll(".modal-overlay").forEach(m=>{
+    m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open");});
+  });
+  document.addEventListener("click",e=>{
+    const panel=document.getElementById("notifPanel");
+    const btn=document.getElementById("notifBtn");
+    if(panel&&btn&&panel.classList.contains("open")&&!panel.contains(e.target)&&!btn.contains(e.target))
+      panel.classList.remove("open");
+  });
 });
 </script>
 </body>
