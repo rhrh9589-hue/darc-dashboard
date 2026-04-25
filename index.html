@@ -796,10 +796,14 @@ function setPassHash(userId, plain){
   obj[userId] = hashPass(plain);
   savePasswords(obj);
 }
-function isFirstLogin(userId){ return !loadPasswords()[userId]; }
+function isFirstLogin(userId){
+  const stored=getPassHash(userId);
+  return !stored || stored.startsWith("OTP:");
+}
 function checkPassword(userId, plain){
   const stored = getPassHash(userId);
-  if(!stored) return plain === DEFAULT_OTP; // first time
+  if(!stored) return plain === DEFAULT_OTP;
+  if(stored.startsWith("OTP:")) return plain === stored.slice(4);
   return stored === hashPass(plain);
 }
 
@@ -2128,20 +2132,7 @@ function saveNewMember(){
   showToast(`✅ ${t("تم إضافة","Added")} ${name} — ${t("كلمة المرور المؤقتة","Temp password")}: ${otp}`);
   updateNotifBadge();
 }
-// Override checkPassword to handle custom OTP
-const _origCheckPassword=checkPassword;
-function checkPassword(userId,plain){
-  const stored=getPassHash(userId);
-  if(!stored) return plain===DEFAULT_OTP;
-  if(stored.startsWith("OTP:")) return plain===stored.slice(4); // custom OTP
-  return stored===hashPass(plain);
-}
-function isFirstLogin(userId){
-  const stored=getPassHash(userId);
-  return !stored || stored.startsWith("OTP:");
-}
-// After first login with OTP, mark as needing change
-// (already handled by submitPassword → screenChangePass flow)
+// OTP and password check handled above
 
 function removeMember(id){
   const m=TEAM.find(x=>x.id===id); if(!m) return;
