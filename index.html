@@ -314,94 +314,21 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
 <!-- ══ SCREEN 2: PASSWORD ══ -->
 <div class="screen hidden" id="screenPassword">
   <div class="auth-box">
-    <div class="pass-back" onclick="backToSelect()">← <span data-ar="العودة" data-en="Back">العودة</span></div>
+    <div class="pass-back" onclick="backToSelect()">← العودة</div>
     <div class="pass-avatar" id="passAvatar"></div>
     <div class="pass-name" id="passName"></div>
     <div class="pass-role" id="passRole"></div>
     <div class="otp-badge" id="otpBadge" style="display:none">
-      🔐 <span data-ar="هذه أول مرة تدخل — كلمة المرور المؤقتة هي" data-en="First login — your temporary password is">هذه أول مرة تدخل — كلمة المرور المؤقتة هي</span> <strong>D_12345678</strong><br>
-      <span data-ar="بعد الدخول ستُطلب منك تغييرها فوراً" data-en="You will be asked to change it immediately">بعد الدخول ستُطلب منك تغييرها فوراً</span>
+      🔐 هذه أول مرة تدخل — كلمة المرور المؤقتة هي <strong>D_12345678</strong><br>
+      بعد الدخول ستُطلب منك تغييرها فوراً
     </div>
     <div class="pass-input-wrap">
-      <input class="pass-input" type="password" id="passInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitPassword()">
+      <input class="pass-input" type="password" id="passInput" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')submitPassword()">
       <button class="pass-toggle" onclick="togglePassVis()" id="passToggleBtn">👁️</button>
     </div>
     <div class="pass-error" id="passError"></div>
     <br>
-    <button class="btn btn-primary btn-full" onclick="submitPassword()"><span data-ar="دخول ←" data-en="Login →">دخول ←</span></button>
-    <div style="margin-top:14px;">
-      <button onclick="openForgotPass()" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;">
-        <span data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SCREEN 3a: REGISTER EMAIL (after OTP login, before change password) ══ -->
-<div class="screen hidden" id="screenRegEmail">
-  <div class="auth-box">
-    <div class="auth-logo">📧</div>
-    <div class="auth-title" data-ar="تسجيل إيميلك" data-en="Register Your Email">تسجيل إيميلك</div>
-    <div class="auth-sub" data-ar="يُستخدم فقط لاستعادة كلمة المرور — لن يُشارك مع أي جهة" data-en="Used only for password recovery — never shared">يُستخدم فقط لاستعادة كلمة المرور — لن يُشارك مع أي جهة</div>
-    <div class="form-group" style="text-align:right;">
-      <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email Address">البريد الإلكتروني</label>
-      <input class="form-input" type="email" id="regEmail" placeholder="example@email.com" style="direction:ltr;text-align:left;">
-    </div>
-    <div style="background:var(--blue-bg);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px;text-align:right;">
-      💡 <span data-ar="إذا نسيت كلمة مرورك، سيُرسل كود استعادة على هذا الإيميل" data-en="If you forget your password, a recovery code will be sent to this email">إذا نسيت كلمة مرورك، سيُرسل كود استعادة على هذا الإيميل</span>
-    </div>
-    <div class="pass-error" id="regEmailError"></div>
-    <button class="btn btn-primary btn-full" onclick="saveRegEmail()"><span data-ar="متابعة ←" data-en="Continue →">متابعة ←</span></button>
-    <div style="margin-top:10px;">
-      <button onclick="skipRegEmail()" style="background:none;border:none;color:var(--gray);font-size:12px;cursor:pointer;font-family:inherit;">
-        <span data-ar="تخطي الآن (غير موصى به)" data-en="Skip for now (not recommended)">تخطي الآن (غير موصى به)</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SCREEN 4: FORGOT PASSWORD ══ -->
-<div class="screen hidden" id="screenForgotPass">
-  <div class="auth-box">
-    <div class="pass-back" onclick="closeForgotPass()">← <span data-ar="العودة" data-en="Back">العودة</span></div>
-    <div class="auth-logo">🔑</div>
-    <div class="auth-title" data-ar="استعادة كلمة المرور" data-en="Password Recovery">استعادة كلمة المرور</div>
-    <div id="forgotStep1">
-      <div class="auth-sub" data-ar="سيُرسل كود مؤقت على إيميلك المسجل وعلى إيميل المدير" data-en="A temporary code will be sent to your registered email and the admin email">سيُرسل كود مؤقت على إيميلك المسجل وعلى إيميل المدير</div>
-      <div id="forgotUserInfo" style="background:var(--gold-bg);border:1px solid var(--gold-pale);border-radius:8px;padding:12px;margin-bottom:16px;text-align:right;font-size:13px;"></div>
-      <button class="btn btn-primary btn-full" onclick="sendResetCode()"><span data-ar="إرسال كود الاستعادة" data-en="Send Recovery Code">إرسال كود الاستعادة</span></button>
-      <div class="pass-error" id="forgotError" style="margin-top:8px;"></div>
-    </div>
-    <div id="forgotStep2" style="display:none;">
-      <div class="auth-sub" data-ar="أدخل الكود المرسل على إيميلك" data-en="Enter the code sent to your email">أدخل الكود المرسل على إيميلك</div>
-      <div style="background:var(--green-bg);border:1px solid #A7F3D0;border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--green);text-align:right;" id="resetCodeInfo"></div>
-      <div class="form-group">
-        <input class="pass-input" type="text" id="resetCodeInput" placeholder="XXXXXX" style="letter-spacing:6px;text-align:center;font-size:20px;text-transform:uppercase;" maxlength="6">
-      </div>
-      <div class="form-group" style="text-align:right;">
-        <label class="form-label" data-ar="كلمة المرور الجديدة" data-en="New Password">كلمة المرور الجديدة</label>
-        <div class="pass-input-wrap">
-          <input class="pass-input" type="password" id="resetNewPass1" placeholder="••••••••" oninput="checkResetPassRules()">
-          <button class="pass-toggle" onclick="togglePassVis2('resetNewPass1')">👁️</button>
-        </div>
-      </div>
-      <div style="text-align:right;margin-bottom:12px;">
-        <div class="pwd-rule" id="rrule-len" data-ar="8 أحرف على الأقل" data-en="At least 8 characters">8 أحرف على الأقل</div>
-        <div class="pwd-rule" id="rrule-num" data-ar="تحتوي على رقم" data-en="Contains a number">تحتوي على رقم</div>
-        <div class="pwd-rule" id="rrule-upper" data-ar="تحتوي على حرف كبير" data-en="Contains uppercase letter">تحتوي على حرف كبير</div>
-      </div>
-      <div class="form-group" style="text-align:right;">
-        <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
-        <div class="pass-input-wrap">
-          <input class="pass-input" type="password" id="resetNewPass2" placeholder="••••••••">
-          <button class="pass-toggle" onclick="togglePassVis2('resetNewPass2')">👁️</button>
-        </div>
-      </div>
-      <div class="pass-error" id="resetError"></div>
-      <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="submitResetPassword()">
-        <span data-ar="✅ تعيين كلمة المرور الجديدة" data-en="✅ Set New Password">✅ تعيين كلمة المرور الجديدة</span>
-      </button>
-    </div>
+    <button class="btn btn-primary btn-full" onclick="submitPassword()">دخول ←</button>
   </div>
 </div>
 
@@ -409,8 +336,8 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
 <div class="screen hidden" id="screenChangePass">
   <div class="auth-box">
     <div class="auth-logo">🔐</div>
-    <div class="auth-title" data-ar="تعيين كلمة مرور جديدة" data-en="Set New Password">تعيين كلمة مرور جديدة</div>
-    <div class="auth-sub" data-ar="هذه خطوة إلزامية — ستُستخدم في كل دخول قادم" data-en="Mandatory step — will be used for all future logins">هذه خطوة إلزامية — ستُستخدم في كل دخول قادم</div>
+    <div class="auth-title">تعيين كلمة مرور جديدة</div>
+    <div class="auth-sub">هذه خطوة إلزامية — ستُستخدم في كل دخول قادم</div>
     <div class="form-group" style="text-align:right;">
       <label class="form-label">كلمة المرور الجديدة</label>
       <div class="pass-input-wrap">
@@ -457,21 +384,21 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
     <div class="logo-text"><div class="brand">DARC</div><div class="sub">المتقدمة للإنشاءات</div></div>
   </div>
   <div class="sidebar-section">
-    <div class="sidebar-section-label" data-ar="الرئيسية" data-en="MAIN">الرئيسية</div>
-    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span><span data-ar="لوحة التحكم" data-en="Dashboard">لوحة التحكم</span></div>
-    <div class="nav-item" onclick="showPage('projects')"><span class="nav-icon">🏗️</span><span data-ar="المشاريع" data-en="Projects">المشاريع</span></div>
+    <div class="sidebar-section-label">الرئيسية</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span><span>لوحة التحكم</span></div>
+    <div class="nav-item" onclick="showPage('projects')"><span class="nav-icon">🏗️</span><span>المشاريع</span></div>
     <div class="nav-item" onclick="showPage('myTasks')">
-      <span class="nav-icon">📋</span><span data-ar="مهامي" data-en="My Tasks">مهامي</span>
+      <span class="nav-icon">📋</span><span>مهامي</span>
       <span class="nav-badge" id="myTasksBadge">0</span>
     </div>
-    <div class="nav-item" onclick="showPage('drawingsDB')"><span class="nav-icon">📐</span><span data-ar="قاعدة المخططات" data-en="Drawings DB">قاعدة المخططات</span></div>
-    <div class="nav-item" onclick="showPage('team')"><span class="nav-icon">👥</span><span data-ar="الفريق" data-en="Team">الفريق</span></div>
+    <div class="nav-item" onclick="showPage('drawingsDB')"><span class="nav-icon">📐</span><span>قاعدة المخططات</span></div>
   </div>
   <div class="sidebar-section" id="adminNavSection" style="display:none">
-    <div class="sidebar-section-label" data-ar="إدارة" data-en="ADMIN">إدارة</div>
-    <div class="nav-item" onclick="openNewTaskModal(null)"><span class="nav-icon">➕</span><span data-ar="مهمة جديدة" data-en="New Task">مهمة جديدة</span></div>
-    <div class="nav-item" onclick="openModal('newProjectModal')"><span class="nav-icon">🏗️</span><span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></div>
-    <div class="nav-item" onclick="showPage('adminDrawings')"><span class="nav-icon">🗂️</span><span data-ar="إدارة المخططات" data-en="Manage Drawings">إدارة المخططات</span></div>
+    <div class="sidebar-section-label">إدارة</div>
+    <div class="nav-item" onclick="showPage('team')"><span class="nav-icon">👥</span><span>الفريق</span></div>
+    <div class="nav-item" onclick="openNewTaskModal(null)"><span class="nav-icon">➕</span><span>مهمة جديدة</span></div>
+    <div class="nav-item" onclick="openModal('newProjectModal')"><span class="nav-icon">🏗️</span><span>مشروع جديد</span></div>
+    <div class="nav-item" onclick="showPage('adminDrawings')"><span class="nav-icon">🗂️</span><span>إدارة المخططات</span></div>
   </div>
   <div class="sidebar-user">
     <div class="user-card">
@@ -479,8 +406,8 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
       <div class="user-info"><div class="uname" id="sidebarName"></div><div class="urole" id="sidebarRole"></div></div>
     </div>
     <div class="sidebar-footer-btns">
-      <button class="btn btn-ghost btn-sm btn-full" onclick="openChangePassModal()"><span data-ar="🔑 تغيير كلمة المرور" data-en="🔑 Change Password">🔑 تغيير كلمة المرور</span></button>
-      <button class="btn btn-ghost btn-sm btn-full" onclick="logout()"><span data-ar="تسجيل الخروج" data-en="Logout">تسجيل الخروج</span></button>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="openChangePassModal()">🔑 تغيير كلمة المرور</button>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="logout()">تسجيل الخروج</button>
     </div>
   </div>
 </div>
@@ -492,63 +419,45 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
     <div class="topbar-actions">
       <button class="notif-btn" onclick="toggleNotif()" id="notifBtn">🔔<span class="notif-count" id="notifCount">0</span></button>
       <button class="lang-btn" onclick="toggleLang()">EN / عر</button>
-      <button class="btn btn-primary btn-sm" id="adminActionBtn" style="display:none" onclick="openModal('newProjectModal')">➕ <span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></button>
+      <button class="btn btn-primary btn-sm" id="adminActionBtn" style="display:none" onclick="openModal('newProjectModal')">➕ مشروع جديد</button>
     </div>
   </div>
   <div class="content">
     <div class="page active" id="page-dashboard">
-      <div class="section-header"><div>
-        <div class="section-title" data-ar="لوحة التحكم الرئيسية" data-en="Main Dashboard">لوحة التحكم الرئيسية</div>
-        <div class="section-sub" data-ar="فريق التصميم — شركة دارك المتقدمة" data-en="Design Team — DARC Advanced Construction">فريق التصميم — شركة دارك المتقدمة</div>
-      </div></div>
+      <div class="section-header"><div><div class="section-title">لوحة التحكم الرئيسية</div><div class="section-sub">فريق التصميم — شركة دارك المتقدمة</div></div></div>
       <div class="kpi-grid" id="kpiGrid"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div class="card"><div class="card-header"><div class="card-title" data-ar="نسبة إنجاز المشاريع" data-en="Projects Progress">نسبة إنجاز المشاريع</div></div><div class="chart-container" id="projectsChart"></div></div>
-        <div class="card"><div class="card-header"><div class="card-title" data-ar="إنجاز أعضاء الفريق" data-en="Team Members Progress">إنجاز أعضاء الفريق</div></div><div class="chart-container" id="teamChart"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">نسبة إنجاز المشاريع</div></div><div class="chart-container" id="projectsChart"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">إنجاز أعضاء الفريق</div></div><div class="chart-container" id="teamChart"></div></div>
       </div>
     </div>
     <div class="page" id="page-projects">
       <div class="section-header">
-        <div>
-          <div class="section-title" data-ar="المشاريع" data-en="Projects">المشاريع</div>
-          <div class="section-sub" data-ar="جميع مشاريع فريق التصميم" data-en="All design team projects">جميع مشاريع فريق التصميم</div>
-        </div>
-        <div id="adminProjectBtn" style="display:none"><button class="btn btn-primary" onclick="openModal('newProjectModal')">➕ <span data-ar="مشروع جديد" data-en="New Project">مشروع جديد</span></button></div>
+        <div><div class="section-title">المشاريع</div><div class="section-sub">جميع مشاريع فريق التصميم</div></div>
+        <div id="adminProjectBtn" style="display:none"><button class="btn btn-primary" onclick="openModal('newProjectModal')">➕ مشروع جديد</button></div>
       </div>
       <div class="projects-grid" id="projectsGrid"></div>
     </div>
     <div class="page" id="page-projectDetail">
-      <div class="back-btn" onclick="showPage('projects')">← <span data-ar="العودة للمشاريع" data-en="Back to Projects">العودة للمشاريع</span></div>
+      <div class="back-btn" onclick="showPage('projects')">← العودة للمشاريع</div>
       <div id="projectDetailContent"></div>
     </div>
     <div class="page" id="page-myTasks">
-      <div class="section-header"><div>
-        <div class="section-title" data-ar="📋 مهامي" data-en="📋 My Tasks">📋 مهامي</div>
-        <div class="section-sub" data-ar="جميع المهام المعينة لي" data-en="All tasks assigned to me">جميع المهام المعينة لي</div>
-      </div></div>
+      <div class="section-header"><div><div class="section-title">📋 مهامي</div><div class="section-sub">جميع المهام المعينة لي</div></div></div>
       <div id="myTasksContent"></div>
     </div>
     <div class="page" id="page-drawingsDB">
-      <div class="section-header"><div>
-        <div class="section-title" data-ar="قاعدة بيانات المخططات" data-en="Drawings Database">قاعدة بيانات المخططات</div>
-        <div class="section-sub" data-ar="جميع أنواع المخططات والمهام المعتمدة" data-en="All approved drawing & task types">جميع أنواع المخططات والمهام المعتمدة</div>
-      </div></div>
+      <div class="section-header"><div><div class="section-title">قاعدة بيانات المخططات</div><div class="section-sub">جميع أنواع المخططات والمهام المعتمدة</div></div></div>
       <div id="drawingsDBContent"></div>
     </div>
     <div class="page" id="page-team">
-      <div class="section-header"><div>
-        <div class="section-title" data-ar="فريق التصميم" data-en="Design Team">فريق التصميم</div>
-        <div class="section-sub" data-ar="أداء الأعضاء عبر جميع المشاريع" data-en="Member performance across all projects">أداء الأعضاء عبر جميع المشاريع</div>
-      </div></div>
+      <div class="section-header"><div><div class="section-title">فريق التصميم</div><div class="section-sub">أداء الأعضاء عبر جميع المشاريع</div></div></div>
       <div id="teamPage"></div>
     </div>
     <div class="page" id="page-adminDrawings">
       <div class="section-header">
-        <div>
-          <div class="section-title" data-ar="🗂️ إدارة قاعدة المخططات" data-en="🗂️ Manage Drawings DB">🗂️ إدارة قاعدة المخططات</div>
-          <div class="section-sub" data-ar="إضافة وحذف المخططات والمهام" data-en="Add and remove drawing & task types">إضافة وحذف المخططات والمهام</div>
-        </div>
-        <button class="btn btn-primary" onclick="openModal('addDrawingModal')">➕ <span data-ar="إضافة نوع جديد" data-en="Add New Type">إضافة نوع جديد</span></button>
+        <div><div class="section-title">🗂️ إدارة قاعدة المخططات</div><div class="section-sub">إضافة وحذف المخططات والمهام</div></div>
+        <button class="btn btn-primary" onclick="openModal('addDrawingModal')">➕ إضافة نوع جديد</button>
       </div>
       <div id="adminDrawingsContent"></div>
     </div>
@@ -620,11 +529,7 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
         <option value="internal">داخلي</option><option value="both">الاثنان</option>
       </select>
     </div>
-    <div class="form-group">
-      <label class="form-label">📝 ${t("تعليمات / إرشادات للمنفذ","Instructions / Guidance for Assignee")}</label>
-      <textarea class="form-textarea" id="assignAdminNotes" rows="3" placeholder="${t("اكتب أي توضيحات أو متطلبات خاصة بالمهمة — ستظهر للمنفذ عند مراجعة المهمة...","Write any special requirements or notes — will appear to the assignee when reviewing the task...")}"></textarea>
-      <div class="form-hint">💡 ${t("سيراها الموظف عند قبوله للمهمة","The employee will see this when reviewing the task")}</div>
-    </div>
+    <div class="form-group"><label class="form-label">ملاحظات للمنفذ</label><textarea class="form-textarea" id="assignAdminNotes" rows="2"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('assignTaskModal')">إلغاء</button>
       <button class="btn btn-primary" onclick="saveAssignment()">💾 حفظ وإرسال الإشعار</button>
@@ -801,10 +706,10 @@ function isFirstLogin(userId){
   return !stored || stored.startsWith("OTP:");
 }
 function checkPassword(userId, plain){
-  const stored = getPassHash(userId);
-  if(!stored) return plain === DEFAULT_OTP;
-  if(stored.startsWith("OTP:")) return plain === stored.slice(4);
-  return stored === hashPass(plain);
+  const stored=getPassHash(userId);
+  if(!stored) return plain===DEFAULT_OTP;
+  if(stored.startsWith("OTP:")) return plain===stored.slice(4);
+  return stored===hashPass(plain);
 }
 
 // ── Password UI state ──
@@ -855,8 +760,13 @@ function submitPassword(){
   }
   // Check if first login (OTP)
   if(isFirstLogin(_loginUser.id)){
-    // Show email registration first, then change password
-    showEmailRegistration();
+    // Force change password
+    document.getElementById("screenPassword").classList.add("hidden");
+    document.getElementById("screenChangePass").classList.remove("hidden");
+    document.getElementById("newPass1").value="";
+    document.getElementById("newPass2").value="";
+    document.getElementById("changePassError").textContent="";
+    checkPassRules();
     return;
   }
   finishLogin(_loginUser);
@@ -900,9 +810,8 @@ function submitChangePassword(){
   if(p1!==p2){err.textContent="كلمتا المرور غير متطابقتين"; return;}
   setPassHash(_loginUser.id, p1);
   document.getElementById("screenChangePass").classList.add("hidden");
-  document.getElementById("screenRegEmail").classList.add("hidden");
   finishLogin(_loginUser);
-  showToast(t("✅ تم تعيين كلمة المرور بنجاح — مرحباً!","✅ Password set successfully — Welcome!"));
+  showToast("✅ تم تعيين كلمة المرور بنجاح — مرحباً!");
 }
 
 function openChangePassModal(){
@@ -929,34 +838,20 @@ function saveChangedPassword(){
 }
 
 function finishLogin(u){
-  // 1. Hide all auth screens
-  ["screenSelect","screenPassword","screenChangePass","screenRegEmail","screenForgotPass"]
-    .forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add("hidden"); });
-
-  // 2. Load saved data (may override defaults)
-  loadFromStorage();
-
-  // 3. Find fresh user object (TEAM may have been updated from storage)
-  currentUser = USERS.find(x=>x.id===u.id) || u;
-
-  // 4. Setup sidebar
+  currentUser=u;
+  document.getElementById("screenSelect").classList.add("hidden");
+  document.getElementById("screenPassword").classList.add("hidden");
+  document.getElementById("screenChangePass").classList.add("hidden");
   const av=document.getElementById("sidebarAvatar");
-  av.textContent = currentUser.name[0];
-  av.style.background = currentUser.color;
-  document.getElementById("sidebarName").textContent = currentUser.name;
-  document.getElementById("sidebarRole").textContent = currentUser.isAdmin ? "Admin" : currentUser.role;
-
-  // 5. Show/hide admin-only UI
-  const isAdm = currentUser.isAdmin;
-  document.getElementById("adminNavSection").style.display = isAdm ? "" : "none";
-  document.getElementById("adminActionBtn").style.display  = isAdm ? "" : "none";
-  document.getElementById("adminProjectBtn").style.display = isAdm ? "" : "none";
-
-  // 6. Rebuild login screen with fresh team data
-  initLogin();
-  renderDrawingCheckboxes();
-
-  // 7. Go to dashboard
+  av.textContent=u.name[0]; av.style.background=u.color;
+  document.getElementById("sidebarName").textContent=u.name;
+  document.getElementById("sidebarRole").textContent=u.isAdmin?"Admin":u.role;
+  if(u.isAdmin){
+    document.getElementById("adminNavSection").style.display="";
+    document.getElementById("adminActionBtn").style.display="";
+    document.getElementById("adminProjectBtn").style.display="";
+  }
+  loadFromStorage();
   updateNotifBadge();
   checkDelays();
   showPage("dashboard");
@@ -977,53 +872,26 @@ function logout(){
 // ══════════════════════════════════════════════════════
 function saveToStorage(){
   try{
-    localStorage.setItem("darc_projects",   JSON.stringify(projects));
-    localStorage.setItem("darc_team",       JSON.stringify(TEAM));
-    localStorage.setItem("darc_drawings",   JSON.stringify(DRAWINGS_DB));
-    localStorage.setItem("darc_notifs",     JSON.stringify(notifications.slice(0,200)));
-    localStorage.setItem("darc_notifId",    String(notifId));
-    localStorage.setItem("darc_drawingId",  String(nextDrawingId));
+    localStorage.setItem("darc_projects", JSON.stringify(projects));
+    localStorage.setItem("darc_team", JSON.stringify(TEAM));
+    localStorage.setItem("darc_drawings", JSON.stringify(DRAWINGS_DB));
+    localStorage.setItem("darc_notifications", JSON.stringify(notifications.slice(0,200)));
+    localStorage.setItem("darc_nextDrawingId", String(nextDrawingId));
     flashSave();
-  }catch(e){ console.warn("Save error",e); }
+  }catch(e){ console.warn("Storage error",e); }
 }
-
 function loadFromStorage(){
   try{
-    // Projects
-    const rawP = localStorage.getItem("darc_projects");
-    if(rawP){
-      const arr = JSON.parse(rawP);
-      if(Array.isArray(arr) && arr.length > 0) projects = arr;
-    }
-    // Team (includes admins now)
-    const rawT = localStorage.getItem("darc_team");
-    if(rawT){
-      const arr = JSON.parse(rawT);
-      if(Array.isArray(arr) && arr.length >= 2){
-        // Validate has at least admins
-        const hasAdmin = arr.some(m=>m.isAdmin);
-        if(hasAdmin){ TEAM.length=0; arr.forEach(m=>TEAM.push(m)); }
-      }
-    }
-    // Drawings
-    const rawD = localStorage.getItem("darc_drawings");
-    if(rawD){
-      const arr = JSON.parse(rawD);
-      if(Array.isArray(arr) && arr.length > 0) DRAWINGS_DB = arr;
-    }
-    // Notifications
-    const rawN = localStorage.getItem("darc_notifs");
-    if(rawN){
-      const arr = JSON.parse(rawN);
-      if(Array.isArray(arr)) notifications = arr;
-    }
-    const rawNid = localStorage.getItem("darc_notifId");
-    if(rawNid){ const n=parseInt(rawNid); if(n>notifId) notifId=n; }
-    const rawDid = localStorage.getItem("darc_drawingId");
-    if(rawDid){ const n=parseInt(rawDid); if(n>nextDrawingId) nextDrawingId=n; }
-
-    // Always sync USERS from TEAM after loading
-    syncUsersFromTeam();
+    const p=localStorage.getItem("darc_projects");
+    if(p) projects=JSON.parse(p);
+    const tm=localStorage.getItem("darc_team");
+    if(tm){ TEAM.length=0; JSON.parse(tm).forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
+    const dr=localStorage.getItem("darc_drawings");
+    if(dr) DRAWINGS_DB=JSON.parse(dr);
+    const no=localStorage.getItem("darc_notifications");
+    if(no) notifications=JSON.parse(no);
+    const ndi=localStorage.getItem("darc_nextDrawingId");
+    if(ndi) nextDrawingId=parseInt(ndi)||nextDrawingId;
     renderDrawingCheckboxes();
     initAddDrawingCategorySelect();
   }catch(e){ console.warn("Load error",e); }
@@ -1092,24 +960,22 @@ let DRAWINGS_DB = [
 let nextDrawingId = 33;
 
 // ══════════════════════════════════════════════════════
-// TEAM — ALL members including admins
+// TEAM — starts with your 5 employees
 // ══════════════════════════════════════════════════════
 let TEAM = [
-  // Admins (can also be assigned tasks)
-  {id:"radwan",    name:"رضوان",           nameEn:"Radwan",         role:"مدير",                roleEn:"Admin",                 color:"#B8960C", isAdmin:true},
-  {id:"jihad",     name:"م. جهاد مسلاتي", nameEn:"Eng. Jihad",    role:"مدير عام",             roleEn:"General Manager",       color:"#1A1A1A", isAdmin:true},
-  // Team members
-  {id:"tariq",     name:"طارق",            nameEn:"Tariq",          role:"منفذ تصاميم 3D",      roleEn:"3D Designer",           color:"#7C3AED", isAdmin:false},
-  {id:"hanan",     name:"حنان",            nameEn:"Hanan",          role:"مهندسة معمارية",       roleEn:"Arch. Engineer",        color:"#DB2777", isAdmin:false},
-  {id:"mohanad",   name:"مهند",            nameEn:"Mohanad",        role:"مهندس معماري",         roleEn:"Arch. Engineer",        color:"#2563EB", isAdmin:false},
-  {id:"hakeem",    name:"عبد الحكيم",      nameEn:"Abd Al-Hakeem",  role:"رسام",                 roleEn:"Draftsman",             color:"#059669", isAdmin:false},
-  {id:"abdrahman", name:"عبدالرحمن شيط",   nameEn:"Abd Al-Rahman",  role:"مهندس إلكتروميكانيك", roleEn:"Electromechanical Eng.", color:"#D97706", isAdmin:false},
+  {id:"tariq",     name:"طارق",              nameEn:"Tariq",          role:"منفذ تصاميم 3D",      roleEn:"3D Designer",           color:"#7C3AED"},
+  {id:"hanan",     name:"حنان",              nameEn:"Hanan",          role:"مهندسة معمارية",       roleEn:"Arch. Engineer",        color:"#DB2777"},
+  {id:"mohanad",   name:"مهند",              nameEn:"Mohanad",        role:"مهندس معماري",         roleEn:"Arch. Engineer",        color:"#2563EB"},
+  {id:"hakeem",    name:"عبد الحكيم",        nameEn:"Abd Al-Hakeem",  role:"رسام",                 roleEn:"Draftsman",             color:"#059669"},
+  {id:"abdrahman", name:"عبدالرحمن شيط",     nameEn:"Abd Al-Rahman",  role:"مهندس إلكتروميكانيك", roleEn:"Electromechanical Eng.", color:"#D97706"},
 ];
 let USERS = [];
-
 function syncUsersFromTeam(){
-  // USERS = all TEAM members (admins + employees)
-  USERS = TEAM.map(m=>({...m}));
+  USERS = [
+    {id:"radwan",name:"رضوان",           nameEn:"Radwan",       role:"مدير",    roleEn:"Admin",           isAdmin:true, color:"#B8960C"},
+    {id:"jihad", name:"م. جهاد مسلاتي", nameEn:"Eng. Jihad",  role:"مدير عام",roleEn:"General Manager", isAdmin:true, color:"#1A1A1A"},
+    ...TEAM.map(m=>({...m,isAdmin:false}))
+  ];
 }
 syncUsersFromTeam();
 
@@ -1117,18 +983,18 @@ syncUsersFromTeam();
 // WF STATUS
 // ══════════════════════════════════════════════════════
 const WF = {
-  "not-started":     {ar:"لم يُعيَّن بعد",        en:"Not Assigned",       icon:"⬜",cls:"wf-not-started"},
-  "pending-accept":  {ar:"بانتظار القبول",          en:"Pending Acceptance", icon:"⏳",cls:"wf-pending-accept"},
-  "negotiating":     {ar:"جارٍ التفاوض على المدة", en:"Negotiating",        icon:"🔄",cls:"wf-negotiating"},
-  "accepted":        {ar:"مقبولة — لم تبدأ",        en:"Accepted",           icon:"✅",cls:"wf-accepted"},
-  "in-progress":     {ar:"جاري التنفيذ",            en:"In Progress",        icon:"🔵",cls:"wf-in-progress"},
-  "submitted":       {ar:"مُسلَّمة للمراجعة",       en:"Submitted",          icon:"📤",cls:"wf-submitted"},
-  "approved":        {ar:"معتمدة داخلياً",           en:"Internally Approved",icon:"✅",cls:"wf-approved"},
-  "rejected":        {ar:"مرجَّعة — تحتاج تعديل",  en:"Rejected",           icon:"❌",cls:"wf-rejected"},
-  "delivery":        {ar:"مرحلة التسليم",            en:"Delivery Stage",     icon:"📦",cls:"wf-delivery"},
-  "client-approved": {ar:"معتمدة من المالك",         en:"Client Approved",    icon:"🏆",cls:"wf-client-approved"},
-  "client-rejected": {ar:"مرجَّعة من المالك",        en:"Client Rejected",    icon:"🔴",cls:"wf-client-rejected"},
-  "done":            {ar:"مكتملة ١٠٠٪",             en:"Complete 100%",      icon:"🎉",cls:"wf-done"},
+  "not-started":     {ar:"لم يُعيَّن بعد",        icon:"⬜",cls:"wf-not-started"},
+  "pending-accept":  {ar:"بانتظار القبول",          icon:"⏳",cls:"wf-pending-accept"},
+  "negotiating":     {ar:"جارٍ التفاوض على المدة", icon:"🔄",cls:"wf-negotiating"},
+  "accepted":        {ar:"مقبولة — لم تبدأ",        icon:"✅",cls:"wf-accepted"},
+  "in-progress":     {ar:"جاري التنفيذ",            icon:"🔵",cls:"wf-in-progress"},
+  "submitted":       {ar:"مُسلَّمة للمراجعة",       icon:"📤",cls:"wf-submitted"},
+  "approved":        {ar:"معتمدة داخلياً",           icon:"✅",cls:"wf-approved"},
+  "rejected":        {ar:"مرجَّعة — تحتاج تعديل",  icon:"❌",cls:"wf-rejected"},
+  "delivery":        {ar:"مرحلة التسليم",            icon:"📦",cls:"wf-delivery"},
+  "client-approved": {ar:"معتمدة من المالك",         icon:"🏆",cls:"wf-client-approved"},
+  "client-rejected": {ar:"مرجَّعة من المالك",        icon:"🔴",cls:"wf-client-rejected"},
+  "done":            {ar:"مكتملة ١٠٠٪",             icon:"🎉",cls:"wf-done"},
 };
 
 // ══════════════════════════════════════════════════════
@@ -1147,18 +1013,18 @@ let taskSource = "drawing";
 // INIT PROJECTS — your 8 real projects, empty tasks
 // ══════════════════════════════════════════════════════
 function initSampleData(){
-  // Set default projects in memory
+  // Only set if localStorage is empty
+  if(localStorage.getItem("darc_projects")) return;
   projects = [
-    {id:"p1",name:"صالون لمسات الخالدية",        nameEn:"Lamasat Salon Al-Khalidiya",      client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p2",name:"صالون لي لي الرياض",           nameEn:"Li Li Salon Riyadh",              client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p3",name:"صالون لي لي جدة",              nameEn:"Li Li Salon Jeddah",              client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p4",name:"برج صاري",                      nameEn:"Sari Tower",                      client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p5",name:"لمسات المدينة المنورة",         nameEn:"Lamasat Al-Madinah",              client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p6",name:"مشروع شقة د. ماجدة أبو راس",  nameEn:"Dr. Majda Apartment",             client:"د. ماجدة أبو راس",start:"",end:"",status:"active",tasks:[]},
-    {id:"p7",name:"مشروع فيلا الزعيم بالرياض",   nameEn:"Al-Za'eem Villa Riyadh",          client:"",start:"",end:"",status:"active",tasks:[]},
-    {id:"p8",name:"مخططات تفصيلية مرسيدس أتومول",nameEn:"Mercedes Automall Detailed Plans", client:"مرسيدس أتومول",start:"",end:"",status:"active",tasks:[]},
+    {id:"p1",name:"صالون لمسات الخالدية",        nameEn:"Lamasat Salon Al-Khalidiya",     client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p2",name:"صالون لي لي الرياض",           nameEn:"Li Li Salon Riyadh",             client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p3",name:"صالون لي لي جدة",              nameEn:"Li Li Salon Jeddah",             client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p4",name:"برج صاري",                      nameEn:"Sari Tower",                     client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p5",name:"لمسات المدينة المنورة",         nameEn:"Lamasat Al-Madinah",             client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p6",name:"مشروع شقة د. ماجدة أبو راس",  nameEn:"Dr. Majda Apartment",            client:"د. ماجدة أبو راس",start:"",end:"",status:"active",tasks:[]},
+    {id:"p7",name:"مشروع فيلا الزعيم بالرياض",   nameEn:"Al-Za'eem Villa Riyadh",         client:"",start:"",end:"",status:"active",tasks:[]},
+    {id:"p8",name:"مخططات تفصيلية مرسيدس أتومول",nameEn:"Mercedes Automall Detailed Plans",client:"مرسيدس أتومول",start:"",end:"",status:"active",tasks:[]},
   ];
-  // loadFromStorage will override these if saved data exists
 }
 
 function mkTask(id,drawingId,assignee,reviewer,duration,taskStart,wfStatus,deliveryTo,notes=""){
@@ -1256,34 +1122,11 @@ function toggleLang(){
   currentLang=currentLang==="ar"?"en":"ar";
   document.documentElement.lang=currentLang;
   document.documentElement.dir=currentLang==="ar"?"rtl":"ltr";
-  document.body.style.fontFamily=currentLang==="ar"?"'Cairo',sans-serif":"'Montserrat',sans-serif";
-  // Update all static elements with data-ar / data-en
-  document.querySelectorAll("[data-ar]").forEach(el=>{
-    el.textContent=currentLang==="ar"?el.dataset.ar:el.dataset.en;
-  });
-  // Re-render current page so all JS-generated content is also translated
+  document.querySelectorAll("[data-ar]").forEach(el=>{el.textContent=currentLang==="ar"?el.dataset.ar:el.dataset.en;});
   renderCurrentPage();
-  // Update topbar title
-  const active=document.querySelector(".page.active");
-  if(active){
-    const id=active.id.replace("page-","");
-    const titles={
-      dashboard:t("لوحة التحكم","Dashboard"),
-      projects:t("المشاريع","Projects"),
-      projectDetail:t("تفاصيل المشروع","Project Detail"),
-      drawingsDB:t("قاعدة المخططات","Drawings DB"),
-      team:t("الفريق","Team"),
-      myTasks:t("مهامي","My Tasks"),
-      adminDrawings:t("إدارة المخططات","Manage Drawings"),
-    };
-    document.getElementById("topbarTitle").textContent=titles[id]||"";
-  }
-  // Refresh login screen if visible
-  if(!document.getElementById("screenSelect").classList.contains("hidden")) initLogin();
 }
 function t(ar,en){return currentLang==="ar"?ar:en;}
-function teamName(m){return currentLang==="ar"?m.name:(m.nameEn||m.name);}
-function roleName(m){return currentLang==="ar"?m.role:(m.roleEn||m.role);}
+function teamName(m){return currentLang==="ar"?m.name:m.nameEn;}
 
 // ══════════════════════════════════════════════════════
 // LOGIN INIT
@@ -1307,15 +1150,8 @@ function showPage(name){
   document.getElementById("page-"+name).classList.add("active");
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   document.getElementById("notifPanel").classList.remove("open");
-  const titles={
-    dashboard:t("لوحة التحكم","Dashboard"),
-    projects:t("المشاريع","Projects"),
-    projectDetail:t("تفاصيل المشروع","Project Detail"),
-    drawingsDB:t("قاعدة المخططات","Drawings DB"),
-    team:t("الفريق","Team"),
-    myTasks:t("مهامي","My Tasks"),
-    adminDrawings:t("إدارة المخططات","Manage Drawings"),
-  };
+  const titles={dashboard:"لوحة التحكم",projects:"المشاريع",projectDetail:"تفاصيل المشروع",
+    drawingsDB:"قاعدة المخططات",team:"الفريق",myTasks:"مهامي",adminDrawings:"إدارة المخططات"};
   document.getElementById("topbarTitle").textContent=titles[name]||"";
   renderCurrentPage();
 }
@@ -1342,11 +1178,7 @@ function getTaskCatColor(task){if(task.type==="free")return"#6B7280";const d=get
 function calcProgress(p){if(!p.tasks.length)return 0;return Math.round(p.tasks.filter(t=>["done","client-approved"].includes(t.wfStatus)).length/p.tasks.length*100);}
 function isDelayed(p){return p.end&&new Date(p.end)<new Date()&&calcProgress(p)<100;}
 function memberTasks(uid){return projects.flatMap(p=>p.tasks.filter(t=>t.assignee===uid));}
-function wfBadge(s){
-  const w=WF[s]||WF["not-started"];
-  const label=currentLang==="ar"?w.ar:(w.en||w.ar);
-  return`<span class="wf-badge ${w.cls}">${w.icon} ${label}</span>`;
-}
+function wfBadge(s){const w=WF[s]||WF["not-started"];return`<span class="wf-badge ${w.cls}">${w.icon} ${w.ar}</span>`;}
 function typeIcon(type){const m={drawing:"📐",table:"📊",letter:"📄",offer:"💰",report:"📋",meeting:"📅",general:"📌",other:"📌"};return m[type]||"📌";}
 
 // ══════════════════════════════════════════════════════
@@ -1387,38 +1219,35 @@ function renderDashboard(){
 // ══════════════════════════════════════════════════════
 function renderProjects(){
   const g=document.getElementById("projectsGrid");
-  if(!projects.length){
-    g.innerHTML=`<div class="empty-state"><div class="icon">📁</div><div>${t("لا توجد مشاريع","No projects yet")}</div></div>`;
-    return;
-  }
+  if(!projects.length){g.innerHTML=`<div class="empty-state"><div class="icon">📁</div><div>لا توجد مشاريع</div></div>`;return;}
   g.innerHTML=projects.map(p=>{
     const pct=calcProgress(p),del=isDelayed(p);
     const assignees=[...new Set(p.tasks.map(t=>t.assignee).filter(Boolean))].slice(0,4);
     const bc=del?"badge-delayed":p.status==="active"?"badge-active":p.status==="done"?"badge-done":"badge-pending";
-    const bt=del?t("متأخر","Delayed"):p.status==="active"?t("جاري","Active"):p.status==="done"?t("منجز","Done"):t("معلق","Pending");
+    const bt=del?"متأخر":p.status==="active"?"جاري":p.status==="done"?"منجز":"معلق";
     const col=pct>=80?"green":pct>=40?"blue":"gold";
-    const pr=p.tasks.filter(t2=>t2.wfStatus==="submitted"&&t2.reviewer===currentUser?.id).length;
-    const pa=p.tasks.filter(t2=>t2.wfStatus==="pending-accept"&&t2.assignee===currentUser?.id).length;
+    const pr=p.tasks.filter(t=>t.wfStatus==="submitted"&&t.reviewer===currentUser?.id).length;
+    const pa=p.tasks.filter(t=>t.wfStatus==="pending-accept"&&t.assignee===currentUser?.id).length;
     return`<div class="project-card" onclick="openProject('${p.id}')">
       <div class="project-card-header">
         <div>
           <div class="project-name">${p.name}
-            ${pr?`<span style="color:var(--purple);font-size:11px;"> ⚡${pr} ${t("مراجعة","review")}</span>`:''}
-            ${pa?`<span style="color:var(--orange);font-size:11px;"> ⏳${pa} ${t("قبول","accept")}</span>`:''}
+            ${pr?`<span style="color:var(--purple);font-size:11px;"> ⚡${pr} مراجعة</span>`:''}
+            ${pa?`<span style="color:var(--orange);font-size:11px;"> ⏳${pa} قبول</span>`:''}
           </div>
           <div class="project-client">${p.client?'👤 '+p.client:''}</div>
         </div>
         <span class="status-badge ${bc}">${bt}</span>
       </div>
       <div class="project-card-body">
-        <div class="progress-label"><span>${t("نسبة الإنجاز","Progress")}</span><strong>${pct}%</strong></div>
+        <div class="progress-label"><span>نسبة الإنجاز</span><strong>${pct}%</strong></div>
         <div class="progress-bar"><div class="progress-fill ${col}" style="width:${pct}%"></div></div>
         <div class="project-meta">
-          <div class="project-meta-item">📋 ${p.tasks.length} ${t("مهمة","tasks")}</div>
-          <div class="project-meta-item">✅ ${p.tasks.filter(t2=>["done","client-approved"].includes(t2.wfStatus)).length} ${t("مكتمل","done")}</div>
+          <div class="project-meta-item">📋 ${p.tasks.length} مهمة</div>
+          <div class="project-meta-item">✅ ${p.tasks.filter(t=>["done","client-approved"].includes(t.wfStatus)).length} مكتمل</div>
           ${p.end?`<div class="project-meta-item">📅 ${p.end}</div>`:''}
         </div>
-        <div class="team-avatars">${assignees.map(aid=>{const m=getMember(aid);return m?`<div class="team-avatar" style="background:${m.color}" title="${m.name}">${m.name[0]}</div>`:''}).join("")}</div>
+        <div class="team-avatars">${assignees.map(aid=>{const m=getMember(aid);return m?`<div class="team-avatar" style="background:${m.color}">${m.name[0]}</div>`:''}).join("")}</div>
       </div>
     </div>`;
   }).join("");
@@ -1447,9 +1276,8 @@ function renderProjectDetail(id){
         <div class="task-name">${name}</div>
         ${task.type==="free"?`<span class="task-type-badge" style="background:${catColor}18;color:${catColor};">${typeIcon(task.freeType)} ${task.freeType||"عام"}</span>`:''}
         ${task.type==="drawing"?(()=>{const d=getDrawing(task.drawingId);const cat=d?getCategory(d.cat):null;return cat?`<span class="task-type-badge" style="background:${cat.color}18;color:${cat.color};">${cat.icon} ${cat.ar}</span>`:''})():''}
-        ${task.notes?`<div style="color:var(--red);font-size:10px;margin-top:3px;">💬 ${t("ملاحظات إرجاع","Return notes")}</div>`:''}
-        ${task.employeeComment?`<div style="color:var(--blue);font-size:10px;margin-top:3px;" title="${task.employeeComment}">💬 ${t("تعليق الموظف","Employee comment")}: ${task.employeeComment.substring(0,30)}${task.employeeComment.length>30?'…':''}</div>`:''}
-        ${isDelayedTask?`<div style="color:var(--red);font-size:10px;">⚠️ ${t("تجاوزت المدة","Overdue")}</div>`:''}
+        ${task.notes?`<div style="color:var(--red);font-size:10px;margin-top:3px;">💬 ملاحظات إرجاع</div>`:''}
+        ${isDelayedTask?`<div style="color:var(--red);font-size:10px;">⚠️ تجاوزت المدة</div>`:''}
       </td>
       <td>${member?`<div style="display:flex;align-items:center;gap:6px;">
         <div style="width:22px;height:22px;border-radius:50%;background:${member.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;">${member.name[0]}</div>
@@ -1552,51 +1380,21 @@ function buildActionBtn(task,taskIdx,projId,isAdmin,isMyTask,isMyReview){
 // MY TASKS
 // ══════════════════════════════════════════════════════
 function renderMyTasks(){
-  const el=document.getElementById("myTasksContent");
-  if(!currentUser){ el.innerHTML=`<div class="empty-state"><div class="icon">🔐</div><div>${t("يرجى تسجيل الدخول","Please login")}</div></div>`; return; }
-
-  if(currentUser.isAdmin){
-    // Admin: show all tasks needing attention
-    const pending=[];
-    projects.forEach(p=>p.tasks.forEach((task,i)=>{
-      if(["submitted","negotiating","pending-accept","delivery","approved"].includes(task.wfStatus))
-        pending.push({task,project:p,taskIdx:i});
-    }));
-    if(!pending.length){ el.innerHTML=`<div class="empty-state"><div class="icon">✅</div><div>${t("لا توجد مهام تحتاج مراجعتك الآن","No tasks need your attention right now")}</div></div>`; return; }
-    let html=`<div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:12px;">⚡ ${t("تحتاج إجراءً منك","Needs your action")} (${pending.length})</div>`;
-    pending.forEach(({task,project,taskIdx})=>{
-      const name=getTaskDisplayName(task);
-      const assignee=getMember(task.assignee);
-      html+=`<div class="card" style="margin-bottom:10px;padding:14px 18px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-          <div>
-            <div style="font-size:14px;font-weight:700;">${name}</div>
-            <div style="font-size:12px;color:var(--gray);margin-top:2px;">📁 ${project.name}${assignee?' | 👤 '+assignee.name:''}</div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            ${wfBadge(task.wfStatus)}
-            ${buildActionBtn(task,taskIdx,project.id,true,task.assignee===currentUser.id,task.reviewer===currentUser.id)}
-          </div>
-        </div>
-      </div>`;
-    });
-    el.innerHTML=html; return;
+  if(!currentUser||currentUser.isAdmin){
+    document.getElementById("myTasksContent").innerHTML=`<div class="empty-state"><div class="icon">📋</div><div>هذه الصفحة للموظفين فقط</div></div>`;return;
   }
-
-  // Employees: show their tasks
   const uid=currentUser.id;
   const allMy=[];
   projects.forEach(p=>p.tasks.forEach((task,i)=>{
     if(task.assignee===uid||task.reviewer===uid) allMy.push({task,project:p,taskIdx:i});
   }));
-  if(!allMy.length){ el.innerHTML=`<div class="empty-state"><div class="icon">📋</div><div>${t("لا توجد مهام معينة لك بعد","No tasks assigned to you yet")}</div></div>`; return; }
-
+  if(!allMy.length){document.getElementById("myTasksContent").innerHTML=`<div class="empty-state"><div class="icon">📋</div><div>لا توجد مهام معينة لك بعد</div></div>`;return;}
   const groups=[
-    {label:`⚡ ${t("تحتاج إجراءً منك","Needs your action")}`,         color:"var(--red)",   filter:x=>(x.task.assignee===uid&&["pending-accept","negotiating","rejected","client-rejected"].includes(x.task.wfStatus))||(x.task.reviewer===uid&&x.task.wfStatus==="submitted")},
-    {label:`✅ ${t("مقبولة — لم تبدأ بعد","Accepted — not started")}`, color:"var(--teal)",  filter:x=>x.task.assignee===uid&&x.task.wfStatus==="accepted"},
-    {label:`🔵 ${t("جاري التنفيذ","In Progress")}`,                    color:"var(--blue)",  filter:x=>x.task.assignee===uid&&x.task.wfStatus==="in-progress"},
-    {label:`📤 ${t("مُسلَّمة / قيد المعالجة","Submitted")}`,          color:"var(--purple)",filter:x=>x.task.assignee===uid&&["submitted","approved","delivery"].includes(x.task.wfStatus)},
-    {label:`🎉 ${t("مكتملة","Completed")}`,                            color:"var(--green)", filter:x=>x.task.assignee===uid&&["done","client-approved"].includes(x.task.wfStatus)},
+    {label:"⚡ تحتاج إجراءً منك",color:"var(--red)",filter:x=>(x.task.assignee===uid&&["pending-accept","negotiating","rejected","client-rejected"].includes(x.task.wfStatus))||(x.task.reviewer===uid&&x.task.wfStatus==="submitted")},
+    {label:"✅ مقبولة — لم تبدأ بعد",color:"var(--teal)",filter:x=>x.task.assignee===uid&&x.task.wfStatus==="accepted"},
+    {label:"🔵 جاري التنفيذ",color:"var(--blue)",filter:x=>x.task.assignee===uid&&x.task.wfStatus==="in-progress"},
+    {label:"📤 مُسلَّمة / قيد المعالجة",color:"var(--purple)",filter:x=>x.task.assignee===uid&&["submitted","approved","delivery"].includes(x.task.wfStatus)},
+    {label:"🎉 مكتملة",color:"var(--green)",filter:x=>x.task.assignee===uid&&["done","client-approved"].includes(x.task.wfStatus)},
   ];
   let html='';
   groups.forEach(g=>{
@@ -1609,14 +1407,14 @@ function renderMyTasks(){
       const isMyTask=task.assignee===uid;
       const isMyReview=task.reviewer===uid;
       const isDelayedTask=task.startedAt&&task.duration&&new Date()>new Date(new Date(task.startedAt).getTime()+task.duration*86400000)&&!["done","client-approved"].includes(task.wfStatus);
-      html+=`<div class="card" style="margin-bottom:12px;padding:16px 20px;${isDelayedTask?'border:1px solid var(--red);':''}">
+      html+=`<div class="card" style="margin-bottom:12px;padding:16px 20px;${isDelayedTask?'border-color:var(--red);':''}">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
           <div style="flex:1;min-width:200px;">
             <div style="font-size:14px;font-weight:700;">${name}</div>
-            <div style="font-size:12px;color:var(--gray);margin-top:3px;">📁 ${project.name}${project.client?' | 👤 '+project.client:''}</div>
-            ${task.duration?`<div style="font-size:11px;color:var(--gray);margin-top:3px;">⏱️ ${t("المدة","Duration")}: ${task.duration} ${t("أيام","days")} ${isDelayedTask?`<span style="color:var(--red);font-weight:700;">— ${t("تجاوزت الموعد","Overdue")} ⚠️</span>`:''}</div>`:''}
-            ${task.notes?`<div class="notes-box" style="margin-top:8px;"><div class="notes-label">💬 ${t("ملاحظات الإرجاع","Return Notes")}:</div>${task.notes}</div>`:''}
-            ${task.adminNotes&&["pending-accept","negotiating"].includes(task.wfStatus)?`<div class="notes-box" style="margin-top:8px;background:var(--blue-bg);border-color:#93C5FD;"><div class="notes-label" style="color:var(--blue);">📌 ${t("تعليمات","Instructions")}:</div>${task.adminNotes}</div>`:''}
+            <div style="font-size:12px;color:var(--gray);margin-top:3px;">📁 ${project.name} ${project.client?'| 👤 '+project.client:''}</div>
+            ${task.duration?`<div style="font-size:11px;color:var(--gray);margin-top:3px;">⏱️ المدة: ${task.duration} أيام ${isDelayedTask?'<span style="color:var(--red);font-weight:700;">— تجاوزت الموعد ⚠️</span>':''}</div>`:''}
+            ${task.notes?`<div class="notes-box" style="margin-top:8px;"><div class="notes-label">💬 ملاحظات الإرجاع:</div>${task.notes}</div>`:''}
+            ${task.adminNotes&&["pending-accept","negotiating"].includes(task.wfStatus)?`<div class="notes-box" style="margin-top:8px;background:var(--blue-bg);border-color:#93C5FD;"><div class="notes-label" style="color:var(--blue);">📌 تعليمات:</div>${task.adminNotes}</div>`:''}
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
             ${wfBadge(task.wfStatus)}
@@ -1626,7 +1424,7 @@ function renderMyTasks(){
       </div>`;
     });
   });
-  el.innerHTML=html;
+  document.getElementById("myTasksContent").innerHTML=html;
 }
 
 // ══════════════════════════════════════════════════════
@@ -1636,102 +1434,55 @@ function openTaskAccept(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
   const task=p.tasks[taskIdx];
   const name=getTaskDisplayName(task);
-  const isNeg=task.wfStatus==="negotiating";
-
   document.getElementById("taskAcceptContent").innerHTML=`
     <div style="background:var(--gold-bg);border:1px solid var(--gold-pale);border-radius:8px;padding:16px;margin-bottom:16px;">
       <div style="font-size:15px;font-weight:700;margin-bottom:6px;">📋 ${name}</div>
-      <div style="font-size:12px;color:var(--gray);">📁 ${p.name}${p.client?' | 👤 '+p.client:''}</div>
-      ${task.duration?`<div style="font-size:13px;margin-top:10px;font-weight:600;">⏱️ ${t("المدة المطلوبة","Required Duration")}: <span style="color:var(--gold);font-family:var(--font-en);">${task.duration}</span> ${t("أيام","days")}</div>`:`<div style="font-size:13px;margin-top:8px;color:var(--orange);">⏱️ ${t("لم تحدد مدة","No duration set")}</div>`}
-      ${task.adminNotes?`<div style="font-size:12px;margin-top:10px;padding:10px 12px;background:var(--white);border-radius:6px;border-right:3px solid var(--gold);"><strong>📌 ${t("تعليمات","Instructions")}:</strong><br>${task.adminNotes}</div>`:''}
+      <div style="font-size:12px;color:var(--gray);">📁 ${p.name} ${p.client?'| 👤 '+p.client:''}</div>
+      ${task.duration?`<div style="font-size:13px;margin-top:8px;font-weight:600;">⏱️ المدة المطلوبة: <span style="color:var(--gold);font-family:var(--font-en);">${task.duration}</span> أيام</div>`:'<div style="font-size:13px;margin-top:8px;color:var(--orange);">⏱️ لم تحدد المدة</div>'}
+      ${task.adminNotes?`<div style="font-size:12px;margin-top:8px;padding:8px 12px;background:var(--white);border-radius:6px;">📌 ${task.adminNotes}</div>`:''}
     </div>
-
-    ${isNeg?`<div class="notes-box" style="margin-bottom:14px;"><div class="notes-label">🔄 ${t("جارٍ التفاوض","Under Negotiation")}</div>${t("طلبت تعديل المدة. يمكنك القبول بالمدة الحالية أو تعديل طلبك.","You requested duration change. You can accept current or modify your request.")}</div>`:''}
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">⏱️ ${t("مدة الإنجاز المقترحة (أيام)","Proposed Duration (days)")}</label>
-        <input class="form-input" type="number" id="acceptDuration" value="${task.proposedDuration||task.duration||''}" min="1" placeholder="${t("عدد الأيام","Number of days")}">
-      </div>
+    <div class="form-group"><label class="form-label">مدة الإنجاز المقترحة منك (أيام)</label>
+      <input class="form-input" type="number" id="acceptDuration" value="${task.proposedDuration||task.duration||''}" min="1">
     </div>
-
-    <div class="form-group">
-      <label class="form-label">💬 ${t("تعليقك / استفسارك (اختياري)","Your Comment / Inquiry (optional)")}</label>
-      <textarea class="form-textarea" id="acceptNote" rows="3" placeholder="${t("اكتب أي استفسار، أو سبب رفض المدة، أو أي ملاحظة للمسؤول...","Write any inquiry, reason for rejecting the duration, or notes for the manager...")}"></textarea>
-      <div class="form-hint">${t("سيظهر تعليقك للمسؤول فور إرساله","Your comment will be visible to the manager immediately")}</div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;">
-      <button class="btn btn-danger" style="font-size:12px;" onclick="rejectTaskByWorker('${projId}',${taskIdx})">❌ ${t("رفض المهمة","Reject Task")}</button>
-      <button class="btn btn-orange" style="font-size:12px;" onclick="requestDurationChange('${projId}',${taskIdx})">⏱️ ${t("طلب تعديل المدة","Request Duration Change")}</button>
-      <button class="btn btn-success" style="font-size:12px;" onclick="acceptTask('${projId}',${taskIdx})">✅ ${t("قبول المهمة","Accept Task")}</button>
+    <div class="form-group"><label class="form-label">ملاحظة (اختياري)</label>
+      <textarea class="form-textarea" id="acceptNote" rows="2" placeholder="أي ملاحظة على القبول أو طلب تعديل المدة..."></textarea>
     </div>`;
-
-  // Clear footer since buttons are inline
   document.getElementById("taskAcceptFooter").innerHTML=`
-    <button class="btn btn-ghost" onclick="closeModal('taskAcceptModal')">✕ ${t("إغلاق","Close")}</button>`;
+    <button class="btn btn-ghost" onclick="closeModal('taskAcceptModal')">إلغاء</button>
+    <button class="btn btn-danger" onclick="rejectTaskByWorker('${projId}',${taskIdx})">❌ رفض المهمة</button>
+    <button class="btn btn-orange" onclick="requestDurationChange('${projId}',${taskIdx})">⏱️ طلب تعديل المدة</button>
+    <button class="btn btn-success" onclick="acceptTask('${projId}',${taskIdx})">✅ قبول المهمة</button>`;
   openModal("taskAcceptModal");
 }
 function acceptTask(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
   const task=p.tasks[taskIdx];
   const dur=parseInt(document.getElementById("acceptDuration").value)||task.duration;
-  const comment=document.getElementById("acceptNote").value.trim();
-  task.wfStatus="accepted";
-  task.duration=dur; task.durationLocked=true; task.proposedDuration=null;
-  task.employeeComment=comment||"";
+  task.wfStatus="accepted"; task.duration=dur; task.durationLocked=true; task.proposedDuration=null;
   const name=getTaskDisplayName(task);
-  const commentPart=comment?` — تعليق: "${comment}"`:"";
-  USERS.filter(u=>u.isAdmin).forEach(a=>
-    addNotif(a.id,"✅","قبِل الموظف المهمة",
-      `${currentUser.name} قبِل: ${name} في ${p.name} — المدة: ${dur} ${t("أيام","days")}${commentPart}`,
-      currentUser.id)
-  );
-  closeModal("taskAcceptModal"); saveToStorage();
-  showToast(t("✅ تم قبول المهمة — تم الإشعار","✅ Task accepted — admin notified"));
-  renderCurrentPage(); updateNotifBadge();
+  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"✅","قبِل الموظف المهمة",`${currentUser.name} قبِل: ${name} في ${p.name} — المدة: ${dur} أيام`,currentUser.id));
+  closeModal("taskAcceptModal"); saveToStorage(); showToast("✅ تم قبول المهمة"); renderCurrentPage(); updateNotifBadge();
 }
 function requestDurationChange(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
   const task=p.tasks[taskIdx];
   const newDur=parseInt(document.getElementById("acceptDuration").value);
-  const comment=document.getElementById("acceptNote").value.trim();
-  if(!newDur||newDur===(task.duration||0)){
-    showToast(t("⚠️ يرجى إدخال مدة مختلفة","⚠️ Please enter a different duration")); return;
-  }
+  const note=document.getElementById("acceptNote").value.trim();
+  if(!newDur||newDur===(task.duration||0)){showToast("⚠️ يرجى إدخال مدة مختلفة");return;}
   task.wfStatus="negotiating"; task.proposedDuration=newDur;
-  task.employeeComment=comment||"";
   const name=getTaskDisplayName(task);
-  const commentPart=comment?` — السبب: "${comment}"`:"";
-  USERS.filter(u=>u.isAdmin).forEach(a=>
-    addNotif(a.id,"⏱️","طلب تعديل مدة",
-      `${currentUser.name} يطلب ${newDur} ${t("يوم","days")} بدلاً من ${task.duration||t("غير محدد","unset")} لـ: ${name} في ${p.name}${commentPart}`,
-      currentUser.id)
-  );
-  closeModal("taskAcceptModal"); saveToStorage();
-  showToast(t("⏱️ تم إرسال طلب تعديل المدة","⏱️ Duration change request sent"));
-  renderCurrentPage(); updateNotifBadge();
+  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"⏱️","طلب تعديل مدة",`${currentUser.name} يطلب ${newDur} يوم لـ: ${name} في ${p.name}${note?" — "+note:""}`,currentUser.id));
+  closeModal("taskAcceptModal"); saveToStorage(); showToast("⏱️ تم إرسال طلب تعديل المدة"); renderCurrentPage(); updateNotifBadge();
 }
 function rejectTaskByWorker(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
   const task=p.tasks[taskIdx];
-  const comment=document.getElementById("acceptNote").value.trim();
-  if(!comment){
-    showToast(t("⚠️ يرجى كتابة سبب الرفض في خانة التعليق","⚠️ Please write rejection reason in the comment field"));
-    document.getElementById("acceptNote").focus();
-    return;
-  }
+  const note=document.getElementById("acceptNote").value.trim();
+  const prevAssignee=task.assignee;
   task.wfStatus="not-started"; task.assignee=null; task.proposedDuration=null;
-  task.employeeComment=comment;
   const name=getTaskDisplayName(task);
-  USERS.filter(u=>u.isAdmin).forEach(a=>
-    addNotif(a.id,"❌","رفض موظف مهمة",
-      `${currentUser.name} رفض: ${name} في ${p.name} — السبب: "${comment}"`,
-      currentUser.id)
-  );
-  closeModal("taskAcceptModal"); saveToStorage();
-  showToast(t("❌ تم رفض المهمة — تم إشعار المدير","❌ Task rejected — manager notified"));
-  renderCurrentPage(); updateNotifBadge();
+  USERS.filter(u=>u.isAdmin).forEach(a=>addNotif(a.id,"❌","رفض موظف مهمة",`${currentUser.name} رفض: ${name} في ${p.name}${note?" — "+note:""}`,currentUser.id));
+  closeModal("taskAcceptModal"); saveToStorage(); showToast("❌ تم رفض المهمة — تم إشعار المدير"); renderCurrentPage(); updateNotifBadge();
 }
 function openNegResponse(projId,taskIdx){
   const p=projects.find(x=>x.id===projId); if(!p) return;
@@ -1742,25 +1493,24 @@ function openNegResponse(projId,taskIdx){
     <div style="font-size:14px;font-weight:700;margin-bottom:12px;">${name} — ${p.name}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
       <div style="background:var(--blue-bg);border-radius:8px;padding:12px;text-align:center;">
-        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${t("مدتك الأصلية","Your original duration")}</div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">مدتك الأصلية</div>
         <div style="font-size:22px;font-weight:700;color:var(--blue);">${task.duration||"—"}</div>
-        <div style="font-size:11px;color:var(--gray);">${t("يوم","days")}</div>
+        <div style="font-size:11px;color:var(--gray);">يوم</div>
       </div>
       <div style="background:var(--orange-bg);border-radius:8px;padding:12px;text-align:center;">
-        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${t("طلب","Request of")} ${assignee?.name.split(" ")[0]||t("الموظف","employee")}</div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">طلب ${assignee?.name.split(" ")[0]||"الموظف"}</div>
         <div style="font-size:22px;font-weight:700;color:var(--orange);">${task.proposedDuration}</div>
-        <div style="font-size:11px;color:var(--gray);">${t("يوم","days")}</div>
+        <div style="font-size:11px;color:var(--gray);">يوم</div>
       </div>
     </div>
-    ${task.employeeComment?`<div class="notes-box" style="margin-bottom:14px;"><div class="notes-label">💬 ${t("تعليق الموظف","Employee Comment")}:</div>${task.employeeComment}</div>`:''}
-    <div class="form-group"><label class="form-label">${t("المدة المعتمدة النهائية","Final approved duration")}</label>
+    <div class="form-group"><label class="form-label">المدة المعتمدة النهائية</label>
       <input class="form-input" type="number" id="negFinalDur" value="${task.proposedDuration}" min="1"></div>
-    <div class="form-group"><label class="form-label">${t("ردّك على الموظف","Your reply to employee")}</label>
-      <textarea class="form-textarea" id="negAdminNote" rows="2" placeholder="${t("اكتب ردك هنا...","Write your reply here...")}"></textarea></div>`;
+    <div class="form-group"><label class="form-label">رسالة للموظف</label>
+      <textarea class="form-textarea" id="negAdminNote" rows="2"></textarea></div>`;
   document.getElementById("negResponseFooter").innerHTML=`
-    <button class="btn btn-ghost" onclick="closeModal('negResponseModal')">${t("إلغاء","Cancel")}</button>
-    <button class="btn btn-danger" onclick="adminRejectNeg('${projId}',${taskIdx})">❌ ${t("رفض — إبقاء المدة الأصلية","Reject — Keep Original")}</button>
-    <button class="btn btn-success" onclick="adminAcceptNeg('${projId}',${taskIdx})">✅ ${t("قبول المدة الجديدة","Accept New Duration")}</button>`;
+    <button class="btn btn-ghost" onclick="closeModal('negResponseModal')">إلغاء</button>
+    <button class="btn btn-danger" onclick="adminRejectNeg('${projId}',${taskIdx})">❌ رفض — إبقاء المدة الأصلية</button>
+    <button class="btn btn-success" onclick="adminAcceptNeg('${projId}',${taskIdx})">✅ قبول المدة الجديدة</button>`;
   openModal("negResponseModal");
 }
 function adminAcceptNeg(projId,taskIdx){
@@ -1993,12 +1743,11 @@ function populateDrawingSelect(selectedId){
   });
   document.getElementById("assign_drawing").innerHTML=opts;
 }
-function populateMemberSelects(assignee, reviewer){
-  // All team members (admins + employees) can be assigned tasks
-  const allOpts = TEAM.map(m=>`<option value="${m.id}" ${m.id===assignee?"selected":""}>${m.name} — ${m.role}</option>`).join("");
-  const reviewerOpts = TEAM.map(m=>`<option value="${m.id}" ${m.id===reviewer?"selected":""}>${m.name} — ${m.role}</option>`).join("");
-  document.getElementById("assignMember").innerHTML   = `<option value="">${t("اختر المنفذ","Select Assignee")}</option>`+allOpts;
-  document.getElementById("assignReviewer").innerHTML = `<option value="">${t("اختر المراجع (اختياري)","Select Reviewer (optional)")}</option>`+reviewerOpts;
+function populateMemberSelects(assignee,reviewer){
+  const teamOpts=TEAM.map(m=>`<option value="${m.id}" ${m.id===assignee?"selected":""}>${m.name} — ${m.role}</option>`).join("");
+  const adminOpts=USERS.filter(u=>u.isAdmin).map(u=>`<option value="${u.id}" ${u.id===reviewer?"selected":""}>${u.name} — ${u.role}</option>`).join("");
+  document.getElementById("assignMember").innerHTML=`<option value="">اختر المنفذ</option>`+teamOpts;
+  document.getElementById("assignReviewer").innerHTML=`<option value="">اختر المراجع (اختياري)</option>`+teamOpts+adminOpts;
 }
 function saveAssignment(){
   const ctx=currentAssignContext||{};
@@ -2110,77 +1859,67 @@ function openAddMemberModal(){
   openModal("addMemberModal");
 }
 function saveNewMember(){
-  const name   = document.getElementById("nm_name").value.trim();
-  const nameEn = document.getElementById("nm_nameEn").value.trim();
-  const role   = document.getElementById("nm_role").value.trim();
-  const roleEn = document.getElementById("nm_roleEn").value.trim();
-  const otp    = document.getElementById("nm_otp").value.trim() || DEFAULT_OTP;
-  if(!name||!role){ showToast("⚠️ الاسم والمنصب مطلوبان"); return; }
-  const id = (name+Date.now()).replace(/\s+/g,"_").replace(/[^\w]/g,"").toLowerCase();
-  if(TEAM.find(m=>m.id===id)){ showToast("⚠️ يوجد تعارض في المعرّف، حاول مرة أخرى"); return; }
-  const color = MEMBER_COLORS[colorIndex%MEMBER_COLORS.length]; colorIndex++;
-  const member = {id, name, nameEn:nameEn||name, role, roleEn:roleEn||role, color, isAdmin:false};
+  const name=document.getElementById("nm_name").value.trim();
+  const nameEn=document.getElementById("nm_nameEn").value.trim();
+  const role=document.getElementById("nm_role").value.trim();
+  const roleEn=document.getElementById("nm_roleEn").value.trim();
+  const otp=document.getElementById("nm_otp").value.trim()||DEFAULT_OTP;
+  if(!name||!role){showToast("⚠️ الاسم والمنصب مطلوبان");return;}
+  const id=(name+Date.now()).replace(/\s+/g,"_").replace(/[^\w]/g,"").toLowerCase();
+  const color=MEMBER_COLORS[colorIndex%MEMBER_COLORS.length]; colorIndex++;
+  const member={id,name,nameEn:nameEn||name,role,roleEn:roleEn||role,color};
   TEAM.push(member);
   syncUsersFromTeam();
-  // Store OTP
+  // Store OTP hash (first-login password)
+  // We don't set a hash — isFirstLogin returns true so DEFAULT_OTP is accepted
+  // But if admin set a custom OTP, store it
+  if(otp!==DEFAULT_OTP){ setPassHash(id, otp); }
+  // Actually keep as OTP (no stored hash = first login = DEFAULT_OTP or custom)
+  // For custom OTP we store it so it works
   const obj=loadPasswords(); obj[id]="OTP:"+otp; savePasswords(obj);
   closeModal("addMemberModal");
-  initLogin();
-  renderDrawingCheckboxes();
-  saveToStorage();
-  renderCurrentPage();
-  showToast(`✅ ${t("تم إضافة","Added")} ${name} — ${t("كلمة المرور المؤقتة","Temp password")}: ${otp}`);
+  renderDrawingCheckboxes(); initLogin();
+  saveToStorage(); renderCurrentPage(); showToast(`✅ تم إضافة ${name} — كلمة المرور المؤقتة: ${otp}`);
   updateNotifBadge();
 }
-// OTP and password check handled above
 
 function removeMember(id){
   const m=TEAM.find(x=>x.id===id); if(!m) return;
-  if(m.isAdmin){ showToast(t("⚠️ لا يمكن حذف الأدمن","⚠️ Cannot delete admin")); return; }
-  const active=projects.flatMap(p=>p.tasks).filter(t2=>t2.assignee===id&&!["done","client-approved"].includes(t2.wfStatus));
-  if(active.length>0){ showToast(`⚠️ ${m.name} ${t("لديه مهام نشطة","has active tasks")}: ${active.length}`); return; }
-  if(!confirm(`${t("هل تريد حذف","Delete")} ${m.name}?`)) return;
+  const active=projects.flatMap(p=>p.tasks).filter(t=>t.assignee===id&&!["done","client-approved"].includes(t.wfStatus));
+  if(active.length>0){showToast(`⚠️ لا يمكن الحذف — لدى ${m.name} ${active.length} مهمة نشطة`);return;}
+  if(!confirm(`هل تريد حذف ${m.name} من الفريق؟`)) return;
   TEAM.splice(TEAM.findIndex(x=>x.id===id),1);
   syncUsersFromTeam(); initLogin();
-  saveToStorage(); renderCurrentPage();
-  showToast(`🗑️ ${t("تم حذف","Deleted")} ${m.name}`);
+  saveToStorage(); renderCurrentPage(); showToast(`🗑️ تم حذف ${m.name}`);
 }
 function renderTeamPage(){
   const isAdmin=currentUser?.isAdmin;
   document.getElementById("teamPage").innerHTML=`
   ${isAdmin?`<div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-    <button class="btn btn-primary" onclick="openAddMemberModal()">➕ ${t("إضافة موظف جديد","Add New Member")}</button>
+    <button class="btn btn-primary" onclick="openAddMemberModal()">➕ إضافة موظف جديد</button>
   </div>`:''}
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
     ${TEAM.map(m=>{
       const mt=memberTasks(m.id);
-      const md=mt.filter(t2=>["done","client-approved"].includes(t2.wfStatus)).length;
-      const mw=mt.filter(t2=>["in-progress","submitted","approved","delivery"].includes(t2.wfStatus)).length;
+      const md=mt.filter(t=>["done","client-approved"].includes(t.wfStatus)).length;
+      const mw=mt.filter(t=>["in-progress","submitted","approved","delivery"].includes(t.wfStatus)).length;
       const pct=mt.length?Math.round(md/mt.length*100):0;
-      const projs=[...new Set(projects.filter(p=>p.tasks.some(t2=>t2.assignee===m.id)).map(p=>p.id))];
-      const canDelete=isAdmin && !m.isAdmin; // Can't delete admins
+      const projs=[...new Set(projects.filter(p=>p.tasks.some(t=>t.assignee===m.id)).map(p=>p.id))];
       return`<div class="card" style="padding:20px;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
           <div class="member-avatar" style="background:${m.color};width:44px;height:44px;font-size:16px;">${m.name[0]}</div>
-          <div style="flex:1;">
-            <div style="font-size:15px;font-weight:700;">${teamName(m)}</div>
-            <div style="font-size:12px;color:var(--gray);">${roleName(m)}</div>
-            ${m.isAdmin?`<span style="font-size:10px;background:var(--gold-bg);color:var(--gold);padding:1px 7px;border-radius:8px;border:1px solid var(--gold-pale);">Admin</span>`:''}
-          </div>
-          <div style="text-align:center;">
-            <div style="font-size:22px;font-weight:700;color:var(--gold)">${pct}%</div>
-            <div style="font-size:10px;color:var(--gray);">${t("إنجاز","Progress")}</div>
-          </div>
+          <div style="flex:1;"><div style="font-size:15px;font-weight:700;">${m.name}</div><div style="font-size:12px;color:var(--gray);">${m.role}</div></div>
+          <div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--gold)">${pct}%</div><div style="font-size:10px;color:var(--gray);">إنجاز</div></div>
         </div>
         <div class="progress-bar" style="margin-bottom:12px;"><div class="progress-fill" style="width:${pct}%;background:${m.color}"></div></div>
         <div class="member-stats">
-          <div class="m-stat done"><div class="n">${md}</div><div class="l">${t("مكتمل","Done")}</div></div>
-          <div class="m-stat wip"><div class="n">${mw}</div><div class="l">${t("جاري","Active")}</div></div>
-          <div class="m-stat rem"><div class="n">${mt.length-md-mw}</div><div class="l">${t("متبقي","Left")}</div></div>
+          <div class="m-stat done"><div class="n">${md}</div><div class="l">مكتمل</div></div>
+          <div class="m-stat wip"><div class="n">${mw}</div><div class="l">جاري</div></div>
+          <div class="m-stat rem"><div class="n">${mt.length-md-mw}</div><div class="l">متبقي</div></div>
         </div>
         <div style="margin-top:10px;font-size:11px;color:var(--gray);display:flex;justify-content:space-between;align-items:center;">
-          <span>📁 ${projs.length} ${t("مشاريع","projects")} | 📋 ${mt.length} ${t("مهمة","tasks")}</span>
-          ${canDelete?`<button class="btn btn-danger btn-sm" onclick="removeMember('${m.id}')">🗑️</button>`:''}
+          <span>📁 ${projs.length} مشاريع | 📋 ${mt.length} مهمة</span>
+          ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="removeMember('${m.id}')">🗑️</button>`:''}
         </div>
       </div>`;
     }).join("")}
@@ -2282,164 +2021,14 @@ function closeModal(id){document.getElementById(id).classList.remove("open");}
 function showToast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2800);}
 
 // ══════════════════════════════════════════════════════
-// EMAIL REGISTRATION & PASSWORD RESET
+// INIT
 // ══════════════════════════════════════════════════════
-
-// Admin emails — reset codes always go here too
-const ADMIN_EMAILS = {
-  radwan: "radwan@darc.sa",    // ← غيّر لإيميلك الحقيقي
-  jihad:  "jihad@darc.sa",     // ← إيميل م. جهاد
-};
-
-function getUserEmail(userId){
-  try{ return JSON.parse(localStorage.getItem("darc_emails")||"{}")[userId]||null; }
-  catch(e){ return null; }
-}
-function setUserEmail(userId, email){
-  const obj=JSON.parse(localStorage.getItem("darc_emails")||"{}");
-  obj[userId]=email;
-  localStorage.setItem("darc_emails", JSON.stringify(obj));
-}
-
-// Reset code storage
-let _activeResetCode = null;
-let _resetUserId = null;
-
-function generateCode(){
-  return Math.random().toString(36).substring(2,8).toUpperCase();
-}
-
-// Called after OTP verified — show email registration screen first
-function showEmailRegistration(){
-  document.getElementById("screenPassword").classList.add("hidden");
-  document.getElementById("screenChangePass").classList.add("hidden");
-  document.getElementById("screenRegEmail").classList.remove("hidden");
-  document.getElementById("regEmail").value = getUserEmail(_loginUser.id)||"";
-  document.getElementById("regEmailError").textContent="";
-}
-
-function saveRegEmail(){
-  const email = document.getElementById("regEmail").value.trim();
-  const errEl = document.getElementById("regEmailError");
-  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    errEl.textContent = t("يرجى إدخال إيميل صحيح","Please enter a valid email");
-    return;
-  }
-  if(!email){
-    errEl.textContent = t("الإيميل مطلوب لاستعادة كلمة المرور","Email required for password recovery");
-    return;
-  }
-  // Save email linked to this user
-  setUserEmail(_loginUser.id, email);
-  document.getElementById("screenRegEmail").classList.add("hidden");
-  // Now show change password
-  document.getElementById("screenChangePass").classList.remove("hidden");
-  document.getElementById("newPass1").value="";
-  document.getElementById("newPass2").value="";
-  document.getElementById("changePassError").textContent="";
-  checkPassRules();
-}
-function skipRegEmail(){
-  document.getElementById("screenRegEmail").classList.add("hidden");
-  document.getElementById("screenChangePass").classList.remove("hidden");
-  document.getElementById("newPass1").value="";
-  document.getElementById("newPass2").value="";
-  document.getElementById("changePassError").textContent="";
-  checkPassRules();
-}
-
-// Forgot password flow
-function openForgotPass(){
-  _resetUserId = _loginUser?.id;
-  if(!_resetUserId) return;
-  const email = getUserEmail(_resetUserId);
-  const user = USERS.find(u=>u.id===_resetUserId);
-  const infoEl = document.getElementById("forgotUserInfo");
-  if(email){
-    infoEl.innerHTML = `👤 <strong>${user?.name||_resetUserId}</strong><br>📧 ${email}`;
-  } else {
-    infoEl.innerHTML = `<span style="color:var(--red);">⚠️ ${t("لم تسجّل إيميلك بعد. سيُرسل الكود على إيميل المدير فقط","No email registered. Code will be sent to admin email only.")}</span>`;
-  }
-  document.getElementById("forgotStep1").style.display="";
-  document.getElementById("forgotStep2").style.display="none";
-  document.getElementById("forgotError").textContent="";
-  document.getElementById("screenPassword").classList.add("hidden");
-  document.getElementById("screenForgotPass").classList.remove("hidden");
-}
-function closeForgotPass(){
-  document.getElementById("screenForgotPass").classList.add("hidden");
-  document.getElementById("screenPassword").classList.remove("hidden");
-}
-
-function sendResetCode(){
-  _activeResetCode = generateCode();
-  const user = USERS.find(u=>u.id===_resetUserId);
-  const userEmail = getUserEmail(_resetUserId);
-  const adminEmails = Object.values(ADMIN_EMAILS).join(", ");
-
-  // Build mailto links (since this is offline — no real email server)
-  // We show the code prominently + give mailto links for admins to use
-  document.getElementById("forgotStep1").style.display="none";
-  document.getElementById("forgotStep2").style.display="";
-
-  const infoHtml = `
-    <div style="font-size:13px;font-weight:700;margin-bottom:6px;">${t("كود الاستعادة الخاص بك:","Your recovery code:")}</div>
-    <div style="font-size:28px;font-weight:900;letter-spacing:8px;color:var(--dark);margin:8px 0;font-family:var(--font-en);">${_activeResetCode}</div>
-    <div style="font-size:11px;color:var(--gray);margin-top:6px;">${t("صالح لمدة 15 دقيقة فقط","Valid for 15 minutes only")}</div>
-    <hr style="border:none;border-top:1px solid #A7F3D0;margin:10px 0;">
-    <div style="font-size:11px;">
-      ${userEmail?`📧 ${t("سيصل على:","Sent to:")} ${userEmail}<br>`:''}
-      📧 ${t("وعلى إيميل المدير","And admin email")}
-    </div>
-    <div style="margin-top:10px;">
-      <a href="mailto:${userEmail||adminEmails}?subject=DARC Reset Code&body=كود الاستعادة: ${_activeResetCode} — ${user?.name||''}%0A%0AValidity: 15 minutes"
-         class="btn btn-ghost btn-sm" style="font-size:11px;" target="_blank">
-        📤 ${t("فتح تطبيق الإيميل","Open Email App")}
-      </a>
-    </div>`;
-  document.getElementById("resetCodeInfo").innerHTML = infoHtml;
-  document.getElementById("resetCodeInput").value="";
-  document.getElementById("resetNewPass1").value="";
-  document.getElementById("resetNewPass2").value="";
-  document.getElementById("resetError").textContent="";
-
-  // Set 15 min expiry
-  setTimeout(()=>{ _activeResetCode=null; }, 15*60*1000);
-}
-
-function checkResetPassRules(){
-  const v=document.getElementById("resetNewPass1").value;
-  [{id:"rrule-len",ok:v.length>=8},{id:"rrule-num",ok:/\d/.test(v)},{id:"rrule-upper",ok:/[A-Z]/.test(v)}]
-    .forEach(r=>{const el=document.getElementById(r.id);if(!el)return;el.classList.toggle("ok",r.ok);el.classList.toggle("bad",!r.ok&&v.length>0);});
-}
-
-function submitResetPassword(){
-  const code = document.getElementById("resetCodeInput").value.trim().toUpperCase();
-  const p1 = document.getElementById("resetNewPass1").value;
-  const p2 = document.getElementById("resetNewPass2").value;
-  const err = document.getElementById("resetError");
-  if(!_activeResetCode){ err.textContent=t("انتهت صلاحية الكود — أعد الطلب","Code expired — request again"); return; }
-  if(code!==_activeResetCode){ err.textContent=t("الكود غير صحيح ❌","Incorrect code ❌"); return; }
-  if(p1.length<8){ err.textContent=t("كلمة المرور قصيرة جداً","Password too short"); return; }
-  if(!/\d/.test(p1)){ err.textContent=t("يجب أن تحتوي على رقم","Must contain a number"); return; }
-  if(!/[A-Z]/.test(p1)){ err.textContent=t("يجب أن تحتوي على حرف كبير","Must contain uppercase"); return; }
-  if(p1!==p2){ err.textContent=t("كلمتا المرور غير متطابقتين","Passwords don't match"); return; }
-  setPassHash(_resetUserId, p1);
-  _activeResetCode=null;
-  document.getElementById("screenForgotPass").classList.add("hidden");
-  document.getElementById("screenPassword").classList.remove("hidden");
-  showToast(t("✅ تم تغيير كلمة المرور — ادخل الآن","✅ Password changed — login now"));
-}
-
-// ══════════════════════════════════════════════════════
-// INIT — Correct sequence
-// ══════════════════════════════════════════════════════
-initSampleData();          // 1. Set default projects in memory
-loadFromStorage();         // 2. Override with saved data if exists (storage wins)
-syncUsersFromTeam();       // 3. Sync USERS from TEAM
-initLogin();               // 4. Build login screen
-renderDrawingCheckboxes(); // 5. Build drawing checkboxes
-initAddDrawingCategorySelect(); // 6. Init drawing category select
+initSampleData();      // sets default projects if localStorage is empty
+loadFromStorage();     // loads saved data on top
+syncUsersFromTeam();
+initLogin();
+renderDrawingCheckboxes();
+initAddDrawingCategorySelect();
 
 document.querySelectorAll(".modal-overlay").forEach(m=>{
   m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open");});
