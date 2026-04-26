@@ -5,6 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DARC | Design Team Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- ═══════════════════════════════════════════════════
+     FIREBASE CONFIGURATION
+     ════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const DEFAULT_CONFIG = {
+  apiKey:            "AIzaSyCc8otiGOrn6PAfiK9SEpwy_LCpdVVCO9g",
+  authDomain:        "darc-dashboard-1d3ff.firebaseapp.com",
+  databaseURL:       "https://darc-dashboard-1d3ff-default-rtdb.firebaseio.com",
+  projectId:         "darc-dashboard-1d3ff",
+  storageBucket:     "darc-dashboard-1d3ff.firebasestorage.app",
+  messagingSenderId: "1026575201022",
+  appId:             "1:1026575201022:web:56db3a396e45204efd2baf",
+  measurementId:     "G-7TL75W3T8T"
+};
+
+let savedConfig = null;
+try { const s = localStorage.getItem("darc_firebase_config"); if(s) savedConfig = JSON.parse(s); } catch(e){}
+const firebaseConfig = savedConfig || DEFAULT_CONFIG;
+
+if(!firebaseConfig.databaseURL || firebaseConfig.databaseURL.includes("YOUR_PROJECT")){
+  window._firebaseReady = false;
+  window._fb = null;
+  window.dispatchEvent(new Event("firebase-unavailable"));
+} else {
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+const DB_REF = "darc";
+let _listeners = {};
+
+async function fbSave(data) {
+  try { await set(ref(db, DB_REF), data); return true; }
+  catch(e) { console.error("Firebase Save Error:", e); return false; }
+}
+async function fbLoad() {
+  try { const snap = await get(ref(db, DB_REF)); return snap.exists() ? snap.val() : null; }
+  catch(e) { console.error("Firebase Load Error:", e); return null; }
+}
+function fbListen(callback) {
+  const r = ref(db, DB_REF);
+  if(_listeners.main) off(r, "value", _listeners.main);
+  _listeners.main = onValue(r, snap => { if(snap.exists()) callback(snap.val()); }, e => console.error("Firebase Listen Error:", e));
+}
+function fbStopListening() {
+  const r = ref(db, DB_REF);
+  if(_listeners.main) { off(r, "value", _listeners.main); _listeners.main = null; }
+}
+
+window._fb = { fbSave, fbLoad, fbListen, fbStopListening };
+window._firebaseReady = true;
+window.dispatchEvent(new Event("firebase-ready"));
+
+} // end if real config
+</script>
+
 <style>
 :root {
   --gold:#B8960C; --gold-light:#D4AF37; --gold-pale:#F5ECC7; --gold-bg:#FFFDF0;
@@ -404,6 +462,7 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
 <div class="toast" id="toast"></div>
 <!-- SAVE INDICATOR -->
 <div class="save-indicator" id="saveIndicator">💾 تم الحفظ</div>
+<div id="syncStatus" style="font-size:11px;min-width:120px;text-align:center;"></div>
 
 <!-- NOTIFICATIONS -->
 <div class="notif-panel" id="notifPanel">
@@ -875,9 +934,9 @@ function saveChangedPassword(){
   showToast("✅ تم تغيير كلمة المرور");
 }
 
-function finishLogin(u){
-  // 1. Load fresh data first so TEAM/USERS are up to date
-  loadFromStorage();
+async function finishLogin(u){
+  // 1. Load fresh data first so TEAM/USERS are up to date (async)
+  await loadFromStorage();
   // 2. Re-find user after reload (TEAM may have changed)
   const freshUser = USERS.find(x=>x.id===u.id) || u;
   currentUser = freshUser;
@@ -916,31 +975,87 @@ function logout(){
 // ══════════════════════════════════════════════════════
 // LOCAL STORAGE — SAVE & LOAD
 // ══════════════════════════════════════════════════════
-function saveToStorage(){
-  try{
-    localStorage.setItem("darc_projects", JSON.stringify(projects));
-    localStorage.setItem("darc_team", JSON.stringify(TEAM));
-    localStorage.setItem("darc_drawings", JSON.stringify(DRAWINGS_DB));
-    localStorage.setItem("darc_notifications", JSON.stringify(notifications.slice(0,200)));
-    localStorage.setItem("darc_nextDrawingId", String(nextDrawingId));
-    flashSave();
-  }catch(e){ console.warn("Storage error",e); }
+// ══ FIREBASE + LOCAL STORAGE ══
+let _storageMode = "local";
+let _saveDebounce = null;
+let _syncActive = false;
+let _lastSaveHash = "";
+
+function _buildPayload(){
+  return {
+    projects, team: TEAM, drawings: DRAWINGS_DB,
+    notifications: notifications.slice(0,200),
+    nextDrawingId,
+    passwords: JSON.parse(localStorage.getItem("darc_passwords")||"{}"),
+    emails:    JSON.parse(localStorage.getItem("darc_emails")||"{}"),
+    updatedAt: Date.now()
+  };
 }
-function loadFromStorage(){
+function _applyPayload(data, skipRender){
+  if(!data) return;
+  if(data.projects)      projects = data.projects;
+  if(data.team)          { TEAM.length=0; data.team.forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
+  if(data.drawings)      DRAWINGS_DB = data.drawings;
+  if(data.notifications) notifications = data.notifications;
+  if(data.nextDrawingId) nextDrawingId = parseInt(data.nextDrawingId)||nextDrawingId;
+  if(data.passwords)     localStorage.setItem("darc_passwords", JSON.stringify(data.passwords));
+  if(data.emails)        localStorage.setItem("darc_emails",    JSON.stringify(data.emails));
+  if(!skipRender){
+    renderDrawingCheckboxes();
+    if(currentUser){ renderCurrentPage(); updateNotifBadge(); }
+  }
+}
+function saveToStorage(){
+  const payload = _buildPayload();
+  const payloadStr = JSON.stringify(payload);
+  if(payloadStr === _lastSaveHash) return;
+  _lastSaveHash = payloadStr;
   try{
-    const p=localStorage.getItem("darc_projects");
-    if(p) projects=JSON.parse(p);
-    const tm=localStorage.getItem("darc_team");
-    if(tm){ TEAM.length=0; JSON.parse(tm).forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
-    const dr=localStorage.getItem("darc_drawings");
-    if(dr) DRAWINGS_DB=JSON.parse(dr);
-    const no=localStorage.getItem("darc_notifications");
-    if(no) notifications=JSON.parse(no);
-    const ndi=localStorage.getItem("darc_nextDrawingId");
-    if(ndi) nextDrawingId=parseInt(ndi)||nextDrawingId;
+    localStorage.setItem("darc_projects",     JSON.stringify(projects));
+    localStorage.setItem("darc_team",         JSON.stringify(TEAM));
+    localStorage.setItem("darc_drawings",     JSON.stringify(DRAWINGS_DB));
+    localStorage.setItem("darc_notifications",JSON.stringify(notifications.slice(0,200)));
+    localStorage.setItem("darc_nextDrawingId",String(nextDrawingId));
+  }catch(e){ console.warn("LocalStorage error:",e); }
+  if(_storageMode === "firebase" && window._fb){
+    clearTimeout(_saveDebounce);
+    _saveDebounce = setTimeout(async ()=>{
+      const ok = await window._fb.fbSave(payload);
+      if(ok){ flashSave(); showSyncStatus("synced"); }
+      else  { showSyncStatus("error"); }
+    }, 1500);
+  } else { flashSave(); }
+}
+async function loadFromStorage(){
+  try{
+    const p  = localStorage.getItem("darc_projects");      if(p)   projects=JSON.parse(p);
+    const tm = localStorage.getItem("darc_team");           if(tm)  { TEAM.length=0; JSON.parse(tm).forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
+    const dr = localStorage.getItem("darc_drawings");       if(dr)  DRAWINGS_DB=JSON.parse(dr);
+    const no = localStorage.getItem("darc_notifications");  if(no)  notifications=JSON.parse(no);
+    const ndi= localStorage.getItem("darc_nextDrawingId");  if(ndi) nextDrawingId=parseInt(ndi)||nextDrawingId;
     renderDrawingCheckboxes();
     initAddDrawingCategorySelect();
   }catch(e){ console.warn("Load error",e); }
+  if(window._firebaseReady && window._fb){ _startFirebaseSync(); }
+  else { window.addEventListener("firebase-ready", ()=>{ _startFirebaseSync(); }, {once:true}); }
+}
+async function _startFirebaseSync(){
+  if(_syncActive) return;
+  _syncActive=true; _storageMode="firebase";
+  showSyncStatus("syncing");
+  const data = await window._fb.fbLoad();
+  if(data){ _applyPayload(data,false); showSyncStatus("synced"); }
+  else { await window._fb.fbSave(_buildPayload()); showSyncStatus("synced"); }
+  window._fb.fbListen((d)=>{
+    if(d.updatedAt && Date.now()-d.updatedAt < 2000) return;
+    _applyPayload(d,false); showSyncStatus("synced");
+  });
+}
+function showSyncStatus(state){
+  const el=document.getElementById("syncStatus"); if(!el) return;
+  const s={syncing:{icon:"🔄",text:"جاري المزامنة...",color:"#D4AF37"},synced:{icon:"☁️",text:"محفوظ ومتزامن",color:"#22c55e"},error:{icon:"⚠️",text:"خطأ في الاتصال",color:"#ef4444"}}[state]||{icon:"💾",text:"محلي فقط",color:"#888"};
+  el.innerHTML=`<span style="color:${s.color};font-size:11px;">${s.icon} ${s.text}</span>`;
+  if(state==="synced") setTimeout(()=>{ if(el) el.innerHTML=""; },3000);
 }
 function flashSave(){
   const el=document.getElementById("saveIndicator");
