@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DARC | Design Team Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- ═══════════════════════════════════════════════════
-     FIREBASE CONFIGURATION
-     ════════════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -24,44 +20,39 @@ const DEFAULT_CONFIG = {
   measurementId:     "G-7TL75W3T8T"
 };
 
-let savedConfig = null;
-try { const s = localStorage.getItem("darc_firebase_config"); if(s) savedConfig = JSON.parse(s); } catch(e) {}
-const firebaseConfig = savedConfig || DEFAULT_CONFIG;
+let _savedCfg = null;
+try { const _s = localStorage.getItem("darc_firebase_config"); if(_s) _savedCfg = JSON.parse(_s); } catch(e){}
+const _cfg = _savedCfg || DEFAULT_CONFIG;
 
-if (!firebaseConfig.databaseURL || firebaseConfig.databaseURL.includes("YOUR_PROJECT")) {
+if (!_cfg.databaseURL || _cfg.databaseURL.includes("YOUR_PROJECT")) {
   window._firebaseReady = false;
   window._fb = null;
   window.dispatchEvent(new Event("firebase-unavailable"));
 } else {
-  const app = initializeApp(firebaseConfig);
-  const db  = getDatabase(app);
-  const DB_REF = "darc";
-  let _listeners = {};
-
-  async function fbSave(data) {
-    try { await set(ref(db, DB_REF), data); return true; }
-    catch(e) { console.error("Firebase Save Error:", e); return false; }
-  }
-  async function fbLoad() {
-    try { const snap = await get(ref(db, DB_REF)); return snap.exists() ? snap.val() : null; }
-    catch(e) { console.error("Firebase Load Error:", e); return null; }
-  }
-  function fbListen(callback) {
-    const r = ref(db, DB_REF);
-    if (_listeners.main) off(r, "value", _listeners.main);
-    _listeners.main = onValue(r, snap => { if (snap.exists()) callback(snap.val()); },
-      e => console.error("Firebase Listen Error:", e));
-  }
-  function fbStopListening() {
-    const r = ref(db, DB_REF);
-    if (_listeners.main) { off(r, "value", _listeners.main); _listeners.main = null; }
-  }
-
-  window._fb = { fbSave, fbLoad, fbListen, fbStopListening };
+  const _app = initializeApp(_cfg);
+  const _db  = getDatabase(_app);
+  const _REF = "darc";
+  let _ls = {};
+  window._fb = {
+    fbSave: async function(data) {
+      try { await set(ref(_db,_REF), data); return true; } catch(e){ console.error("fbSave:",e); return false; }
+    },
+    fbLoad: async function() {
+      try { const s = await get(ref(_db,_REF)); return s.exists() ? s.val() : null; } catch(e){ console.error("fbLoad:",e); return null; }
+    },
+    fbListen: function(cb) {
+      if(_ls.main) off(ref(_db,_REF),"value",_ls.main);
+      _ls.main = onValue(ref(_db,_REF), s=>{ if(s.exists()) cb(s.val()); }, e=>console.error("fbListen:",e));
+    },
+    fbStop: function() {
+      if(_ls.main){ off(ref(_db,_REF),"value",_ls.main); _ls.main=null; }
+    }
+  };
   window._firebaseReady = true;
   window.dispatchEvent(new Event("firebase-ready"));
 }
 </script>
+
 <style>
 :root {
   --gold:#B8960C; --gold-light:#D4AF37; --gold-pale:#F5ECC7; --gold-bg:#FFFDF0;
@@ -358,52 +349,6 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
 </head>
 <body>
 
-<!-- ══ FIREBASE SETUP BANNER (يختفي بعد الإعداد) ══ -->
-<div id="firebaseBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:#1E40AF;color:#fff;padding:10px 20px;font-size:13px;font-family:'Cairo',sans-serif;text-align:center;">
-  ⚠️ Firebase غير متصل — البيانات تُحفظ محلياً فقط |
-  <a href="#" onclick="document.getElementById('firebaseSetupModal').style.display='flex';return false;"
-     style="color:#FDE68A;font-weight:700;text-decoration:underline;">اضبط Firebase الآن →</a>
-</div>
-
-<!-- ══ FIREBASE SETUP MODAL ══ -->
-<div id="firebaseSetupModal" style="display:none;position:fixed;inset:0;z-index:998;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:16px;padding:32px;width:520px;max-width:95vw;font-family:'Cairo',sans-serif;direction:rtl;">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
-      <div style="width:44px;height:44px;background:#1A1A1A;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#D4AF37;font-size:16px;flex-shrink:0;">🔥</div>
-      <div>
-        <div style="font-size:17px;font-weight:700;">ربط Firebase</div>
-        <div style="font-size:12px;color:#6B7280;">لمزامنة البيانات بين جميع الأجهزة</div>
-      </div>
-    </div>
-    <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;font-size:12px;color:#92400E;margin-bottom:16px;line-height:1.7;">
-      <strong>📋 خطوات الإعداد:</strong><br>
-      1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#1D4ED8;font-weight:700;">console.firebase.google.com</a><br>
-      2. أنشئ مشروعاً جديداً (أو استخدم موجوداً)<br>
-      3. من القائمة الجانبية: <strong>Build → Realtime Database → Create Database</strong><br>
-      4. اختر <strong>Start in test mode</strong> (يمكن تأمينه لاحقاً)<br>
-      5. من ⚙️ Project Settings → Your Apps → Add Web App<br>
-      6. انسخ <code style="background:#F3F4F6;padding:2px 6px;border-radius:4px;">firebaseConfig</code> والصقه أدناه
-    </div>
-    <div style="margin-bottom:12px;">
-      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">الصق firebaseConfig هنا:</label>
-      <textarea id="fbConfigInput" rows="8" placeholder='const firebaseConfig = {
-  apiKey: "...",
-  authDomain: "...",
-  databaseURL: "https://...",
-  projectId: "...",
-  ...
-};' style="width:100%;border:1.5px solid #E5E7EB;border-radius:8px;padding:10px;font-size:12px;font-family:monospace;direction:ltr;resize:vertical;outline:none;"></textarea>
-    </div>
-    <div id="fbSetupError" style="color:#DC2626;font-size:12px;min-height:18px;margin-bottom:8px;"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button onclick="document.getElementById('firebaseSetupModal').style.display='none'"
-        style="padding:8px 16px;border:1.5px solid #E5E7EB;background:#fff;border-radius:8px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:13px;">إغلاق</button>
-      <button onclick="_applyFirebaseConfig()"
-        style="padding:8px 20px;background:#D4AF37;border:none;border-radius:8px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;color:#1A1A1A;">✅ تطبيق وحفظ</button>
-    </div>
-  </div>
-</div>
-
 <!-- ══ SCREEN 1: USER SELECT ══ -->
 <div class="screen" id="screenSelect">
   <div class="auth-box">
@@ -466,10 +411,48 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
   </div>
 </div>
 
+<!-- QR SYNC MODAL -->
+<div class="modal-overlay" id="qrSyncModal">
+  <div class="modal" style="max-width:480px;text-align:center;">
+    <div class="modal-header">
+      <div class="modal-title">📲 مزامنة كلمة المرور عبر QR</div>
+      <button class="modal-close" onclick="closeModal('qrSyncModal')">✕</button>
+    </div>
+    <div style="padding:0 8px 8px;">
+      <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">اختر عضو الفريق لتوليد QR خاص به — يمسحه من الجوال لتطبيق كلمة مروره مباشرة</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;" id="qrUserBtns"></div>
+      <div id="qrCodeArea" style="display:none;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;" id="qrUserLabel"></div>
+        <div style="font-size:12px;color:var(--gray);margin-bottom:16px;">امسح هذا الـ QR من الجوال لتطبيق كلمة المرور</div>
+        <div style="display:flex;justify-content:center;margin-bottom:16px;">
+          <canvas id="qrCanvas" style="border-radius:12px;border:3px solid var(--gold-pale);padding:8px;background:#fff;"></canvas>
+        </div>
+        <div style="background:var(--orange-bg);border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--orange);">
+          ⚠️ هذا الـ QR يحتوي على كلمة المرور الحالية — لا تشاركه إلا مع صاحبه
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="downloadQR()">⬇️ تحميل QR</button>
+        </div>
+      </div>
+      <div id="qrEmptyMsg" style="color:var(--gray);font-size:13px;padding:20px 0;">اختر عضواً من الأعلى</div>
+    </div>
+  </div>
+</div>
+
+<!-- QR APPLY SCREEN -->
+<div class="screen hidden" id="screenQRImport">
+  <div class="auth-box" style="max-width:380px;">
+    <div class="auth-logo">📲</div>
+    <div class="auth-title">مزامنة كلمة المرور</div>
+    <div id="qrImportContent"></div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 <!-- SAVE INDICATOR -->
 <div class="save-indicator" id="saveIndicator">💾 تم الحفظ</div>
+      <div id="syncStatus" style="font-size:11px;min-width:100px;text-align:center;"></div>
 
 <!-- NOTIFICATIONS -->
 <div class="notif-panel" id="notifPanel">
@@ -502,6 +485,7 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
     <div class="nav-item" onclick="openNewTaskModal(null)"><span class="nav-icon">➕</span><span>مهمة جديدة</span></div>
     <div class="nav-item" onclick="openModal('newProjectModal')"><span class="nav-icon">🏗️</span><span>مشروع جديد</span></div>
     <div class="nav-item" onclick="showPage('adminDrawings')"><span class="nav-icon">🗂️</span><span>إدارة المخططات</span></div>
+    <div class="nav-item" onclick="openQRSyncModal()"><span class="nav-icon">📲</span><span>مزامنة QR</span></div>
   </div>
   <div class="sidebar-user">
     <div class="user-card">
@@ -520,7 +504,6 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
   <div class="topbar">
     <div class="topbar-title"><span id="topbarTitle">لوحة التحكم</span></div>
     <div class="topbar-actions">
-      <div id="syncStatus" style="font-size:11px;color:var(--gray);min-width:110px;text-align:center;"></div>
       <button class="notif-btn" onclick="toggleNotif()" id="notifBtn">🔔<span class="notif-count" id="notifCount">0</span></button>
       <button class="lang-btn" onclick="toggleLang()">EN / عر</button>
       <button class="btn btn-primary btn-sm" id="adminActionBtn" style="display:none" onclick="openModal('newProjectModal')">➕ مشروع جديد</button>
@@ -941,21 +924,29 @@ function saveChangedPassword(){
   showToast("✅ تم تغيير كلمة المرور");
 }
 
-function finishLogin(u){
-  currentUser=u;
+async function finishLogin(u){
+  // 1. Load fresh data first so TEAM/USERS are up to date
+  await loadFromStorage();
+  // 2. Re-find user after reload (TEAM may have changed)
+  const freshUser = USERS.find(x=>x.id===u.id) || u;
+  currentUser = freshUser;
+  // 3. Hide all auth screens
   document.getElementById("screenSelect").classList.add("hidden");
   document.getElementById("screenPassword").classList.add("hidden");
   document.getElementById("screenChangePass").classList.add("hidden");
+  // 4. Update sidebar user info
   const av=document.getElementById("sidebarAvatar");
-  av.textContent=u.name[0]; av.style.background=u.color;
-  document.getElementById("sidebarName").textContent=u.name;
-  document.getElementById("sidebarRole").textContent=u.isAdmin?"Admin":u.role;
-  if(u.isAdmin){
-    document.getElementById("adminNavSection").style.display="";
-    document.getElementById("adminActionBtn").style.display="";
-    document.getElementById("adminProjectBtn").style.display="";
-  }
-  loadFromStorage();
+  av.textContent=freshUser.name[0]; av.style.background=freshUser.color;
+  document.getElementById("sidebarName").textContent=freshUser.name;
+  document.getElementById("sidebarRole").textContent=freshUser.isAdmin?"Admin":freshUser.role;
+  // 5. Show/hide admin UI
+  const isAdm=freshUser.isAdmin;
+  document.getElementById("adminNavSection").style.display=isAdm?"":"none";
+  document.getElementById("adminActionBtn").style.display=isAdm?"":"none";
+  document.getElementById("adminProjectBtn").style.display=isAdm?"":"none";
+  // 6. Rebuild login list with fresh team
+  initLogin();
+  renderDrawingCheckboxes();
   updateNotifBadge();
   checkDelays();
   showPage("dashboard");
@@ -972,155 +963,84 @@ function logout(){
 }
 
 // ══════════════════════════════════════════════════════
-// FIREBASE + LOCAL STORAGE — SAVE & LOAD
+// LOCAL STORAGE — SAVE & LOAD
 // ══════════════════════════════════════════════════════
+let _storageMode="local", _saveTimer=null, _syncOn=false, _lastHash="";
 
-// وضع الاتصال: "firebase" أو "local"
-let _storageMode = "local";
-let _saveDebounce = null;
-let _syncActive   = false;
-let _lastSaveHash = "";
-
-/** تحويل البيانات الحالية إلى كائن قابل للحفظ */
-function _buildPayload(){
+function _payload(){
   return {
-    projects:       projects,
-    team:           TEAM,
-    drawings:       DRAWINGS_DB,
-    notifications:  notifications.slice(0,200),
-    nextDrawingId:  nextDrawingId,
-    passwords:      JSON.parse(localStorage.getItem("darc_passwords")||"{}"),
-    emails:         JSON.parse(localStorage.getItem("darc_emails")||"{}"),
-    updatedAt:      Date.now()
+    projects, team:TEAM, drawings:DRAWINGS_DB,
+    notifications:notifications.slice(0,200),
+    nextDrawingId,
+    passwords: JSON.parse(localStorage.getItem("darc_passwords")||"{}"),
+    emails:    JSON.parse(localStorage.getItem("darc_emails")||"{}"),
+    ts: Date.now()
   };
 }
-
-/** تطبيق البيانات المحملة على الحالة الحالية */
-function _applyPayload(data, skipRender){
-  if(!data) return;
-  if(data.projects)      projects = data.projects;
-  if(data.team)          { TEAM.length=0; data.team.forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
-  if(data.drawings)      DRAWINGS_DB = data.drawings;
-  if(data.notifications) notifications = data.notifications;
-  if(data.nextDrawingId) nextDrawingId = parseInt(data.nextDrawingId)||nextDrawingId;
-  // كلمات المرور والإيميلات تبقى محلياً للأمان (لا تنزل من Firebase إلى المتصفح الآخر تلقائياً)
-  if(data.passwords)     localStorage.setItem("darc_passwords", JSON.stringify(data.passwords));
-  if(data.emails)        localStorage.setItem("darc_emails", JSON.stringify(data.emails));
-  if(!skipRender){
-    renderDrawingCheckboxes();
-    initAddDrawingCategorySelect();
-    if(currentUser) { renderCurrentPage(); updateNotifBadge(); }
-  }
+function _apply(d, skip){
+  if(!d) return;
+  if(d.projects)      projects=d.projects;
+  if(d.team)          { TEAM.length=0; d.team.forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
+  if(d.drawings)      DRAWINGS_DB=d.drawings;
+  if(d.notifications) notifications=d.notifications;
+  if(d.nextDrawingId) nextDrawingId=parseInt(d.nextDrawingId)||nextDrawingId;
+  if(d.passwords)     localStorage.setItem("darc_passwords",JSON.stringify(d.passwords));
+  if(d.emails)        localStorage.setItem("darc_emails",   JSON.stringify(d.emails));
+  if(!skip && currentUser){ renderCurrentPage(); updateNotifBadge(); }
 }
-
-/** حفظ — Firebase أولاً ثم localStorage كنسخة احتياطية */
+function _syncStatus(st){
+  const el=document.getElementById("syncStatus"); if(!el) return;
+  const map={syncing:"🔄 جاري المزامنة...",synced:"☁️ متزامن",error:"⚠️ خطأ في الاتصال",local:"💾 محلي فقط"};
+  el.textContent=map[st]||"";
+  el.style.color=st==="synced"?"#22c55e":st==="error"?"#ef4444":"#D4AF37";
+  if(st==="synced") setTimeout(()=>{ if(el) el.textContent=""; },3000);
+}
+async function _startSync(){
+  if(_syncOn) return; _syncOn=true; _storageMode="firebase";
+  _syncStatus("syncing");
+  const d=await window._fb.fbLoad();
+  if(d){ _apply(d,false); } else { await window._fb.fbSave(_payload()); }
+  _syncStatus("synced");
+  window._fb.fbListen(d=>{ if(d.ts && Date.now()-d.ts<2000) return; _apply(d,false); _syncStatus("synced"); });
+}
 function saveToStorage(){
-  const payload = _buildPayload();
-  const payloadStr = JSON.stringify(payload);
-
-  // تجنب الحفظ المتكرر لنفس البيانات
-  if(payloadStr === _lastSaveHash) return;
-  _lastSaveHash = payloadStr;
-
-  // حفظ محلي دائماً (نسخة احتياطية)
+  const p=_payload(), ps=JSON.stringify(p);
+  if(ps===_lastHash) return; _lastHash=ps;
   try{
-    localStorage.setItem("darc_projects",    JSON.stringify(projects));
-    localStorage.setItem("darc_team",        JSON.stringify(TEAM));
-    localStorage.setItem("darc_drawings",    JSON.stringify(DRAWINGS_DB));
+    localStorage.setItem("darc_projects",     JSON.stringify(projects));
+    localStorage.setItem("darc_team",         JSON.stringify(TEAM));
+    localStorage.setItem("darc_drawings",     JSON.stringify(DRAWINGS_DB));
     localStorage.setItem("darc_notifications",JSON.stringify(notifications.slice(0,200)));
     localStorage.setItem("darc_nextDrawingId",String(nextDrawingId));
-  }catch(e){ console.warn("LocalStorage error:",e); }
-
-  // حفظ Firebase (مع debounce 1.5 ثانية لتقليل الكتابات)
-  if(_storageMode === "firebase" && window._fb){
-    clearTimeout(_saveDebounce);
-    _saveDebounce = setTimeout(async ()=>{
-      const ok = await window._fb.fbSave(payload);
-      if(ok){ flashSave(); showSyncStatus("synced"); }
-      else  { showSyncStatus("error"); }
-    }, 1500);
-  } else {
-    flashSave();
-  }
+  }catch(e){}
+  if(_storageMode==="firebase" && window._fb){
+    clearTimeout(_saveTimer);
+    _saveTimer=setTimeout(async()=>{
+      const ok=await window._fb.fbSave(p);
+      if(ok){ flashSave(); _syncStatus("synced"); } else { _syncStatus("error"); }
+    },1500);
+  } else { flashSave(); }
 }
-
-/** تحميل — Firebase أولاً وإن فشل يرجع للـ localStorage */
 async function loadFromStorage(){
-  // أولاً: حمّل من localStorage فوراً (لتجنب الشاشة الفارغة)
   try{
-    const p  = localStorage.getItem("darc_projects");
-    const tm = localStorage.getItem("darc_team");
-    const dr = localStorage.getItem("darc_drawings");
-    const no = localStorage.getItem("darc_notifications");
-    const ndi= localStorage.getItem("darc_nextDrawingId");
-    if(p)   projects=JSON.parse(p);
-    if(tm)  { TEAM.length=0; JSON.parse(tm).forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
-    if(dr)  DRAWINGS_DB=JSON.parse(dr);
-    if(no)  notifications=JSON.parse(no);
-    if(ndi) nextDrawingId=parseInt(ndi)||nextDrawingId;
-  }catch(e){ console.warn("LocalStorage load error:",e); }
-
-  renderDrawingCheckboxes();
-  initAddDrawingCategorySelect();
-
-  // ثانياً: إذا Firebase جاهز، حمّل منه وابدأ المزامنة الفورية
-  if(window._firebaseReady && window._fb){
-    _startFirebaseSync();
-  } else {
-    // انتظر حتى يجهز Firebase
-    window.addEventListener("firebase-ready", ()=>{ _startFirebaseSync(); }, { once:true });
-  }
+    const p  =localStorage.getItem("darc_projects");      if(p)   projects=JSON.parse(p);
+    const tm =localStorage.getItem("darc_team");           if(tm)  { TEAM.length=0; JSON.parse(tm).forEach(m=>TEAM.push(m)); syncUsersFromTeam(); }
+    const dr =localStorage.getItem("darc_drawings");       if(dr)  DRAWINGS_DB=JSON.parse(dr);
+    const no =localStorage.getItem("darc_notifications");  if(no)  notifications=JSON.parse(no);
+    const ndi=localStorage.getItem("darc_nextDrawingId");  if(ndi) nextDrawingId=parseInt(ndi)||nextDrawingId;
+    renderDrawingCheckboxes();
+    initAddDrawingCategorySelect();
+  }catch(e){ console.warn("Load error",e); }
+  if(window._firebaseReady && window._fb) _startSync();
+  else window.addEventListener("firebase-ready",()=>_startSync(),{once:true});
 }
-
-/** بدء المزامنة الفورية مع Firebase */
-async function _startFirebaseSync(){
-  if(_syncActive) return;
-  _syncActive = true;
-  _storageMode = "firebase";
-  showSyncStatus("syncing");
-
-  // تحميل أول مرة
-  const data = await window._fb.fbLoad();
-  if(data){
-    _applyPayload(data, false);
-    showSyncStatus("synced");
-  } else {
-    // لا يوجد بيانات في Firebase — ارفع البيانات المحلية
-    await window._fb.fbSave(_buildPayload());
-    showSyncStatus("synced");
-  }
-
-  // مزامنة فورية — يستمع لأي تغيير من أي جهاز
-  window._fb.fbListen((data) => {
-    // تجاهل التحديث إذا كان من نفس الجهاز (مقارنة الوقت)
-    if(data.updatedAt && Date.now() - data.updatedAt < 2000) return;
-    _applyPayload(data, false);
-    showSyncStatus("synced");
-  });
-}
-
-/** مؤشر حالة المزامنة */
-function showSyncStatus(state){
-  const el = document.getElementById("syncStatus");
-  if(!el) return;
-  const states = {
-    syncing: { icon:"🔄", text:"جاري المزامنة...", color:"var(--orange)" },
-    synced:  { icon:"☁️", text:"محفوظ ومتزامن",   color:"var(--green)"  },
-    error:   { icon:"⚠️", text:"خطأ في الاتصال",  color:"var(--red)"   },
-    local:   { icon:"💾", text:"محلي فقط",         color:"var(--gray)"  }
-  };
-  const s = states[state] || states.local;
-  el.innerHTML = `<span style="color:${s.color};font-size:11px;">${s.icon} ${s.text}</span>`;
-  if(state === "synced") setTimeout(()=>{ if(el) el.innerHTML=""; }, 3000);
-}
-
 function flashSave(){
   const el=document.getElementById("saveIndicator");
-  if(el){ el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),1800); }
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),1800);
 }
-
 // Auto-save every 60 seconds and on page unload
-setInterval(()=>{ if(currentUser) saveToStorage(); }, 60000);
+setInterval(()=>{ if(currentUser) saveToStorage(); },60000);
 window.addEventListener("beforeunload",()=>{ if(currentUser) saveToStorage(); });
 
 // ══════════════════════════════════════════════════════
@@ -2100,7 +2020,6 @@ function saveNewMember(){
   saveToStorage(); renderCurrentPage(); showToast(`✅ تم إضافة ${name} — كلمة المرور المؤقتة: ${otp}`);
   updateNotifBadge();
 }
-// Override checkPassword to handle custom OTP
 
 function removeMember(id){
   const m=TEAM.find(x=>x.id===id); if(!m) return;
@@ -2240,72 +2159,178 @@ function closeModal(id){document.getElementById(id).classList.remove("open");}
 function showToast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2800);}
 
 // ══════════════════════════════════════════════════════
-// FIREBASE CONFIG — RUNTIME SETUP
+// QR SYNC SYSTEM
 // ══════════════════════════════════════════════════════
 
-/**
- * يُعالج الإعدادات التي يلصقها المستخدم في النافذة المنبثقة،
- * يحفظها في localStorage ويُعيد تحميل الصفحة لتفعيلها.
- */
-function _applyFirebaseConfig(){
-  const raw = (document.getElementById("fbConfigInput")||{}).value||"";
-  const errEl = document.getElementById("fbSetupError");
-  errEl.textContent = "";
-
-  // استخراج القيم من النص المُلصق
-  const extract = (key) => {
-    const m = raw.match(new RegExp(`${key}\\s*:\\s*["']([^"']+)["']`));
-    return m ? m[1] : "";
+// Tiny QR generator (pure JS, no external lib needed for simple URLs)
+// We'll use a data URL approach with qrcode-generator style encoding
+// Load qrcode lib dynamically
+function loadQRLib(cb){
+  if(window.QRCode){cb();return;}
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload=cb;
+  s.onerror=()=>{
+    // Fallback: use canvas-based QR via qr-creator
+    const s2=document.createElement('script');
+    s2.src='https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js';
+    s2.onload=cb;
+    document.head.appendChild(s2);
   };
-  const cfg = {
-    apiKey:            extract("apiKey"),
-    authDomain:        extract("authDomain"),
-    databaseURL:       extract("databaseURL"),
-    projectId:         extract("projectId"),
-    storageBucket:     extract("storageBucket"),
-    messagingSenderId: extract("messagingSenderId"),
-    appId:             extract("appId")
-  };
-
-  if(!cfg.apiKey || !cfg.databaseURL){
-    errEl.textContent = "⚠️ لم يتم العثور على apiKey أو databaseURL — تأكد من نسخ firebaseConfig كاملاً";
-    return;
-  }
-
-  localStorage.setItem("darc_firebase_config", JSON.stringify(cfg));
-  showToast("✅ تم حفظ إعدادات Firebase — سيتم إعادة التحميل...");
-  setTimeout(()=> location.reload(), 1500);
+  document.head.appendChild(s);
 }
 
-/**
- * يتحقق إذا كانت هناك إعدادات Firebase محفوظة ويُحقنها في
- * Firebase module الذي يقرأها من window._pendingFirebaseConfig
- */
-(function _checkSavedFirebaseConfig(){
-  const saved = localStorage.getItem("darc_firebase_config");
-  if(saved){
-    try{
-      window._pendingFirebaseConfig = JSON.parse(saved);
-    } catch(e){ localStorage.removeItem("darc_firebase_config"); }
+let _qrSelectedUser=null;
+let _qrInstance=null;
+
+function openQRSyncModal(){
+  if(!currentUser?.isAdmin){showToast("⛔ للمدير فقط");return;}
+  // Render user buttons
+  const btns=document.getElementById("qrUserBtns");
+  btns.innerHTML=TEAM.map(m=>`
+    <button onclick="selectQRUser('${m.id}')" id="qrBtn_${m.id}"
+      style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--gray-border);border-radius:20px;background:var(--white);cursor:pointer;font-size:12px;font-family:inherit;transition:all 0.2s;">
+      <span style="width:24px;height:24px;border-radius:50%;background:${m.color};display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:10px;">${m.name[0]}</span>
+      ${m.name}
+    </button>
+  `).join("");
+  document.getElementById("qrCodeArea").style.display="none";
+  document.getElementById("qrEmptyMsg").style.display="";
+  _qrSelectedUser=null;
+  openModal("qrSyncModal");
+}
+
+function selectQRUser(uid){
+  const u=TEAM.find(x=>x.id===uid); if(!u) return;
+  _qrSelectedUser=u;
+  // Highlight selected
+  document.querySelectorAll("[id^='qrBtn_']").forEach(b=>{
+    b.style.borderColor="var(--gray-border)";b.style.background="var(--white)";
+  });
+  const btn=document.getElementById("qrBtn_"+uid);
+  if(btn){btn.style.borderColor="var(--gold-light)";btn.style.background="var(--gold-bg)";}
+
+  // Get stored password hash for this user
+  const passwords=loadPasswords();
+  const stored=passwords[uid];
+  
+  if(!stored){
+    // First login — no custom password set yet, use OTP
+    showQRForData(u, "OTP:"+DEFAULT_OTP);
+  } else {
+    showQRForData(u, stored);
   }
-})();
+}
+
+function showQRForData(u, passData){
+  document.getElementById("qrEmptyMsg").style.display="none";
+  document.getElementById("qrCodeArea").style.display="";
+  document.getElementById("qrUserLabel").textContent="🔐 " + u.name + " — " + u.role;
+
+  // Build payload: userId + passHash (hash only, never plain text)
+  const payload = JSON.stringify({uid: u.id, ph: passData, n: u.name});
+  // Encode as base64 for URL safety
+  const encoded = btoa(unescape(encodeURIComponent(payload)));
+  // Build a URL that triggers QR import when opened
+  const currentURL = window.location.href.split('?')[0].split('#')[0];
+  const qrURL = currentURL + "?darc_sync=" + encoded;
+
+  // Generate QR
+  const canvas=document.getElementById("qrCanvas");
+  // Clear previous
+  const ctx=canvas.getContext("2d");
+  canvas.width=220; canvas.height=220;
+  ctx.fillStyle="#fff"; ctx.fillRect(0,0,220,220);
+  ctx.fillStyle="#888"; ctx.font="13px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("جاري التوليد...",110,110);
+
+  loadQRLib(()=>{
+    try{
+      if(window.QRCode){
+        // Clear canvas div approach
+        const div=document.createElement('div');
+        new QRCode(div,{text:qrURL,width:220,height:220,colorDark:"#1A1A1A",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+        setTimeout(()=>{
+          const img=div.querySelector('img')||div.querySelector('canvas');
+          if(img){
+            canvas.width=220;canvas.height=220;
+            const ctx2=canvas.getContext('2d');
+            ctx2.drawImage(img,0,0,220,220);
+          }
+        },200);
+      }
+    }catch(e){
+      // Fallback text
+      const ctx3=canvas.getContext("2d");
+      ctx3.fillStyle="#fff";ctx3.fillRect(0,0,220,220);
+      ctx3.fillStyle="#333";ctx3.font="11px monospace";ctx3.textAlign="center";
+      ctx3.fillText("يتطلب اتصال بالإنترنت",110,110);
+    }
+  });
+}
+
+function downloadQR(){
+  const canvas=document.getElementById("qrCanvas");
+  const link=document.createElement("a");
+  link.download=`darc-qr-${_qrSelectedUser?.name||'user'}.png`;
+  link.href=canvas.toDataURL("image/png");
+  link.click();
+}
+
+// ── Check on page load if URL has QR sync param ──
+function checkQRSyncParam(){
+  const params=new URLSearchParams(window.location.search);
+  const syncData=params.get("darc_sync");
+  if(!syncData) return false;
+  
+  try{
+    const decoded=decodeURIComponent(escape(atob(syncData)));
+    const obj=JSON.parse(decoded);
+    const{uid,ph,n}=obj;
+    if(!uid||!ph) return false;
+
+    // Apply the password hash directly to localStorage
+    const passwords=loadPasswords();
+    passwords[uid]=ph;
+    savePasswords(passwords);
+
+    // Show success screen
+    document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
+    const screen=document.getElementById("screenQRImport");
+    screen.classList.remove("hidden");
+    document.getElementById("qrImportContent").innerHTML=`
+      <div style="padding:20px 0;">
+        <div style="font-size:48px;margin-bottom:12px;">✅</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">تم تطبيق كلمة المرور</div>
+        <div style="font-size:13px;color:var(--gray);margin-bottom:24px;">مرحباً <strong>${n}</strong>! كلمة مرورك جاهزة على هذا الجهاز</div>
+        <button class="btn btn-primary btn-full" onclick="finishQRImport()">🚀 ابدأ الدخول</button>
+      </div>
+    `;
+
+    // Clean URL
+    window.history.replaceState({},"",window.location.pathname);
+    return true;
+  }catch(e){
+    console.warn("QR sync error:",e);
+    return false;
+  }
+}
+
+function finishQRImport(){
+  document.getElementById("screenQRImport").classList.add("hidden");
+  document.getElementById("screenSelect").classList.remove("hidden");
+}
 
 // ══════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════
-initSampleData();
-loadFromStorage();
+initSampleData();      // sets default projects if localStorage is empty
+loadFromStorage();     // loads saved data on top
 syncUsersFromTeam();
-initLogin();
+const _hadQR = checkQRSyncParam(); // check for QR sync in URL
+if(!_hadQR) initLogin();
 renderDrawingCheckboxes();
 initAddDrawingCategorySelect();
-
-// إظهار Banner إذا لم يكن Firebase مُعدّاً
-(function _checkFirebaseBanner(){
-  // Firebase config is baked in — banner only shows if databaseURL missing
-  const banner = document.getElementById("firebaseBanner");
-  if(banner) banner.style.display = "none"; // config is set, hide banner
-})();
 
 document.querySelectorAll(".modal-overlay").forEach(m=>{
   m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open");});
