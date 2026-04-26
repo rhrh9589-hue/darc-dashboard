@@ -10,14 +10,9 @@
      FIREBASE CONFIGURATION
      ════════════════════════════════════════════════ -->
 <script type="module">
-// ⚠️  ضع إعدادات Firebase الخاصة بك هنا
-// اذهب إلى: https://console.firebase.google.com
-// أنشئ مشروع جديد → Realtime Database → ابدأ → انسخ الإعدادات هنا
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// 🔧 إعدادات Firebase — darc-dashboard
 const DEFAULT_CONFIG = {
   apiKey:            "AIzaSyCc8otiGOrn6PAfiK9SEpwy_LCpdVVCO9g",
   authDomain:        "darc-dashboard-1d3ff.firebaseapp.com",
@@ -31,76 +26,41 @@ const DEFAULT_CONFIG = {
 
 let savedConfig = null;
 try { const s = localStorage.getItem("darc_firebase_config"); if(s) savedConfig = JSON.parse(s); } catch(e) {}
-
 const firebaseConfig = savedConfig || DEFAULT_CONFIG;
 
-// إذا لم تكن إعدادات حقيقية، توقف هنا ولا تُهيئ Firebase
-if(!firebaseConfig.databaseURL || firebaseConfig.databaseURL.includes("YOUR_PROJECT")){
+if (!firebaseConfig.databaseURL || firebaseConfig.databaseURL.includes("YOUR_PROJECT")) {
   window._firebaseReady = false;
   window._fb = null;
-  // أشعر الـ app بأن Firebase غير متاح
   window.dispatchEvent(new Event("firebase-unavailable"));
 } else {
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+  const DB_REF = "darc";
+  let _listeners = {};
 
-// ── تهيئة Firebase ──
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-
-// ── مرجع قاعدة البيانات ──
-const DB_REF = "darc";
-
-// ── متغير تتبع المستمعين ──
-let _listeners = {};
-
-// ══════════════════════════════════════════════
-// FIREBASE API — الحفظ والتحميل
-// ══════════════════════════════════════════════
-
-/** حفظ كل البيانات إلى Firebase */
-async function fbSave(data) {
-  try {
-    await set(ref(db, DB_REF), data);
-    return true;
-  } catch(e) {
-    console.error("Firebase Save Error:", e);
-    return false;
+  async function fbSave(data) {
+    try { await set(ref(db, DB_REF), data); return true; }
+    catch(e) { console.error("Firebase Save Error:", e); return false; }
   }
-}
-
-/** تحميل كل البيانات من Firebase مرة واحدة */
-async function fbLoad() {
-  try {
-    const snap = await get(ref(db, DB_REF));
-    return snap.exists() ? snap.val() : null;
-  } catch(e) {
-    console.error("Firebase Load Error:", e);
-    return null;
+  async function fbLoad() {
+    try { const snap = await get(ref(db, DB_REF)); return snap.exists() ? snap.val() : null; }
+    catch(e) { console.error("Firebase Load Error:", e); return null; }
   }
+  function fbListen(callback) {
+    const r = ref(db, DB_REF);
+    if (_listeners.main) off(r, "value", _listeners.main);
+    _listeners.main = onValue(r, snap => { if (snap.exists()) callback(snap.val()); },
+      e => console.error("Firebase Listen Error:", e));
+  }
+  function fbStopListening() {
+    const r = ref(db, DB_REF);
+    if (_listeners.main) { off(r, "value", _listeners.main); _listeners.main = null; }
+  }
+
+  window._fb = { fbSave, fbLoad, fbListen, fbStopListening };
+  window._firebaseReady = true;
+  window.dispatchEvent(new Event("firebase-ready"));
 }
-
-/** الاستماع للتغييرات الفورية (real-time) */
-function fbListen(callback) {
-  const r = ref(db, DB_REF);
-  if(_listeners.main) off(r, 'value', _listeners.main);
-  _listeners.main = onValue(r, snap => {
-    if(snap.exists()) callback(snap.val());
-  }, e => console.error("Firebase Listen Error:", e));
-}
-
-/** إيقاف الاستماع */
-function fbStopListening() {
-  const r = ref(db, DB_REF);
-  if(_listeners.main) { off(r, 'value', _listeners.main); _listeners.main = null; }
-}
-
-// ══════════════════════════════════════════════
-// تصدير الوظائف للـ window
-// ══════════════════════════════════════════════
-window._fb = { fbSave, fbLoad, fbListen, fbStopListening };
-window._firebaseReady = true;
-window.dispatchEvent(new Event("firebase-ready"));
-
-} // end if real config
 </script>
 <style>
 :root {
@@ -506,43 +466,6 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
   </div>
 </div>
 
-<!-- QR SYNC MODAL -->
-<div class="modal-overlay" id="qrSyncModal">
-  <div class="modal" style="max-width:480px;text-align:center;">
-    <div class="modal-header">
-      <div class="modal-title">📲 مزامنة كلمة المرور عبر QR</div>
-      <button class="modal-close" onclick="closeModal('qrSyncModal')">✕</button>
-    </div>
-    <div style="padding:0 8px 8px;">
-      <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">اختر عضو الفريق لتوليد QR خاص به — يمسحه من الجوال لتطبيق كلمة مروره مباشرة</p>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;" id="qrUserBtns"></div>
-      <div id="qrCodeArea" style="display:none;">
-        <div style="font-size:14px;font-weight:700;margin-bottom:4px;" id="qrUserLabel"></div>
-        <div style="font-size:12px;color:var(--gray);margin-bottom:16px;">امسح هذا الـ QR من الجوال لتطبيق كلمة المرور</div>
-        <div style="display:flex;justify-content:center;margin-bottom:16px;">
-          <canvas id="qrCanvas" style="border-radius:12px;border:3px solid var(--gold-pale);padding:8px;background:#fff;"></canvas>
-        </div>
-        <div style="background:var(--orange-bg);border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--orange);">
-          ⚠️ هذا الـ QR يحتوي على كلمة المرور الحالية — لا تشاركه إلا مع صاحبه
-        </div>
-        <div style="margin-top:12px;">
-          <button class="btn btn-ghost btn-sm" onclick="downloadQR()">⬇️ تحميل QR</button>
-        </div>
-      </div>
-      <div id="qrEmptyMsg" style="color:var(--gray);font-size:13px;padding:20px 0;">اختر عضواً من الأعلى</div>
-    </div>
-  </div>
-</div>
-
-<!-- QR APPLY SCREEN -->
-<div class="screen hidden" id="screenQRImport">
-  <div class="auth-box" style="max-width:380px;">
-    <div class="auth-logo">📲</div>
-    <div class="auth-title">مزامنة كلمة المرور</div>
-    <div id="qrImportContent"></div>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 <!-- SAVE INDICATOR -->
@@ -579,7 +502,6 @@ body{font-family:var(--font-ar);background:#F8F9FB;color:var(--dark);min-height:
     <div class="nav-item" onclick="openNewTaskModal(null)"><span class="nav-icon">➕</span><span>مهمة جديدة</span></div>
     <div class="nav-item" onclick="openModal('newProjectModal')"><span class="nav-icon">🏗️</span><span>مشروع جديد</span></div>
     <div class="nav-item" onclick="showPage('adminDrawings')"><span class="nav-icon">🗂️</span><span>إدارة المخططات</span></div>
-    <div class="nav-item" onclick="openQRSyncModal()"><span class="nav-icon">📲</span><span>مزامنة QR</span></div>
   </div>
   <div class="sidebar-user">
     <div class="user-card">
@@ -1019,7 +941,7 @@ function saveChangedPassword(){
   showToast("✅ تم تغيير كلمة المرور");
 }
 
-async function finishLogin(u){
+function finishLogin(u){
   currentUser=u;
   document.getElementById("screenSelect").classList.add("hidden");
   document.getElementById("screenPassword").classList.add("hidden");
@@ -1028,12 +950,12 @@ async function finishLogin(u){
   av.textContent=u.name[0]; av.style.background=u.color;
   document.getElementById("sidebarName").textContent=u.name;
   document.getElementById("sidebarRole").textContent=u.isAdmin?"Admin":u.role;
-  const isAdm = u.isAdmin;
-  document.getElementById("adminNavSection").style.display = isAdm ? "" : "none";
-  document.getElementById("adminActionBtn").style.display  = isAdm ? "" : "none";
-  document.getElementById("adminProjectBtn").style.display = isAdm ? "" : "none";
-  await loadFromStorage();
-  initLogin();
+  if(u.isAdmin){
+    document.getElementById("adminNavSection").style.display="";
+    document.getElementById("adminActionBtn").style.display="";
+    document.getElementById("adminProjectBtn").style.display="";
+  }
+  loadFromStorage();
   updateNotifBadge();
   checkDelays();
   showPage("dashboard");
@@ -2178,6 +2100,7 @@ function saveNewMember(){
   saveToStorage(); renderCurrentPage(); showToast(`✅ تم إضافة ${name} — كلمة المرور المؤقتة: ${otp}`);
   updateNotifBadge();
 }
+// Override checkPassword to handle custom OTP
 
 function removeMember(id){
   const m=TEAM.find(x=>x.id===id); if(!m) return;
@@ -2393,156 +2316,6 @@ document.addEventListener("click",e=>{
   if(panel.classList.contains("open")&&!panel.contains(e.target)&&!btn.contains(e.target))
     panel.classList.remove("open");
 });
-
-
-function openQRSyncModal(){
-  if(!currentUser?.isAdmin){showToast("⛔ للمدير فقط");return;}
-  // Render user buttons
-  const btns=document.getElementById("qrUserBtns");
-  btns.innerHTML=TEAM.map(m=>`
-    <button onclick="selectQRUser('${m.id}')" id="qrBtn_${m.id}"
-      style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--gray-border);border-radius:20px;background:var(--white);cursor:pointer;font-size:12px;font-family:inherit;transition:all 0.2s;">
-      <span style="width:24px;height:24px;border-radius:50%;background:${m.color};display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:10px;">${m.name[0]}</span>
-      ${m.name}
-    </button>
-  `).join("");
-  document.getElementById("qrCodeArea").style.display="none";
-  document.getElementById("qrEmptyMsg").style.display="";
-  _qrSelectedUser=null;
-  openModal("qrSyncModal");
-}
-
-function selectQRUser(uid){
-  const u=TEAM.find(x=>x.id===uid); if(!u) return;
-  _qrSelectedUser=u;
-  // Highlight selected
-  document.querySelectorAll("[id^='qrBtn_']").forEach(b=>{
-    b.style.borderColor="var(--gray-border)";b.style.background="var(--white)";
-  });
-  const btn=document.getElementById("qrBtn_"+uid);
-  if(btn){btn.style.borderColor="var(--gold-light)";btn.style.background="var(--gold-bg)";}
-
-  // Get stored password hash for this user
-  const passwords=loadPasswords();
-  const stored=passwords[uid];
-  
-  if(!stored){
-    // First login — no custom password set yet, use OTP
-    showQRForData(u, "OTP:"+DEFAULT_OTP);
-  } else {
-    showQRForData(u, stored);
-  }
-}
-
-function showQRForData(u, passData){
-  document.getElementById("qrEmptyMsg").style.display="none";
-  document.getElementById("qrCodeArea").style.display="";
-  document.getElementById("qrUserLabel").textContent="🔐 " + u.name + " — " + u.role;
-
-  // Build payload: userId + passHash (hash only, never plain text)
-  const payload = JSON.stringify({uid: u.id, ph: passData, n: u.name});
-  // Encode as base64 for URL safety
-  const encoded = btoa(unescape(encodeURIComponent(payload)));
-  // Build a URL that triggers QR import when opened
-  const currentURL = window.location.href.split('?')[0].split('#')[0];
-  const qrURL = currentURL + "?darc_sync=" + encoded;
-
-  // Generate QR
-  const canvas=document.getElementById("qrCanvas");
-  // Clear previous
-  const ctx=canvas.getContext("2d");
-  canvas.width=220; canvas.height=220;
-  ctx.fillStyle="#fff"; ctx.fillRect(0,0,220,220);
-  ctx.fillStyle="#888"; ctx.font="13px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("جاري التوليد...",110,110);
-
-  loadQRLib(()=>{
-    try{
-      if(window.QRCode){
-        // Clear canvas div approach
-        const div=document.createElement('div');
-        new QRCode(div,{text:qrURL,width:220,height:220,colorDark:"#1A1A1A",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
-        setTimeout(()=>{
-          const img=div.querySelector('img')||div.querySelector('canvas');
-          if(img){
-            canvas.width=220;canvas.height=220;
-            const ctx2=canvas.getContext('2d');
-            ctx2.drawImage(img,0,0,220,220);
-          }
-        },200);
-      }
-    }catch(e){
-      // Fallback text
-      const ctx3=canvas.getContext("2d");
-      ctx3.fillStyle="#fff";ctx3.fillRect(0,0,220,220);
-      ctx3.fillStyle="#333";ctx3.font="11px monospace";ctx3.textAlign="center";
-      ctx3.fillText("يتطلب اتصال بالإنترنت",110,110);
-    }
-  });
-}
-
-function downloadQR(){
-  const canvas=document.getElementById("qrCanvas");
-  const link=document.createElement("a");
-  link.download=`darc-qr-${_qrSelectedUser?.name||'user'}.png`;
-  link.href=canvas.toDataURL("image/png");
-  link.click();
-}
-
-// ── Check on page load if URL has QR sync param ──
-function checkQRSyncParam(){
-  const params=new URLSearchParams(window.location.search);
-  const syncData=params.get("darc_sync");
-  if(!syncData) return false;
-  
-  try{
-    const decoded=decodeURIComponent(escape(atob(syncData)));
-    const obj=JSON.parse(decoded);
-    const{uid,ph,n}=obj;
-    if(!uid||!ph) return false;
-
-    // Apply the password hash directly to localStorage
-    const passwords=loadPasswords();
-    passwords[uid]=ph;
-    savePasswords(passwords);
-
-    // Show success screen
-    document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
-    const screen=document.getElementById("screenQRImport");
-    screen.classList.remove("hidden");
-    document.getElementById("qrImportContent").innerHTML=`
-      <div style="padding:20px 0;">
-        <div style="font-size:48px;margin-bottom:12px;">✅</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">تم تطبيق كلمة المرور</div>
-        <div style="font-size:13px;color:var(--gray);margin-bottom:24px;">مرحباً <strong>${n}</strong>! كلمة مرورك جاهزة على هذا الجهاز</div>
-        <button class="btn btn-primary btn-full" onclick="finishQRImport()">🚀 ابدأ الدخول</button>
-      </div>
-    `;
-
-    // Clean URL
-    window.history.replaceState({},"",window.location.pathname);
-    return true;
-  }catch(e){
-    console.warn("QR sync error:",e);
-    return false;
-  }
-}
-
-function finishQRImport(){
-  document.getElementById("screenQRImport").classList.add("hidden");
-  document.getElementById("screenSelect").classList.remove("hidden");
-}
-
-// ══════════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════════
-initSampleData();      // sets default projects if localStorage is empty
-loadFromStorage();     // loads saved data on top
-syncUsersFromTeam();
-const _hadQR = checkQRSyncParam(); // check for QR sync in URL
-if(!_hadQR) initLogin();
-renderD
-
 </script>
 </body>
 </html>
